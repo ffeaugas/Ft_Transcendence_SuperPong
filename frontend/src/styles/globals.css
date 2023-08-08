@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Vibur");
+
+:root {
+  /* [COLORS] */
+  --backgroundColor1: #03121d;
+  --backgroundColor2: hsl(252, 64%, 8%);
+  --backgroundColor3: hsl(281, 69%, 53%);
+  --titleColor1: #e93cac;
+  --titleColor2: #00bce1;
+  --titleColor3: #59cbe8;
+  --textColor1: hsl(0, 14%, 73%);
+  --textColor2: hsl(0, 8%, 59%);
+
+  /* [FONT SIZES] */
+  --titleSize1: clamp(0.3em, 0.3em + 5vw, 2.5em);
+  --titleSize2: clamp(0.3em, 0.3em + 2vw, 1.3em);
+  --titleSize3: clamp(0.3em, 0.3em + 1vw, 1em);
+  --textSize1: clamp(0.3em, 0.3em + 1vw, 1em);
+
+  /* [ICON SIZES] */
+  --iconSize1: clamp(0.5em, 0.5em + 2vw, 1.8em);
+
+  /* [BORDER RADIUS] */
+  --borderRadius1: 14px;
+
+  /* [PADDING] */
+  --padding1: clamp(0.3em, 0.3em + 1vw, 1em);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--backgroundColor1);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-light.png"); */
+  background-image: url("https://www.transparenttextures.com/patterns/otis-redding.png");
+  /* background-image: url("https://rare-gallery.com/resol/1920x1080/340193-Digital-Art-Synthwave-Retrowave-Vaporwave-Mountain-Night.jpg"); */
+}
+
+h1 {
+  color: var(--titleColor1);
+  font-size: var(--titleSize1);
+  font-family: "Teko", sans-serif;
+  font-weight: 600;
+}
+
+h1 b {
+  font-weight: 1000;
+  /* color: var(--titleColor2); */
+  font-family: "Vibur", sans-serif;
+  color: #fff;
+  animation: pulsate 0.24s ease-in-out infinite alternate;
+}
+
+@keyframes pulsate {
+  100% {
+    text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff,
+      0 0 40px var(--titleColor2), 0 0 80px var(--titleColor2),
+      0 0 90px var(--titleColor2), 0 0 100px var(--titleColor2),
+      0 0 150px var(--titleColor2);
+  }
+
+  0% {
+    text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 18px #fff,
+      0 0 38px var(--titleColor2), 0 0 73px var(--titleColor2),
+      0 0 80px var(--titleColor2), 0 0 94px var(--titleColor2),
+      0 0 140px var(--titleColor2);
+  }
+}
+
+h2 {
+  font-size: var(--titleSize3);
+}
+
+p {
+  font-size: var(--textSize1);
+}

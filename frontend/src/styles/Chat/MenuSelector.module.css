@@ -1,0 +1,25 @@
+.menuSelector {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--backgroundColor2);
+  justify-content: center;
+  padding: 0 3px;
+  padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em);
+  border-radius: var(--borderRadius1);
+}
+
+.menuSelector button {
+  color: var(--titleColor1);
+  border: none;
+  background: none;
+  font-size: var(--iconSize1);
+}
+
+.menuSelector button:hover {
+  color: var(--titleColor2);
+}
+
+.isActive {
+  font-weight: bold;
+  color: var(--titleColor2) !important;
+}

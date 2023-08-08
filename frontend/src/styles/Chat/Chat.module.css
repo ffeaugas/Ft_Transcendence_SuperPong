@@ -1,0 +1,8 @@
+.chat {
+  color: var(--textColor1);
+  border: 2px solid var(--backgroundColor3);
+  border-radius: var(--borderRadius1);
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+}

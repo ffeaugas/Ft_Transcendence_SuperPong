@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// generator dbml {
+//     provider = "prisma-dbml-generator"
+// }
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+    USER
+    ADMIN
+}
+
+enum Status {
+    ONLINE
+    OFFLINE
+    BUSY
+    AFK
+}
+
+enum ChannelMode {
+    PRIVATE
+    PUBLIC
+    PROTECTED_PASSWD
+}
+
+model User {
+    id            Int       @id @default(autoincrement())
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt()
+    role          Role      @default(USER)
+    username      String    @unique
+    hash          String    @unique
+    status        Status    @default(ONLINE)
+    user42        Boolean   @default(true)
+    profile       Profile?
+    channelsOwned Channel[] @relation(name: "OwnedChannel")
+    channels      Channel[]
+    messages      Message[] @relation(name: "SenderMessage")
+    gameAsPlayer1 Game[]    @relation(name: "Player1")
+    gameAsPlayer2 Game[]    @relation(name: "Player2")
+
+    @@map("users")
+}
+
+model Profile {
+    id             Int      @id @default(autoincrement())
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt()
+    bio            String   @default("")
+    winCount       Int      @default(0)
+    loseCount      Int      @default(0)
+    profilePicture String   @default("https://i.imgur.com/6LwIx5Q.png")
+    eloMatchMaking Int      @default(1200)
+    userId         Int      @unique
+    user           User     @relation(fields: [userId], references: [id])
+
+    @@map("profiles")
+}
+
+model Message {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt()
+    content   String?
+    senderId  Int
+    sender    User     @relation(name: "SenderMessage", fields: [senderId], references: [id])
+    channelId Int
+    Channel   Channel  @relation(fields: [channelId], references: [id])
+
+    @@map("messages")
+}
+
+model Channel {
+    id          Int         @id @default(autoincrement())
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt()
+    channelName String
+    ownerId     Int
+    owner       User        @relation(name: "OwnedChannel", fields: [ownerId], references: [id])
+    users       User[]
+    password    String?
+    messages    Message[]
+    mode        ChannelMode @default(PUBLIC)
+
+    @@map("channels")
+}
+
+model Game {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt()
+    winner    String?
+    looser    String?
+    player1   User     @relation(name: "Player1", fields: [player1Id], references: [id])
+    player1Id Int
+    player2   User     @relation(name: "Player2", fields: [player2Id], references: [id])
+    player2Id Int
+
+    @@map("games")
+}

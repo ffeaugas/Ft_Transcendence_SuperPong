@@ -1,0 +1,21 @@
+.userItem {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  min-height: 25px;
+}
+
+.userItem .imgDiv {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.userItem img {
+  width: auto;
+  height: 100%;
+  margin-left: -10px;
+}

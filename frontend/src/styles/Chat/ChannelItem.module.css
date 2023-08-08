@@ -1,0 +1,6 @@
+.channelItem {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  min-height: 25px;
+}

@@ -1,0 +1,22 @@
+.msg {
+  background-color: var(--backgroundColor2);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: clamp(0.3em, 0.3em + 1vw, 1em);
+  border-radius: var(--borderRadius1);
+}
+
+.divInfos {
+  display: flex;
+  flex-direction: row;
+  gap: 5%;
+}
+
+.msg .author {
+  color: var(--titleColor2);
+}
+
+.msg .date {
+  color: var(--textColor2);
+}

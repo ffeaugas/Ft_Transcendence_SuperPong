@@ -1,0 +1,94 @@
+.header {
+    background-color: var(--backgroundColor2);
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    margin-top: -3%;
+}
+
+.header .subdiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 93%;
+    margin: 0.5em auto;
+}
+
+.header ul {
+    display: flex;
+    flex-direction: row;
+    gap: var(--titleSize2);
+    text-decoration: none;
+}
+
+.header li {
+    list-style: none;
+}
+
+.header span {
+    color: #007e97;
+    font-size: 13px;
+}
+
+.header a {
+    font-size: var(--titleSize2);
+    text-decoration: none;
+    color: var(--titleColor2);
+    transition: 0.2s;
+    font-family: "Teko", sans-serif;
+}
+
+.header a:hover {
+    color: var(--titleColor3);
+}
+
+.isActive {
+    font-weight: bold;
+    color: var(--titleColor3) !important;
+}
+
+.userContainer {
+    font-weight: bold;
+    color: var(--titleColor2) !important;
+    display: flex;
+    align-items: center;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.authenticatedUser {
+    display: flex;
+    align-items: center;
+}
+
+img.rounded {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    margin-right: 8px;
+}
+
+.button {
+    background-color: var(--backgroundColor2);
+    border: none;
+    color: var(--textColor1);
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 400;
+    font-family: "Teko", sans-serif;
+    font-size: 12px;
+    display: flex;
+}
+
+.button:hover {
+    background-color: var(--titleColor1);
+    color: var(--textColor1);
+}
