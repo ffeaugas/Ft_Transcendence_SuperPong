@@ -55,6 +55,7 @@ export class UsersService {
     const username = req['user'].username;
     const user = await this.prismaService.user.findUnique({
       where: { username: username },
+      include: { channels: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;
