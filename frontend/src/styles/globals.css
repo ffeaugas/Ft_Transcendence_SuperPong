@@ -16,6 +16,7 @@
   --titleSize1: clamp(0.3em, 0.3em + 5vw, 2.5em);
   --titleSize2: clamp(0.3em, 0.3em + 2vw, 1.3em);
   --titleSize3: clamp(0.3em, 0.3em + 1vw, 1em);
+  --titleSize4: clamp(0.5em, 0.5em + 2vw, 2em);
   --textSize1: clamp(0.3em, 0.3em + 1vw, 1em);
 
   /* [ICON SIZES] */
@@ -32,6 +33,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  /* border: solid red 1px; */
 }
 
 body {
@@ -56,6 +58,24 @@ h1 b {
   animation: pulsate 0.24s ease-in-out infinite alternate;
 }
 
+h2 {
+  font-size: var(--titleSize4);
+  color: var(--titleColor1);
+}
+
+h3 {
+  color: var(--titleColor1);
+  font-size: var(--titleSize1);
+  font-family: "Teko", sans-serif;
+  margin: 0 auto;
+}
+
+p {
+  font-size: var(--textSize1);
+}
+
+/* [ANIMATIONS] */
+
 @keyframes pulsate {
   100% {
     text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff,
@@ -70,12 +90,4 @@ h1 b {
       0 0 80px var(--titleColor2), 0 0 94px var(--titleColor2),
       0 0 140px var(--titleColor2);
   }
-}
-
-h2 {
-  font-size: var(--titleSize3);
-}
-
-p {
-  font-size: var(--textSize1);
 }

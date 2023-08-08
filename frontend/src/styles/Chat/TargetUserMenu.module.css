@@ -1,33 +1,33 @@
 .targetUserMenu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(0.3em, 0.3em + 1vw, 1em);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.3em, 0.3em + 1vw, 1em);
 }
 
 .targetUserMenu .imgDiv {
-    display: inline-block;
-    position: relative;
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .targetUserMenu img {
-    width: auto;
-    height: 100%;
-    margin-left: -50px;
-    animation: 0.5s slidein alternate infinite;
-    /* animation-iteration-count: 5; */
+  width: auto;
+  height: 100%;
+  margin-left: -50px;
+  animation: 0.5s slidein alternate infinite;
+  /* animation-iteration-count: 5; */
 }
 
 @keyframes slidein {
-    from {
-        transform: scaleX(0);
-    }
-    to {
-        transform: scaleX(1);
-    }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }

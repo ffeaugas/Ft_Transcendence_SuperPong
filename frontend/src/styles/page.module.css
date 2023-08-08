@@ -16,3 +16,33 @@
 .alternativePage p {
   font-size: var(--titleSize2);
 }
+
+img.rounded {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.userInfos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 30%;
+  background-color: antiquewhite;
+  padding: var(--padding1);
+}
+
+.profile {
+  display: flex;
+  flex-direction: row;
+}
+
+.stats {
+  background-color: aqua;
+  width: 70%;
+}
