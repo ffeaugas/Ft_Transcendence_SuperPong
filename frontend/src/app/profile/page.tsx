@@ -5,11 +5,25 @@ import styles from "../../styles/page.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function Profile() {
-  const [username, setUsername] = useState("wfwefe");
-  const [userPicture, setUserPicture] = useState("");
+type ProfileDatas = {
+  id: number;
+  createdAt?: string;
+  updatedAt?: string;
+  bio: string;
+  winCount?: number;
+  loseCount?: number;
+  profilePicture?: string;
+  eloMatchMaking?: number;
+  userId: number;
+};
 
-  async function getUsername() {
+export default function Profile() {
+  const [username, setUsername] = useState<string>("");
+  const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
+    undefined
+  );
+
+  async function getUsername(): Promise<string> {
     const res = await fetch("http://10.5.0.3:3001/users/me", {
       method: "GET",
       headers: {
@@ -20,31 +34,42 @@ export default function Profile() {
     return user["username"];
   }
 
-  async function getUserPicture(user: string) {
+  async function getProfileDatas(
+    username: string
+  ): Promise<ProfileDatas | undefined> {
     try {
       const res = await axios.get("http://10.5.0.3:3001/users", {
-        params: { username: user },
+        params: { username: username },
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data.url_picture);
-      const userPictureUrl = res.data.url_picture;
-      return userPictureUrl;
+      console.log(res.data);
+      const profileDatas = res.data;
+      return profileDatas;
     } catch (error) {
-      console.error("Error fetching user picture:", error);
-      return null;
+      console.error("Error fetching profile datas", error);
+      return undefined;
     }
   }
 
   useEffect(() => {
-    getUsername().then((user) => {
-      setUsername(user);
-      getUserPicture(user).then((userPictureUrl) => {
-        setUserPicture(userPictureUrl);
+    getUsername().then((username) => {
+      setUsername(username);
+      getProfileDatas(username).then((datas) => {
+        setProfileDatas(datas);
       });
     });
   }, []);
+
+  if (profileDatas === undefined) {
+    return (
+      <section className={`${styles.page}`}>
+        <Header />
+        <p>...</p>;
+      </section>
+    );
+  }
 
   return (
     <section className={`${styles.page}`}>
@@ -53,10 +78,16 @@ export default function Profile() {
       <div className={`${styles.profile}`}>
         <div className={`${styles.userInfos}`}>
           <h2>{username}</h2>
-          <img className={`${styles.rounded}`} src={`${userPicture}`} />
+          <img
+            className={`${styles.rounded}`}
+            src={`${profileDatas["profilePicture"]}`}
+          />
         </div>
         <div className={`${styles.stats}`}>
-          <p>defwregregreghrehrehrgrehrehrehe</p>
+          <div className={`${styles.winslooses}`}>
+            <h4>W : {profileDatas["winCount"]}</h4>
+            <h4>L : {profileDatas["loseCount"]}</h4>
+          </div>
         </div>
       </div>
     </section>
