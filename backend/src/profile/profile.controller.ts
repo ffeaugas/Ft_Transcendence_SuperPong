@@ -10,8 +10,11 @@ import {
 import { ProfileService } from './profile.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ProfileDto } from './dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('profiles')
+@ApiBearerAuth()
+@ApiTags('profiles')
 @UseGuards(AuthGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
@@ -31,6 +34,10 @@ export class ProfileController {
   }
 
   @Patch()
+  @ApiCreatedResponse({
+    description: 'Update profile bio.',
+    type: ProfileDto,
+  })
   async updateBioProfile(
     @Query('username') user: string,
     @Body() dto: ProfileDto,

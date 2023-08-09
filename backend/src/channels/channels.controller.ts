@@ -12,8 +12,17 @@ import { ChannelsService } from './channels.service';
 import { ChannelDto } from './dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
+import {
+  ApiBearerAuth,
+  ApiProperty,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('channels')
+@ApiBearerAuth()
+@ApiTags('channels')
 @UseGuards(AuthGuard)
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
@@ -34,6 +43,14 @@ export class ChannelsController {
   }
 
   @Patch('add')
+  @ApiQuery({
+    name: 'channelName',
+    description: 'Channel name for adding user.',
+  })
+  @ApiQuery({
+    name: 'userName',
+    description: 'The username to add in the channel.',
+  })
   async addUserByUsername(
     @Query('channelName') channelName: string,
     @Query('userName') userName: string,
@@ -42,6 +59,14 @@ export class ChannelsController {
   }
 
   @Patch('change-mode')
+  @ApiResponse({
+    status: 201,
+    description: 'The channel mode has been successfully changed.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: "User isn't owner channel Forbidden.",
+  })
   async changeChannelMode(
     @Req() req: Request,
     @Query('channelName') channelName: string,

@@ -38,7 +38,6 @@ export class ChannelsService {
         ownerId: channelOwner.id,
       },
     });
-    console.log(channelOwner);
     if (!verifyOwner)
       throw new ForbiddenException("This user is not channel's owner");
     if (mode === 'private') {
