@@ -1,0 +1,5 @@
+.achievements {
+  border: 2px solid var(--backgroundColor3);
+  height: 50px;
+  padding: var(--padding2);
+}
