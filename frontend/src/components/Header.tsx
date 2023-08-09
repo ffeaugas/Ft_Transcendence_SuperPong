@@ -8,14 +8,28 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+type ProfileDatas = {
+  id: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  bio: string;
+  winCount?: number;
+  loseCount?: number;
+  profilePicture?: string;
+  eloMatchMaking?: number;
+  userId: number;
+};
+
 export default function Header() {
   const router = useRouter();
 
   const [auth, setAuth] = useState(false);
   const [username, setUsername] = useState("");
-  const [userProfilePicture, setUserProfilePicture] = useState("");
+  const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
+    undefined
+  );
 
-  async function getUsername() {
+  async function getUsername(): Promise<string> {
     const res = await fetch("http://10.5.0.3:3001/users/me", {
       method: "GET",
       headers: {
@@ -26,20 +40,22 @@ export default function Header() {
     return user["username"];
   }
 
-  async function getUserPicture(user: string) {
+  async function getProfileDatas(
+    username: string
+  ): Promise<ProfileDatas | undefined> {
     try {
       const res = await axios.get("http://10.5.0.3:3001/users", {
-        params: { username: user },
+        params: { username: username },
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data.url_picture);
-      const userPictureUrl = res.data.url_picture;
-      return userPictureUrl;
+      console.log(res.data);
+      const profileDatas = res.data;
+      return profileDatas;
     } catch (error) {
-      console.error("Error fetching user picture:", error);
-      return null;
+      console.error("Error fetching profile datas", error);
+      return undefined;
     }
   }
 
@@ -60,8 +76,8 @@ export default function Header() {
     if (auth) {
       getUsername().then((user) => {
         setUsername(user);
-        getUserPicture(user).then((userProfilePicture) => {
-          setUserProfilePicture(userProfilePicture);
+        getProfileDatas(user).then((profileDatas) => {
+          setProfileDatas(profileDatas);
         });
       });
     }
@@ -106,10 +122,14 @@ export default function Header() {
           ) : (
             <li className={styles.authenticatedUser}>
               <div className={styles.userContainer}>
-                <img
-                  className={`${styles.rounded}`}
-                  src={`${userProfilePicture}`}
-                />
+                {!profileDatas ? (
+                  <p>...</p>
+                ) : (
+                  <img
+                    className={`${styles.rounded}`}
+                    src={profileDatas["profilePicture"]}
+                  />
+                )}
                 <div className={styles.userInfo}>
                   <span>{`Bonjour ${username}`}</span>
                   <div className={styles.loggedOptions}>
