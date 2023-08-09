@@ -8,21 +8,16 @@ import { Request } from 'express';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Delete()
-  async deleteUser(
-    @Query('username') username?: string,
-    @Query('id') id?: string,
-  ) {
-    if (username) return await this.usersService.deleteByUsername(username);
-    else if (id) return await this.usersService.deleteById(+id);
-    else return await this.usersService.deleteAllUsers();
-  }
-
-  @Get()
-  async getPictureByUsername(
+  @Get('profile')
+  async getProfileByUsername(
     @Query('username') username: string,
   ): Promise<any> {
-    return this.usersService.getPictureByUsername(username);
+    return this.usersService.getProfileByUsername(username);
+  }
+
+  @Get('channels')
+  async getPrivateChannels(@Query('username') username: string) {
+    return this.usersService.getPrivateChannels(username);
   }
 
   @Get('me')
@@ -38,5 +33,15 @@ export class UsersController {
     if (username) return await this.usersService.getByUsername(username);
     else if (id) return await this.usersService.getById(+id);
     else return await this.usersService.getAllUsers();
+  }
+
+  @Delete()
+  async deleteUser(
+    @Query('username') username?: string,
+    @Query('id') id?: string,
+  ) {
+    if (username) return await this.usersService.deleteByUsername(username);
+    else if (id) return await this.usersService.deleteById(+id);
+    else return await this.usersService.deleteAllUsers();
   }
 }

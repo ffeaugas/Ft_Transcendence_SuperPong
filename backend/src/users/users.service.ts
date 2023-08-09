@@ -5,6 +5,7 @@ import { ProfileService } from 'src/profile/profile.service';
 import { AuthDto } from 'src/auth/dto';
 import { Request } from 'express';
 import * as argon from 'argon2';
+import { ChannelMode } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +44,19 @@ export class UsersService {
     return userProfile;
   }
 
+  async getPrivateChannels(username: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { username: username },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const privateChannels = await this.prismaService.channel.findMany({
+      where: { mode: ChannelMode.PRIVATE || ChannelMode.PROTECTED_PASSWD },
+    });
+    if (!privateChannels)
+      throw new ForbiddenException('No private channels found.');
+    return privateChannels;
+  }
+
   async getByUsername(username: string): Promise<Users> {
     const user = await this.prismaService.user.findUnique({
       where: { username: username },
@@ -72,7 +86,12 @@ export class UsersService {
   }
 
   async getAllUsers(): Promise<Users[]> {
-    const users = await this.prismaService.user.findMany();
+    const users = await this.prismaService.user.findMany({
+      include: {
+        channels: true,
+        channelsOwned: true,
+      },
+    });
     if (users.length <= 0) throw new ForbiddenException('No users found');
     users.forEach((user) => {
       delete user.hash;
