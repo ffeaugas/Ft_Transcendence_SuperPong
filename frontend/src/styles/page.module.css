@@ -45,4 +45,16 @@ img.rounded {
 .stats {
   background-color: aqua;
   width: 70%;
+  padding: var(--padding1);
+}
+
+.winslooses {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10%;
+}
+
+.winslooses h4 {
+  font-size: var(--titleSize2);
 }

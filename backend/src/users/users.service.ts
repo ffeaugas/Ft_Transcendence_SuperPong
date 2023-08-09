@@ -32,7 +32,7 @@ export class UsersService {
     return newUser;
   }
 
-  async getPictureByUsername(username: string): Promise<any> {
+  async getProfileByUsername(username: string): Promise<any> {
     const user = await this.prismaService.user.findUnique({
       where: { username: username },
     });
@@ -40,7 +40,7 @@ export class UsersService {
     const userProfile = await this.prismaService.profile.findUnique({
       where: { userId: user.id },
     });
-    return { url_picture: userProfile.profilePicture };
+    return userProfile;
   }
 
   async getByUsername(username: string): Promise<Users> {
