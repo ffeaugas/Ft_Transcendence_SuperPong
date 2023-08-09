@@ -1,0 +1,26 @@
+.friendList {
+  border: 2px solid var(--backgroundColor3);
+  /* height: 50px; */
+  padding: var(--padding2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+}
+
+.friendList ul {
+  display: flex;
+  flex-direction: row;
+  gap: var(--padding1);
+  overflow-x: scroll;
+  padding-bottom: 15px;
+}
+
+.friendList h3 {
+  font-size: var(--titleSize2);
+}
+
+.friendList p {
+  font-size: var(--textSize2);
+  color: var(--textColor1);
+  font-weight: 600;
+}

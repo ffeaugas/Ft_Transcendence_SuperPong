@@ -1,0 +1,31 @@
+.friendItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+}
+
+.friendItem img {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(40px, 40px + 3vw, 80px);
+  height: clamp(40px, 40px + 3vw, 80px);
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.online {
+  border: solid 2px rgb(47, 202, 112);
+}
+
+.offline {
+  border: solid 2px rgb(223, 54, 82);
+}
+
+.waiting {
+  border: solid 2px rgb(236, 221, 83);
+}
+
+.friendItem p {
+  margin: 0 auto;
+}

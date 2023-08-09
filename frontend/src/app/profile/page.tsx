@@ -4,6 +4,9 @@ import Header from "@/components/Header";
 import styles from "../../styles/page.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import FriendList from "@/components/FriendList/FriendList";
+import GamesHistoric from "@/components/GamesHistoric/GamesHistoric";
+import Achievements from "@/components/Achievements/Achievements";
 
 type ProfileDatas = {
   id: number;
@@ -72,22 +75,26 @@ export default function Profile() {
   }
 
   return (
-    <section className={`${styles.page}`}>
+    <section className={styles.page}>
       <Header />
       <h3>PROFILE </h3>
-      <div className={`${styles.profile}`}>
-        <div className={`${styles.userInfos}`}>
+      <div className={styles.profile}>
+        <div className={styles.userInfos}>
           <h2>{username}</h2>
           <img
-            className={`${styles.rounded}`}
-            src={`${profileDatas["profilePicture"]}`}
+            className={styles.rounded}
+            src={profileDatas["profilePicture"]}
           />
         </div>
-        <div className={`${styles.stats}`}>
-          <div className={`${styles.winslooses}`}>
-            <h4>W : {profileDatas["winCount"]}</h4>
-            <h4>L : {profileDatas["loseCount"]}</h4>
+        <div className={styles.stats}>
+          <div className={styles.winslooses}>
+            <h4 className={styles.wins}>W : {profileDatas["winCount"]}</h4>
+            <h4 className={styles.looses}>L : {profileDatas["loseCount"]}</h4>
+            <h4> Elo : {profileDatas["eloMatchMaking"]}</h4>
           </div>
+          <FriendList username={username} />
+          <GamesHistoric username={username} />
+          <Achievements username={username} />
         </div>
       </div>
     </section>

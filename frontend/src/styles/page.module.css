@@ -17,6 +17,8 @@
   font-size: var(--titleSize2);
 }
 
+/* PROFILE PAGE */
+
 img.rounded {
   object-fit: cover;
   display: inline-block;
@@ -33,7 +35,7 @@ img.rounded {
   align-items: center;
   gap: 10px;
   width: 30%;
-  background-color: antiquewhite;
+  background-color: rgba(250, 235, 215, 0.205);
   padding: var(--padding1);
 }
 
@@ -43,9 +45,22 @@ img.rounded {
 }
 
 .stats {
-  background-color: aqua;
+  background-color: rgba(202, 230, 230, 0.096);
   width: 70%;
   padding: var(--padding1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media screen and (max-width: 600px) {
+  .profile {
+    flex-direction: column;
+  }
+  .userInfos,
+  .stats {
+    width: 100%;
+  }
 }
 
 .winslooses {
@@ -57,4 +72,12 @@ img.rounded {
 
 .winslooses h4 {
   font-size: var(--titleSize2);
+}
+
+.wins {
+  color: rgb(93, 218, 93);
+}
+
+.looses {
+  color: rgb(235, 108, 108);
 }
