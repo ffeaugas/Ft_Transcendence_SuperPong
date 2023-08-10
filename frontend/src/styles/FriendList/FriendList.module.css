@@ -11,6 +11,7 @@
   flex-direction: row;
   gap: var(--padding1);
   overflow-x: scroll;
+  padding: 0 10px;
   padding-bottom: 15px;
 }
 

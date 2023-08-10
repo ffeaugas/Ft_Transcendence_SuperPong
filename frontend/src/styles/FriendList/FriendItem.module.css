@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--padding2);
+  padding-top: 10px;
 }
 
 .friendItem img {
@@ -12,18 +13,32 @@
   height: clamp(40px, 40px + 3vw, 80px);
   overflow: hidden;
   border-radius: 50%;
+  animation: pulsate 0.24s ease-in-out infinite alternate;
+
+  /* border: 0.2rem solid #fff; */
+  padding: 0.4em;
+  overflow: visible;
 }
 
 .online {
   border: solid 2px rgb(47, 202, 112);
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 0.1rem rgb(47, 202, 112),
+    0 0 0.8rem rgb(47, 202, 112), 0 0 0.8rem rgb(47, 202, 112),
+    inset 0 0 1rem rgb(47, 202, 112);
 }
 
 .offline {
   border: solid 2px rgb(223, 54, 82);
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 0.1rem rgb(223, 54, 82),
+    0 0 0.8rem rgb(223, 54, 82), 0 0 0.8rem rgb(223, 54, 82),
+    inset 0 0 1rem rgb(223, 54, 82);
 }
 
 .waiting {
   border: solid 2px rgb(236, 221, 83);
+  box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 0.1rem rgb(236, 221, 83),
+    0 0 0.8rem rgb(236, 221, 83), 0 0 0.8rem rgb(236, 221, 83),
+    inset 0 0 1rem rgb(236, 221, 83);
 }
 
 .friendItem p {
