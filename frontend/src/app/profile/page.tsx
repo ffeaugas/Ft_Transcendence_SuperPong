@@ -65,6 +65,13 @@ export default function Profile() {
     });
   }, []);
 
+  function isYourProfile(): boolean {
+    if (username === "ffeaugas") {
+      return true;
+    }
+    return false;
+  }
+
   if (profileDatas === undefined) {
     return (
       <section className={`${styles.page}`}>
@@ -80,15 +87,25 @@ export default function Profile() {
       <h3>PROFILE </h3>
       <div className={styles.profile}>
         <div className={styles.userInfos}>
-          <h2>{username}</h2>
-          <img
-            className={styles.rounded}
-            src={profileDatas["profilePicture"]}
-          />
+          <div className={styles.editProfile}>
+            <h2>{username}</h2>
+            {isYourProfile() ? <button>&#9998;</button> : undefined}
+          </div>
+          <div className={styles.editProfile}>
+            <img
+              className={styles.rounded}
+              src={profileDatas["profilePicture"]}
+            />
+            {isYourProfile() ? <button>&#9998;</button> : undefined}
+          </div>
           <div className={styles.winslooses}>
             <h4 className={styles.wins}>W : {profileDatas["winCount"]}</h4>
             <h4 className={styles.looses}>L : {profileDatas["loseCount"]}</h4>
             <h4> Elo : {profileDatas["eloMatchMaking"]}</h4>
+          </div>
+          <div className={styles.editProfile}>
+            <p>"{profileDatas["bio"]}Jojo a pas mis de bio ce looseur"</p>
+            {isYourProfile() ? <button>&#9998;</button> : undefined}
           </div>
         </div>
         <div className={styles.stats}>

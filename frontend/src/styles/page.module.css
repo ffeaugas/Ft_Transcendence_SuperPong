@@ -39,13 +39,36 @@ img.rounded {
   padding: var(--padding1);
 }
 
+.editProfile {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.editProfile button {
+  border-style: none;
+  background: none;
+  color: rgb(214, 133, 197);
+  padding: 0;
+  font-size: var(--titleSize2);
+}
+
+.editProfile button:hover {
+  color: rgb(191, 197, 195);
+}
+
+.editProfile p {
+  text-align: center;
+}
+
 .profile {
   display: flex;
   flex-direction: row;
 }
 
 .stats {
-  background-color: rgba(202, 230, 230, 0.096);
+  /* background-color: rgba(202, 230, 230, 0.096); */
   width: 70%;
   padding: var(--padding1);
   display: flex;

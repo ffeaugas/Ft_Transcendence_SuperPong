@@ -26,4 +26,5 @@
   font-size: var(--textSize2);
   margin: 0 auto;
   color: grey;
+  text-align: center;
 }
