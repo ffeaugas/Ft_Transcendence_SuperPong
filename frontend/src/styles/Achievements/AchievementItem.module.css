@@ -1,0 +1,29 @@
+.achievement {
+  display: flex;
+  flex-direction: column;
+}
+
+.achievement img {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(60px, 60px + 3vw, 100px);
+  height: clamp(60px, 60px + 3vw, 100px);
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: rgb(228, 150, 6);
+  border: solid 4px black;
+  margin: 0 auto;
+}
+
+.achievement h3 {
+  font-size: var(--titleSize2);
+  margin: 0 auto;
+  color: rgb(228, 150, 6);
+}
+
+.achievement p {
+  font-size: var(--textSize2);
+  margin: 0 auto;
+  color: grey;
+}

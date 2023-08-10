@@ -85,13 +85,13 @@ export default function Profile() {
             className={styles.rounded}
             src={profileDatas["profilePicture"]}
           />
-        </div>
-        <div className={styles.stats}>
           <div className={styles.winslooses}>
             <h4 className={styles.wins}>W : {profileDatas["winCount"]}</h4>
             <h4 className={styles.looses}>L : {profileDatas["loseCount"]}</h4>
             <h4> Elo : {profileDatas["eloMatchMaking"]}</h4>
           </div>
+        </div>
+        <div className={styles.stats}>
           <FriendList username={username} />
           <GamesHistoric username={username} />
           <Achievements username={username} />
