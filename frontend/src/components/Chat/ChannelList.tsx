@@ -10,13 +10,9 @@ type ChannelItem = {
 
 type ChannelListProps = {
   channels: ChannelItem[];
-  addChannel: () => void;
 };
 
-export default function ChannelList({
-  channels,
-  addChannel,
-}: ChannelListProps) {
+export default function ChannelList({ channels }: ChannelListProps) {
   return (
     <div className={`${styles.channelList}`}>
       <h2>Channels :</h2>

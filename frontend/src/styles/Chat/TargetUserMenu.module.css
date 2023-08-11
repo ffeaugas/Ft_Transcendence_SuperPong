@@ -19,7 +19,7 @@
   width: auto;
   height: 100%;
   margin-left: -50px;
-  animation: 0.5s slidein alternate infinite;
+  /* animation: 0.5s slidein alternate infinite; */
   /* animation-iteration-count: 5; */
 }
 

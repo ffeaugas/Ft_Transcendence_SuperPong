@@ -24,6 +24,18 @@ type UserItem = {
   username: string;
 };
 
+enum ChannelMode {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+  PROTECTED = "PROTECTED",
+}
+
+type ChannelInfos = {
+  channelName: string;
+  password?: string;
+  mode: ChannelMode;
+};
+
 type ChatData = {
   messages: ChatMsgItem[];
   channels: ChannelItem[];
@@ -46,8 +58,8 @@ export default function Chat() {
       });
   }, []);
 
-  function addChannel() {
-    const newChannel = { channelName: "newLOL" };
+  function createChannel(channelInfos: ChannelInfos): void {
+    const newChannel = { channelName: channelInfos.channelName };
     //requete pour la db
     //...
     setChatData((chatData: ChatData | null) => {
@@ -74,7 +86,7 @@ export default function Chat() {
         channels={chatData.channels}
         users={chatData.users}
         selectedMenu={selectedMenu}
-        addChannel={addChannel}
+        createChannel={createChannel}
       />
       <MsgList msgArray={chatData.messages} />
       {targetUser ? <TargetUserMenu targetUser={targetUser} /> : undefined}

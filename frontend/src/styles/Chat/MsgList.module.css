@@ -3,6 +3,10 @@
   /* max-height: 400px; */
 }
 
+.msgList h2 {
+  font-size: var(--titleSize3);
+}
+
 .msgList ul {
   display: flex;
   flex-direction: column;

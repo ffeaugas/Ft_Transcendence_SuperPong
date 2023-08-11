@@ -16,24 +16,36 @@ type UserItem = {
   profilePicture: string;
 };
 
+enum ChannelMode {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+  PROTECTED = "PROTECTED",
+}
+
+type ChannelInfos = {
+  channelName: string;
+  password?: string;
+  mode: ChannelMode;
+};
+
 type MenuProps = {
   channels: ChannelItem[];
   users: UserItem[];
   selectedMenu: number;
-  addChannel: () => void;
+  createChannel: (channelInfos: ChannelInfos) => void;
 };
 
 export default function Menu({
   channels,
   users,
   selectedMenu,
-  addChannel,
+  createChannel,
 }: MenuProps) {
   switch (selectedMenu) {
     case 0:
       return (
         <div className={`${styles.menu}`}>
-          <ChannelList channels={channels} addChannel={addChannel} />
+          <ChannelList channels={channels} />
         </div>
       );
     case 1:
@@ -45,7 +57,7 @@ export default function Menu({
     case 2:
       return (
         <div className={`${styles.menu}`}>
-          <CreateChannel addChannel={addChannel} />
+          <CreateChannel createChannel={createChannel} />
         </div>
       );
   }
