@@ -19,6 +19,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ChannelModifyDto } from './dto/channelModify.dto';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -37,9 +38,21 @@ export class ChannelsController {
     return await this.channelsService.getAllPublic();
   }
 
+  @Get('messages')
+  async getAllMessageFromChannelName(
+    @Query('channelName') channelName: string,
+  ) {
+    return this.channelsService.getAllMessageFromChannelName(channelName);
+  }
+
   @Post()
   async createChannel(@Body() dto: ChannelDto) {
     return await this.channelsService.createChannel(dto);
+  }
+
+  @Patch()
+  async setChannelPassword(@Body() dto: ChannelModifyDto, @Req() req: Request) {
+    return await this.channelsService.setChannelPassword(dto, req);
   }
 
   @Patch('add')

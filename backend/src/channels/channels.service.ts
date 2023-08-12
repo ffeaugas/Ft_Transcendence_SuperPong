@@ -4,6 +4,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { ChannelMode, Prisma } from '@prisma/client';
 import { Request } from 'express';
+import { ChannelModifyDto } from './dto/channelModify.dto';
+import * as argon from 'argon2';
 
 @Injectable()
 export class ChannelsService {
@@ -78,6 +80,27 @@ export class ChannelsService {
     });
   }
 
+  async setChannelPassword(dto: ChannelModifyDto, req: Request) {
+    const channelOwner = await this.prisma.user.findUnique({
+      where: { username: req['user'].username },
+    });
+    const verifyOwner = await this.prisma.channel.findUnique({
+      where: {
+        channelName: dto.channelName,
+        ownerId: channelOwner.id,
+      },
+    });
+    if (!verifyOwner)
+      throw new ForbiddenException("This user is not channel's owner");
+    const hashPasswd = await argon.hash(dto.password);
+    const updatedChannel = await this.prisma.channel.update({
+      where: { channelName: dto.channelName, mode: ChannelMode.PRIVATE },
+      data: { password: hashPasswd },
+    });
+    delete updatedChannel.password;
+    return updatedChannel;
+  }
+
   async getAllUsers(channelName: string) {
     const channel = await this.prisma.channel.findUnique({
       where: { channelName: channelName },
@@ -94,7 +117,19 @@ export class ChannelsService {
   async getAllPublic() {
     const publicChannels = await this.prisma.channel.findMany({
       where: { mode: ChannelMode.PUBLIC },
+      include: { messages: true },
     });
     return publicChannels;
+  }
+
+  async getAllMessageFromChannelName(channelName: string) {
+    const channel = await this.prisma.channel.findUnique({
+      where: { channelName: channelName },
+    });
+    if (!channel) throw new ForbiddenException('Channel not found.');
+    const allMessages = await this.prisma.message.findMany({
+      where: { channelId: channel.id },
+    });
+    return allMessages;
   }
 }
