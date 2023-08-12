@@ -1,6 +1,11 @@
-.channelItem {
+.channelItem,
+.activeChannelItem {
   display: flex;
   flex-direction: row;
   gap: 5px;
   min-height: 24px;
+}
+
+.activeChannelItem {
+  background-color: rgb(136, 136, 89);
 }

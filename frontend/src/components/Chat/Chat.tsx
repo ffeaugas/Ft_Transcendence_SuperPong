@@ -6,12 +6,15 @@ import MsgList from "./MsgList";
 import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
+import axios from "axios";
 
-type ChatMsgItem = {
-  id: string;
-  author: string;
-  date: string;
+type Message = {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
   content: string;
+  senderId: number;
+  channelId: number;
 };
 
 type ChannelItem = {
@@ -24,71 +27,39 @@ type UserItem = {
   username: string;
 };
 
-enum ChannelMode {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  PROTECTED = "PROTECTED",
+enum ActiveChannelOption {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
 }
 
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
-
-type ChatData = {
-  messages: ChatMsgItem[];
-  channels: ChannelItem[];
-  users: UserItem[];
-};
-
 export default function Chat() {
-  const [chatData, setChatData] = useState<ChatData | null>(null);
   const [targetUser, setTargetUser] = useState("joe");
   const [selectedMenu, setSelectedMenu] = useState(0);
-  const [isLoading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch("http://localhost:3000/api/chatdata")
-      .then((res) => res.json())
-      .then((chatData) => {
-        setChatData(chatData);
-        setLoading(false);
-      });
-  }, []);
-
-  function createChannel(channelInfos: ChannelInfos): void {
-    const newChannel = { channelName: channelInfos.channelName };
-    //requete pour la db
-    //...
-    setChatData((chatData: ChatData | null) => {
-      if (!chatData) {
-        return null;
-      }
-      return {
-        ...chatData,
-        channels: [...chatData.channels, newChannel],
-      };
-    });
-  }
+  const [activeChannel, setActiveChannel] = useState<string>("General");
+  const [activeChannelOption, setActiveChannelOption] =
+    useState<ActiveChannelOption>(ActiveChannelOption.CHANNEL);
 
   function changeMenu(menuId: number) {
     setSelectedMenu(menuId);
   }
 
-  if (isLoading || !chatData) return <h1>...</h1>;
+  function switchChannel(channelName: string): void {
+    setActiveChannel(channelName);
+    console.log("SWITCHING CHANNEL TO :", channelName);
+  }
 
   return (
     <div className={`${styles.chat}`}>
       <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
       <Menu
-        channels={chatData.channels}
-        users={chatData.users}
         selectedMenu={selectedMenu}
-        createChannel={createChannel}
+        activeChannel={activeChannel}
+        switchChannel={switchChannel}
       />
-      <MsgList msgArray={chatData.messages} />
+      <MsgList
+        activeChannel={activeChannel}
+        activeChannelOption={activeChannelOption}
+      />
       {targetUser ? <TargetUserMenu targetUser={targetUser} /> : undefined}
     </div>
   );

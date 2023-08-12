@@ -129,6 +129,10 @@ export class ChannelsService {
     if (!channel) throw new ForbiddenException('Channel not found.');
     const allMessages = await this.prisma.message.findMany({
       where: { channelId: channel.id },
+      include: { sender: true },
+    });
+    allMessages.forEach((message) => {
+      delete message.sender.hash;
     });
     return allMessages;
   }

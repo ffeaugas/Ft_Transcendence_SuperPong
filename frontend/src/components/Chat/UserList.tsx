@@ -11,10 +11,9 @@ type UserItem = {
 
 type UserListProps = {
   users: UserItem[];
-  activeUser: string;
 };
 
-export default function UserList({ users, activeUser }: UserListProps) {
+export default function UserList({ users }: UserListProps) {
   return (
     <div className={`${styles.userList}`}>
       <h2>User List</h2>

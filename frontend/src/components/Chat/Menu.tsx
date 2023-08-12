@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import styles from "../../styles/Chat/Menu.module.css";
 import ChannelList from "./ChannelList";
 import CreateChannel from "./CreateChannel";
 import UserList from "./UserList";
+import axios from "axios";
 
 type ChannelItem = {
   id: string;
@@ -16,48 +18,66 @@ type UserItem = {
   profilePicture: string;
 };
 
-enum ChannelMode {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  PROTECTED = "PROTECTED",
-}
-
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
-
 type MenuProps = {
-  channels: ChannelItem[];
-  users: UserItem[];
   selectedMenu: number;
-  createChannel: (channelInfos: ChannelInfos) => void;
+  activeChannel: string;
+  switchChannel: (channelName: string) => void;
 };
 
 export default function Menu({
-  channels,
-  users,
   selectedMenu,
-  createChannel,
+  activeChannel,
+  switchChannel,
 }: MenuProps) {
+  const [channels, setChannels] = useState<ChannelItem[]>();
+
+  async function getChannels(): Promise<ChannelItem[] | undefined> {
+    try {
+      const res = await axios.get("http://10.5.0.3:3001/channels/publics", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      console.log(res.data);
+      const channels = res.data;
+      return channels;
+    } catch (error) {
+      console.error("Error fetching public channel list", error);
+      return undefined;
+    }
+  }
+
+  useEffect(() => {
+    if (selectedMenu === 0) {
+      getChannels().then((channels) => setChannels(channels));
+    }
+  }, [selectedMenu]);
+
+  if (channels === undefined) {
+    return <p>channel loading...</p>;
+  }
+
   switch (selectedMenu) {
     case 0:
       return (
         <div className={`${styles.menu}`}>
-          <ChannelList channels={channels} />
+          <ChannelList
+            channels={channels}
+            activeChannel={activeChannel}
+            switchChannel={switchChannel}
+          />
         </div>
       );
     case 1:
       return (
         <div className={`${styles.menu}`}>
-          <UserList users={users} activeUser={activeUser} />
+          <UserList users={users} />
         </div>
       );
     case 2:
       return (
         <div className={`${styles.menu}`}>
-          <CreateChannel createChannel={createChannel} />
+          <CreateChannel />
         </div>
       );
   }

@@ -21,6 +21,7 @@ export class MessageService {
         content: dto.content,
         channelId: channelToSend.id,
       },
+      include: { sender: true },
     });
     return newMessage;
   }
