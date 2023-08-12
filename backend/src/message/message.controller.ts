@@ -8,7 +8,7 @@ import { Request } from 'express';
 
 @Controller('message')
 @ApiBearerAuth()
-@ApiTags('profiles')
+@ApiTags('messages')
 @UseGuards(AuthGuard)
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}

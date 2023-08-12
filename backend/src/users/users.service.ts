@@ -50,7 +50,7 @@ export class UsersService {
     });
     if (!user) throw new ForbiddenException('User not found');
     const privateChannels = await this.prismaService.channel.findMany({
-      where: { mode: ChannelMode.PRIVATE || ChannelMode.PROTECTED_PASSWD },
+      where: { mode: ChannelMode.PRIVATE || ChannelMode.PROTECTED },
     });
     if (!privateChannels)
       throw new ForbiddenException('No private channels found.');

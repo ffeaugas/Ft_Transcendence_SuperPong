@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ChannelDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UsersService } from 'src/users/users.service';
 import { ChannelMode, Prisma } from '@prisma/client';
 import { Request } from 'express';
 import { ChannelModifyDto } from './dto/channelModify.dto';
@@ -9,24 +8,70 @@ import * as argon from 'argon2';
 
 @Injectable()
 export class ChannelsService {
-  constructor(
-    private prisma: PrismaService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async createChannel(dto: ChannelDto) {
-    const owner = await this.prisma.user.findUnique({
-      where: { username: dto.ownerName },
-    });
-    if (!owner) throw new ForbiddenException('User not found.');
-    const newChannel = await this.prisma.channel.create({
+  private async createPublicChannel(owner: any, dto: ChannelDto) {
+    return await this.prisma.channel.create({
       data: {
         ownerId: owner.id,
         channelName: dto.channelName,
         users: { connect: [owner] },
+        password: '',
+        mode: ChannelMode.PUBLIC,
       },
     });
-    return newChannel;
+  }
+
+  private async createPrivateChannel(owner: any, dto: ChannelDto) {
+    return await this.prisma.channel.create({
+      data: {
+        ownerId: owner.id,
+        channelName: dto.channelName,
+        users: { connect: [owner] },
+        password: '',
+        mode: ChannelMode.PRIVATE,
+      },
+    });
+  }
+
+  private async createProtectedChannel(owner: any, dto: ChannelDto) {
+    const hashPasswd = await argon.hash(dto.password);
+    return await this.prisma.channel.create({
+      data: {
+        ownerId: owner.id,
+        channelName: dto.channelName,
+        mode: ChannelMode.PROTECTED,
+        password: hashPasswd,
+        users: { connect: [owner] },
+      },
+    });
+  }
+
+  async createChannel(req: Request, dto: ChannelDto) {
+    try {
+      const owner = await this.prisma.user.findUnique({
+        where: { username: req['user'].username },
+      });
+      if (!owner) throw new ForbiddenException('User not found.');
+      let newChannel: any;
+      switch (dto.mode) {
+        case 'PUBLIC':
+          newChannel = await this.createPublicChannel(owner, dto);
+          break;
+        case 'PROTECTED':
+          newChannel = await this.createProtectedChannel(owner, dto);
+          break;
+        case 'PRIVATE':
+          newChannel = await this.createPrivateChannel(owner, dto);
+          break;
+      }
+      return newChannel;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ForbiddenException('Channel already exists.');
+      }
+      throw error;
+    }
   }
 
   async changeChannelMode(req: Request, channelName: string, mode: string) {
@@ -55,7 +100,7 @@ export class ChannelsService {
     } else if (mode === 'invit_only') {
       updateChannel = await this.prisma.channel.update({
         where: { channelName: channelName },
-        data: { mode: ChannelMode.PROTECTED_PASSWD },
+        data: { mode: ChannelMode.PROTECTED },
       });
     } else {
       throw new ForbiddenException('mode not valid.');

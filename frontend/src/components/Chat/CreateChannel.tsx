@@ -60,8 +60,9 @@ export default function ChannelList({ createChannel }: CreateChannelProps) {
             const data = {
                 channelName: channelInfos.channelName,
                 ownerName: ownerName,
+                mode: channelInfos.mode,
+                password: channelInfos.password,
             };
-
             const res = await fetch("http://10.5.0.3:3001/channels", {
                 method: "POST",
                 headers: {
