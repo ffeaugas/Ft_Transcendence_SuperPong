@@ -9,5 +9,5 @@ export class ChannelModifyDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Password of the channel' })
-  password: string;
+  password?: string;
 }
