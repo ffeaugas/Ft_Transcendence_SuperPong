@@ -5,6 +5,7 @@
   gap: 5px;
   min-height: 24px;
   cursor: pointer;
+  padding: var(--padding2);
 }
 
 .channelItem:hover {
@@ -12,6 +13,10 @@
 }
 
 .activeChannelItem {
-  background-color: rgb(29, 46, 83);
   cursor: default;
+}
+
+.activeChannelItem p {
+  color: var(--titleColor2);
+  font-weight: 600;
 }

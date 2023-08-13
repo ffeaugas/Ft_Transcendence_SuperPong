@@ -29,15 +29,15 @@ type MsgItemProps = {
 
 export default function MsgItem({ message, showUserInfos }: MsgItemProps) {
   return (
-    <li className={`${styles.msg}`}>
-      <div className={`${styles.divInfos}`}>
+    <li className={styles.msg}>
+      <div className={styles.divInfos}>
         <p
-          className={`${styles.author}`}
+          className={styles.author}
           onClick={() => showUserInfos(message.sender.username)}
         >
           <a data-id={message.sender.username}>{message.sender.username} </a>
         </p>
-        <p className={`${styles.date}`}>{message.createdAt}</p>
+        <p className={styles.date}>{message.createdAt}</p>
       </div>
       <p>{message.content}</p>
     </li>

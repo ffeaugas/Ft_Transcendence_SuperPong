@@ -4,19 +4,19 @@ import { useState } from "react";
 import styles from "../../styles/Chat/ChannelList.module.css";
 import ChannelItem from "./ChannelItem";
 
-enum ChannelMode {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  PROTECTED = "PROTECTED",
-}
-
 type ChannelItem = {
   id: string;
   channelName: string;
 };
 
+type Channels = {
+  publics: ChannelItem[];
+  privates: ChannelItem[];
+  protecteds: ChannelItem[];
+};
+
 type ChannelListProps = {
-  channels: ChannelItem[];
+  channels: Channels;
   activeChannel: string;
   switchChannel: (channelName: string) => void;
 };
@@ -54,7 +54,8 @@ export default function ChannelList({
 
   return (
     <div className={`${styles.channelList}`}>
-      <h2>Channels :</h2>
+      <h2>Channels</h2>
+      <br></br>
       <div
         className={
           channelDisplay.publicChannels ? styles.displayedChannels : undefined
@@ -68,7 +69,7 @@ export default function ChannelList({
       </div>
       {channelDisplay.publicChannels ? (
         <ul>
-          {channels.map((channel) => (
+          {channels.publics.map((channel) => (
             <ChannelItem
               key={channel.id}
               {...channel}
@@ -88,6 +89,18 @@ export default function ChannelList({
       >
         <h4>Private :</h4>
       </div>
+      {channelDisplay.privateChannels ? (
+        <ul>
+          {channels.privates.map((channel) => (
+            <ChannelItem
+              key={channel.id}
+              {...channel}
+              isActive={isActive(channel.channelName) ? true : false}
+              switchChannel={switchChannel}
+            />
+          ))}
+        </ul>
+      ) : undefined}
       <div
         className={
           channelDisplay.protectedChannels
@@ -100,6 +113,18 @@ export default function ChannelList({
       >
         <h4>Protected :</h4>
       </div>
+      {channelDisplay.protectedChannels ? (
+        <ul>
+          {channels.protecteds.map((channel) => (
+            <ChannelItem
+              key={channel.id}
+              {...channel}
+              isActive={isActive(channel.channelName) ? true : false}
+              switchChannel={switchChannel}
+            />
+          ))}
+        </ul>
+      ) : undefined}
     </div>
   );
 }

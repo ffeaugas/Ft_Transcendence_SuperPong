@@ -33,9 +33,14 @@ export class ChannelsController {
     return await this.channelsService.getAllUsers(channelName);
   }
 
-  @Get('publics')
+  @Get('publics') //NOT USED
   async getAllPublic() {
     return await this.channelsService.getAllPublic();
+  }
+
+  @Get('all')
+  async getAllChannels() {
+    return await this.channelsService.getAllChannels();
   }
 
   @Get('messages')

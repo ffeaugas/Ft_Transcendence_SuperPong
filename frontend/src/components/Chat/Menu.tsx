@@ -24,16 +24,22 @@ type MenuProps = {
   switchChannel: (channelName: string) => void;
 };
 
+type Channels = {
+  publics: ChannelItem[];
+  privates: ChannelItem[];
+  protecteds: ChannelItem[];
+};
+
 export default function Menu({
   selectedMenu,
   activeChannel,
   switchChannel,
 }: MenuProps) {
-  const [channels, setChannels] = useState<ChannelItem[]>();
+  const [channels, setChannels] = useState<Channels>();
 
-  async function getChannels(): Promise<ChannelItem[] | undefined> {
+  async function getChannels(): Promise<Channels | undefined> {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/channels/publics", {
+      const res = await axios.get("http://10.5.0.3:3001/channels/all", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },

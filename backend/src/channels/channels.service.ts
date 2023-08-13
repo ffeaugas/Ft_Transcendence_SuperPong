@@ -167,6 +167,24 @@ export class ChannelsService {
     return publicChannels;
   }
 
+  async getAllChannels() {
+    const channels = {
+      publics: await this.prisma.channel.findMany({
+        where: { mode: ChannelMode.PUBLIC },
+        include: { messages: true },
+      }),
+      privates: await this.prisma.channel.findMany({
+        where: { mode: ChannelMode.PRIVATE },
+        include: { messages: true },
+      }),
+      protecteds: await this.prisma.channel.findMany({
+        where: { mode: ChannelMode.PROTECTED },
+        include: { messages: true },
+      }),
+    };
+    return channels;
+  }
+
   async getAllMessageFromChannelName(channelName: string) {
     const channel = await this.prisma.channel.findUnique({
       where: { channelName: channelName },

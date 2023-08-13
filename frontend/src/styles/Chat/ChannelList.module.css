@@ -1,11 +1,11 @@
 .channelList {
   display: flex;
   flex-direction: column;
-  gap: var(--padding1);
+  gap: var(--padding2);
 }
 
 .channelList .displayedChannels {
-  background-color: brown;
+  color: rgb(178, 111, 209);
 }
 
 .channelList ul {
@@ -17,4 +17,10 @@
 
 .channelList h2 {
   font-size: var(--titleSize3);
+}
+
+.channelList h4 {
+  user-select: none;
+  cursor: pointer;
+  font-size: var(--textSize1);
 }
