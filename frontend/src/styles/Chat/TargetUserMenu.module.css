@@ -45,11 +45,14 @@
 }
 
 .targetUserMenu img {
-  width: auto;
-  height: 100%;
-  margin-left: -50px;
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
   /* animation: 0.5s slidein alternate infinite; */
-  /* animation-iteration-count: 5; */
 }
 
 @keyframes slidein {

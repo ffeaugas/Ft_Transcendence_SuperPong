@@ -111,7 +111,6 @@ export default function MsgList({
 
   return (
     <div className={`${styles.msgList}`}>
-      <h2>Chat :</h2>
       <ul>
         {messages.map((message) => (
           <MsgItem

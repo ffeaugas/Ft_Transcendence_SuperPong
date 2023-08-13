@@ -79,6 +79,12 @@ img.rounded {
   margin-right: 8px;
 }
 
+@media screen and (max-width: 600px) {
+  img.rounded {
+    display: none;
+  }
+}
+
 .button {
   background-color: var(--backgroundColor2);
   border: none;

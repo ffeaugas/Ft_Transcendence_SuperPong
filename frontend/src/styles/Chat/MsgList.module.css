@@ -1,12 +1,11 @@
 .msgList {
   padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em) 0;
-  /* max-height: 400px; */
-  min-width: 50%;
+  flex-grow: 1;
 }
 
-.msgList h2 {
+/* .msgList h2 {
   font-size: var(--titleSize3);
-}
+} */
 
 .msgList ul {
   display: flex;
