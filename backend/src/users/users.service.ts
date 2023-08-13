@@ -76,6 +76,13 @@ export class UsersService {
     return user;
   }
 
+  async getAll(): Promise<Users[]> {
+    const users = await this.prismaService.user.findMany();
+    if (!users) throw new ForbiddenException('Users not found');
+    users.forEach((user) => delete user.hash);
+    return users;
+  }
+
   async getById(id: number): Promise<Users> {
     const user = await this.prismaService.user.findUnique({
       where: { id: id },

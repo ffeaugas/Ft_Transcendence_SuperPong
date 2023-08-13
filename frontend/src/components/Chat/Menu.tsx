@@ -36,6 +36,7 @@ export default function Menu({
   switchChannel,
 }: MenuProps) {
   const [channels, setChannels] = useState<Channels>();
+  const [users, setUsers] = useState<any[]>();
 
   async function getChannels(): Promise<Channels | undefined> {
     try {
@@ -52,13 +53,30 @@ export default function Menu({
     }
   }
 
+  async function getUsers(): Promise<any[] | undefined> {
+    try {
+      const res = await axios.get("http://10.5.0.3:3001/users/all", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      const users = res.data;
+      return users;
+    } catch (error) {
+      console.error("Error fetching user list", error);
+      return undefined;
+    }
+  }
+
   useEffect(() => {
     if (selectedMenu === 0) {
       getChannels().then((channels) => setChannels(channels));
+    } else if (selectedMenu === 1) {
+      getUsers().then((users) => setUsers(users));
     }
   }, [selectedMenu]);
 
-  if (channels === undefined) {
+  if ((selectedMenu === 0 && !channels) || (selectedMenu === 1 && !users)) {
     return <p>channel loading...</p>;
   }
 

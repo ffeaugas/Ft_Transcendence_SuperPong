@@ -28,6 +28,11 @@ export class UsersController {
     return this.usersService.getMe(req);
   }
 
+  @Get('all')
+  async getAll() {
+    return this.usersService.getAll();
+  }
+
   @Get()
   async getUser(
     @Query('username') username?: string,

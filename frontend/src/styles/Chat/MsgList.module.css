@@ -16,6 +16,11 @@
   max-height: 400px;
 }
 
+.msgList form {
+  width: 98%;
+  margin: 0 auto;
+}
+
 .msgList input {
   width: 100%;
   background-color: var(--backgroundColor1);
