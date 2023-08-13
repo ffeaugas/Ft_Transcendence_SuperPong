@@ -50,7 +50,6 @@ export default function Header() {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data);
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {

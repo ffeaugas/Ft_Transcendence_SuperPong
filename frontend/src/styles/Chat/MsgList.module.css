@@ -1,6 +1,10 @@
 .msgList {
   padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em) 0;
   flex-grow: 1;
+  margin-right: clamp(0.1em, 0.1em + 0.5vw, 0.6em);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* .msgList h2 {

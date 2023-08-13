@@ -8,12 +8,18 @@
 
 .targetUserMenu .closeTargetUserMenu {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   width: 100%;
 }
 
 .targetUserMenu .closeTargetUserMenu p {
   cursor: pointer;
+}
+
+.targetUserMenu .closeTargetUserMenu p:hover {
+  cursor: pointer;
+  color: var(--titleColor1);
+  font-weight: 700;
 }
 
 .targetUserMenu .imgDiv {
@@ -52,14 +58,4 @@
   height: clamp(50px, 50px + 5vw, 200px);
   overflow: hidden;
   border-radius: 50%;
-  /* animation: 0.5s slidein alternate infinite; */
-}
-
-@keyframes slidein {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
 }

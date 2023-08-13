@@ -38,7 +38,6 @@ export default function Menu({
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data);
       const channels = res.data;
       return channels;
     } catch (error) {

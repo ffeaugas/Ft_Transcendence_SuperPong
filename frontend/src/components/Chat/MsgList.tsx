@@ -4,6 +4,7 @@ import MsgItem from "./MsgItem";
 import styles from "../../styles/Chat/MsgList.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import React from "react";
 
 //---------[TYPES]------------//
 
@@ -63,7 +64,6 @@ export default function MsgList({
         },
         body: JSON.stringify(data),
       });
-      console.log(res.data);
     } catch (error) {
       console.error("Error adding a new message", error);
     }
@@ -78,7 +78,6 @@ export default function MsgList({
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         });
-        console.log(res.data);
         const messages = res.data;
         return messages;
       } catch (error) {
@@ -96,13 +95,22 @@ export default function MsgList({
 
   function handleSubmit(evt) {
     evt.preventDefault();
-    console.log(textInput);
     addMessage(textInput);
     setTextInput("");
   }
 
   useEffect(() => {
-    getMessages().then((messages) => setMessages(messages));
+    getMessages()
+      .then((messages) => setMessages(messages))
+      .then(() => {
+        //CE THEN SERT A SCROLL EN BAS DU CHAT MAIS CA MARCHE PAS
+        const elem = document.querySelector("ul");
+        elem?.scrollTo({
+          top: elem.scrollHeight,
+          behavior: "smooth",
+        });
+        // console.log(elem);
+      });
   }, [activeChannel]);
 
   if (!messages) {
