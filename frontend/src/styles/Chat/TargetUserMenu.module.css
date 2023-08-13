@@ -6,6 +6,16 @@
   padding: clamp(0.3em, 0.3em + 1vw, 1em);
 }
 
+.targetUserMenu .closeTargetUserMenu {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+}
+
+.targetUserMenu .closeTargetUserMenu p {
+  cursor: pointer;
+}
+
 .targetUserMenu .imgDiv {
   display: inline-block;
   position: relative;
@@ -13,6 +23,25 @@
   height: 100px;
   overflow: hidden;
   border-radius: 50%;
+}
+
+.targetUserMenu button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+}
+
+.targetUserMenu button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
 }
 
 .targetUserMenu img {

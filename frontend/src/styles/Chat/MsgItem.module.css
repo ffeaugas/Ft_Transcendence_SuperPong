@@ -15,6 +15,12 @@
 
 .msg .author {
   color: var(--titleColor2);
+  cursor: pointer;
+}
+
+.msg .author:hover {
+  color: var(--titleColor3);
+  font-weight: 600;
 }
 
 .msg .date {

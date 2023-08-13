@@ -4,8 +4,14 @@
   flex-direction: row;
   gap: 5px;
   min-height: 24px;
+  cursor: pointer;
+}
+
+.channelItem:hover {
+  background-color: rgba(125, 89, 136, 0.514);
 }
 
 .activeChannelItem {
-  background-color: rgb(136, 136, 89);
+  background-color: rgb(29, 46, 83);
+  cursor: default;
 }

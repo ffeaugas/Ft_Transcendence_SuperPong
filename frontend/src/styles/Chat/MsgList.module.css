@@ -1,6 +1,7 @@
 .msgList {
   padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em) 0;
   /* max-height: 400px; */
+  min-width: 50%;
 }
 
 .msgList h2 {

@@ -12,9 +12,30 @@ enum ActiveChannelOption {
   CHANNEL = "CHANNEL",
 }
 
+type Sender = {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  role: string;
+  username: string;
+  status: string;
+  user42: boolean;
+};
+
+type Message = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  content: string;
+  senderId: number;
+  channelId: number;
+  sender: Sender;
+};
+
 type MsgListProps = {
   activeChannel: string;
   activeChannelOption: ActiveChannelOption;
+  showUserInfos: (username: string | null) => void;
 };
 
 //---------------------------//
@@ -22,9 +43,10 @@ type MsgListProps = {
 export default function MsgList({
   activeChannel,
   activeChannelOption,
+  showUserInfos,
 }: MsgListProps) {
   const [textInput, setTextInput] = useState<string>("");
-  const [messages, setMessages] = useState<any[] | undefined>(undefined);
+  const [messages, setMessages] = useState<Message[] | undefined>(undefined);
 
   async function addMessage(content: string) {
     try {
@@ -47,7 +69,7 @@ export default function MsgList({
     }
   }
 
-  async function getMessages(): Promise<any | undefined> {
+  async function getMessages(): Promise<Message[] | undefined> {
     if (activeChannelOption === ActiveChannelOption.CHANNEL) {
       try {
         const res = await axios.get("http://10.5.0.3:3001/channels/messages", {
@@ -92,7 +114,11 @@ export default function MsgList({
       <h2>Chat :</h2>
       <ul>
         {messages.map((message) => (
-          <MsgItem key={message.id} {...message} />
+          <MsgItem
+            key={message.id}
+            message={message}
+            showUserInfos={showUserInfos}
+          />
         ))}
       </ul>
       <form onSubmit={(evt) => handleSubmit(evt)}>

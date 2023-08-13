@@ -2,22 +2,44 @@
 
 import styles from "../../styles/Chat/MsgItem.module.css";
 
-type MsgItemProps = {
-  author: string;
-  date: string;
-  content: string;
+type Sender = {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  role: string;
+  username: string;
+  status: string;
+  user42: boolean;
 };
 
-export default function MsgItem({ author, date, content }: MsgItemProps) {
+type Message = {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  content: string;
+  senderId: number;
+  channelId: number;
+  sender: Sender;
+};
+
+type MsgItemProps = {
+  message: Message;
+  showUserInfos: (username: string | null) => void;
+};
+
+export default function MsgItem({ message, showUserInfos }: MsgItemProps) {
   return (
     <li className={`${styles.msg}`}>
       <div className={`${styles.divInfos}`}>
-        <p className={`${styles.author}`}>
-          <a data-id={author}>{author}</a>
+        <p
+          className={`${styles.author}`}
+          onClick={() => showUserInfos(message.sender.username)}
+        >
+          <a data-id={message.sender.username}>{message.sender.username} </a>
         </p>
-        <p className={`${styles.date}`}>{date}</p>
+        <p className={`${styles.date}`}>{message.createdAt}</p>
       </div>
-      <p>{content}</p>
+      <p>{message.content}</p>
     </li>
   );
 }

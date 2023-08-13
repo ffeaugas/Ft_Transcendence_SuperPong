@@ -14,8 +14,11 @@ export default function ChannelItem({
   switchChannel,
 }: ChannelItemProps) {
   return (
-    <div className={isActive ? styles.activeChannelItem : styles.channelItem}>
-      <p onClick={() => switchChannel(channelName)}>{channelName}</p>
+    <div
+      className={isActive ? styles.activeChannelItem : styles.channelItem}
+      onClick={() => switchChannel(channelName)}
+    >
+      <p>{channelName}</p>
     </div>
   );
 }

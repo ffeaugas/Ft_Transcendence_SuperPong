@@ -6,7 +6,6 @@ import MsgList from "./MsgList";
 import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
-import axios from "axios";
 
 type Message = {
   id: number;
@@ -33,7 +32,7 @@ enum ActiveChannelOption {
 }
 
 export default function Chat() {
-  const [targetUser, setTargetUser] = useState("joe");
+  const [targetUser, setTargetUser] = useState<string | null>(null);
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [activeChannel, setActiveChannel] = useState<string>("General");
   const [activeChannelOption, setActiveChannelOption] =
@@ -45,7 +44,14 @@ export default function Chat() {
 
   function switchChannel(channelName: string): void {
     setActiveChannel(channelName);
-    console.log("SWITCHING CHANNEL TO :", channelName);
+  }
+
+  function showUserInfos(username: string | null): void {
+    setTargetUser(username);
+  }
+
+  function closeUserInfos(): void {
+    setTargetUser(null);
   }
 
   return (
@@ -59,8 +65,14 @@ export default function Chat() {
       <MsgList
         activeChannel={activeChannel}
         activeChannelOption={activeChannelOption}
+        showUserInfos={showUserInfos}
       />
-      {targetUser ? <TargetUserMenu targetUser={targetUser} /> : undefined}
+      {targetUser ? (
+        <TargetUserMenu
+          targetUser={targetUser}
+          closeUserInfos={closeUserInfos}
+        />
+      ) : undefined}
     </div>
   );
 }
