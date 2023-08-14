@@ -58,10 +58,10 @@ model Profile {
     bio            String   @default("")
     winCount       Int      @default(0)
     loseCount      Int      @default(0)
-    profilePicture String   @default("https://i.imgur.com/6LwIx5Q.png")
+    profilePicture String   @default("default.png")
     eloMatchMaking Int      @default(1200)
     userId         Int      @unique
-    user           User     @relation(fields: [userId], references: [id])
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
     @@map("profiles")
 }

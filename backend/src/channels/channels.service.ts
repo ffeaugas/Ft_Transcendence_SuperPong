@@ -97,7 +97,7 @@ export class ChannelsService {
         where: { channelName: channelName },
         data: { mode: ChannelMode.PUBLIC },
       });
-    } else if (mode === 'invit_only') {
+    } else if (mode === 'protected') {
       updateChannel = await this.prisma.channel.update({
         where: { channelName: channelName },
         data: { mode: ChannelMode.PROTECTED },
