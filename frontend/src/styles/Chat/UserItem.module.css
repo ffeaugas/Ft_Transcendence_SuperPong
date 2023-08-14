@@ -1,21 +1,22 @@
-.userItem {
+.userItem,
+.activeUserItem {
   display: flex;
   flex-direction: row;
   gap: 5px;
-  min-height: 25px;
+  min-height: 24px;
+  cursor: pointer;
+  padding: var(--padding2);
 }
 
-.userItem .imgDiv {
-  display: inline-block;
-  position: relative;
-  width: 20px;
-  height: 20px;
-  overflow: hidden;
-  border-radius: 50%;
+.userItem:hover {
+  background-color: rgba(125, 89, 136, 0.514);
 }
 
-.userItem img {
-  width: auto;
-  height: 100%;
-  margin-left: -10px;
+.activeUserItem {
+  cursor: default;
+}
+
+.activeUserItem p {
+  color: var(--titleColor2);
+  font-weight: 600;
 }

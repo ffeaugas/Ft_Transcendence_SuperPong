@@ -15,16 +15,16 @@ type Channels = {
   protecteds: ChannelItem[];
 };
 
-type ChannelListProps = {
-  channels: Channels;
-  activeChannel: string;
-  switchChannel: (channelName: string) => void;
-};
-
 type ChannelDisplay = {
   publicChannels: boolean;
   privateChannels: boolean;
   protectedChannels: boolean;
+};
+
+type ChannelListProps = {
+  channels: Channels | undefined;
+  activeChannel: string;
+  switchChannel: (channelName: string) => void;
 };
 
 export default function ChannelList({
@@ -50,6 +50,10 @@ export default function ChannelList({
       return true;
     }
     return false;
+  }
+
+  if (!channels) {
+    return undefined;
   }
 
   return (

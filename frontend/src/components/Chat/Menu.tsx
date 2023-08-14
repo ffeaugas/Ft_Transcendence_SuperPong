@@ -12,10 +12,15 @@ type ChannelItem = {
   channelName: string;
 };
 
-type UserItem = {
+enum UserStatus {
+  ONLINE = "ONLINE",
+  OFFLINE = "OFFLINE",
+}
+
+type User = {
   id: string;
   username: string;
-  profilePicture: string;
+  status: UserStatus;
 };
 
 type MenuProps = {
@@ -36,7 +41,7 @@ export default function Menu({
   switchChannel,
 }: MenuProps) {
   const [channels, setChannels] = useState<Channels>();
-  const [users, setUsers] = useState<any[]>();
+  const [users, setUsers] = useState<User[]>();
 
   async function getChannels(): Promise<Channels | undefined> {
     try {
@@ -53,7 +58,7 @@ export default function Menu({
     }
   }
 
-  async function getUsers(): Promise<any[] | undefined> {
+  async function getUsers(): Promise<User[] | undefined> {
     try {
       const res = await axios.get("http://10.5.0.3:3001/users/all", {
         headers: {
@@ -94,7 +99,11 @@ export default function Menu({
     case 1:
       return (
         <div className={`${styles.menu}`}>
-          <UserList users={users} />
+          <UserList
+            users={users}
+            activeChannel={activeChannel}
+            switchChannel={switchChannel}
+          />
         </div>
       );
     case 2:
