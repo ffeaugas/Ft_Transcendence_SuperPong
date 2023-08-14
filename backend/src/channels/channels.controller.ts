@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ChannelModifyDto } from './dto/channelModify.dto';
+import { ChannelMode } from '@prisma/client';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -85,11 +86,7 @@ export class ChannelsController {
     status: 403,
     description: "User isn't owner channel Forbidden.",
   })
-  async changeChannelMode(
-    @Req() req: Request,
-    @Query('channelName') channelName: string,
-    @Query('mode') mode: string,
-  ) {
-    return await this.channelsService.changeChannelMode(req, channelName, mode);
+  async changeChannelMode(@Req() req: Request, @Body() dto: ChannelModifyDto) {
+    return await this.channelsService.changeChannelMode(req, dto);
   }
 }

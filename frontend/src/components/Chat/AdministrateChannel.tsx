@@ -35,23 +35,43 @@ export default function AdministrateChannel({
     setChannelInfos({ ...channelInfos, [name]: value });
   }
 
+  //------------------------------------------------------
+  //   async function getProfileDatas(
+  //     username: string
+  //   ): Promise<ProfileDatas | undefined> {
+  //     try {
+  //       const res = await axios.get("http://10.5.0.3:3001/users/profile", {
+  //         params: { username: username },
+  //         headers: {
+  //           Authorization: "Bearer " + localStorage.getItem("token"),
+  //         },
+  //       });
+  //       const profileDatas = res.data;
+  //       return profileDatas;
+  //     } catch (error) {
+  //       console.error("Error fetching profile datas", error);
+  //       return undefined;
+  //     }
+  //   }
+  //------------------------------------------------------
+
   async function handleSubmit(evt: any): Promise<void> {
     evt.preventDefault();
-
     try {
-      const data = {
-        channelName: channelInfos.channelName,
-        mode: channelInfos.mode,
-        // password: channelInfos.password,
-      };
-      const res = await fetch("http://10.5.0.3:3001/channels/change-mode", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
+      const res = await axios.patch(
+        "http://10.5.0.3:3001/channels/change-mode",
+        {
+          channelName: activeChannel,
+          mode: channelInfos.mode,
+          password: "",
         },
-        body: JSON.stringify(data),
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       if (res.ok) {
         const channelName = channelInfos.channelName;
         setChannelInfos({
