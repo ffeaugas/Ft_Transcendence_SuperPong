@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ChannelMode } from '@prisma/client';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class ChannelDto {
+export class ChannelModifyDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Name of the channel' })
   channelName: string;
   @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'Password of the channel' })
   password?: string;
-  @IsString()
-  mode?: string;
 }

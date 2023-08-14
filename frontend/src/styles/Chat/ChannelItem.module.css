@@ -1,6 +1,22 @@
-.channelItem {
+.channelItem,
+.activeChannelItem {
   display: flex;
   flex-direction: row;
   gap: 5px;
   min-height: 24px;
+  cursor: pointer;
+  padding: var(--padding2);
+}
+
+.channelItem:hover {
+  background-color: rgba(125, 89, 136, 0.514);
+}
+
+.activeChannelItem {
+  cursor: default;
+}
+
+.activeChannelItem p {
+  color: var(--titleColor2);
+  font-weight: 600;
 }

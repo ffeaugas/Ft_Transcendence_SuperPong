@@ -50,7 +50,7 @@ export class UsersService {
     });
     if (!user) throw new ForbiddenException('User not found');
     const privateChannels = await this.prismaService.channel.findMany({
-      where: { mode: ChannelMode.PRIVATE || ChannelMode.PROTECTED_PASSWD },
+      where: { mode: ChannelMode.PRIVATE || ChannelMode.PROTECTED },
     });
     if (!privateChannels)
       throw new ForbiddenException('No private channels found.');
@@ -74,6 +74,13 @@ export class UsersService {
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;
     return user;
+  }
+
+  async getAll(): Promise<Users[]> {
+    const users = await this.prismaService.user.findMany();
+    if (!users) throw new ForbiddenException('Users not found');
+    users.forEach((user) => delete user.hash);
+    return users;
   }
 
   async getById(id: number): Promise<Users> {

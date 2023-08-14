@@ -6,6 +6,22 @@
   padding: clamp(0.3em, 0.3em + 1vw, 1em);
 }
 
+.targetUserMenu .closeTargetUserMenu {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.targetUserMenu .closeTargetUserMenu p {
+  cursor: pointer;
+}
+
+.targetUserMenu .closeTargetUserMenu p:hover {
+  cursor: pointer;
+  color: var(--titleColor1);
+  font-weight: 700;
+}
+
 .targetUserMenu .imgDiv {
   display: inline-block;
   position: relative;
@@ -15,19 +31,31 @@
   border-radius: 50%;
 }
 
-.targetUserMenu img {
-  width: auto;
-  height: 100%;
-  margin-left: -50px;
-  animation: 0.5s slidein alternate infinite;
-  /* animation-iteration-count: 5; */
+.targetUserMenu button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
 }
 
-@keyframes slidein {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+.targetUserMenu button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
+}
+
+.targetUserMenu img {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
 }

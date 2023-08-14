@@ -1,6 +1,26 @@
+.channelList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+}
+
+.channelList .displayedChannels {
+  color: rgb(178, 111, 209);
+}
+
 .channelList ul {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
   max-height: 400px;
+}
+
+.channelList h2 {
+  font-size: var(--titleSize3);
+}
+
+.channelList h4 {
+  user-select: none;
+  cursor: pointer;
+  font-size: var(--textSize1);
 }

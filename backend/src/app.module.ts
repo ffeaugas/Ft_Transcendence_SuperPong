@@ -12,6 +12,7 @@ import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
 import { ProfileService } from './profile/profile.service';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
     ProfileModule,
     ChannelsModule,
     HttpModule,
+    MessageModule,
   ],
   controllers: [AppController, ExchangeCodeController],
   providers: [AppService, AuthService, UsersService, ProfileService],

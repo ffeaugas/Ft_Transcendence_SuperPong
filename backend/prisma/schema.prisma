@@ -29,7 +29,7 @@ enum Status {
 enum ChannelMode {
     PRIVATE
     PUBLIC
-    PROTECTED_PASSWD
+    PROTECTED
 }
 
 model User {

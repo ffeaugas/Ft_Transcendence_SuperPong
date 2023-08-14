@@ -1,6 +1,11 @@
 .msgList {
   padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em) 0;
-  /* max-height: 400px; */
+  flex-grow: 1;
+  margin-right: clamp(0.1em, 0.1em + 0.5vw, 0.6em);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 }
 
 .msgList ul {
@@ -9,6 +14,11 @@
   gap: 2px;
   overflow-y: scroll;
   max-height: 400px;
+}
+
+.msgList form {
+  width: 98%;
+  margin: 0 auto;
 }
 
 .msgList input {

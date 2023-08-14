@@ -1,6 +1,14 @@
+.userList {
+  gap: var(--padding2);
+}
+
 .userList ul {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
   max-height: 400px;
+}
+
+.userList h2 {
+  font-size: var(--titleSize3);
 }
