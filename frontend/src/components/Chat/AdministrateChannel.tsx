@@ -30,30 +30,51 @@ export default function AdministrateChannel({
   });
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
 
+  // async function deleteChannel(): Promise<void> {
+  //   try {
+  //     const res = await axios.delete("http://10.5.0.3:3001/channels/delete", {
+  //       headers: {
+  //         Authorization: "Bearer " + localStorage.getItem("token"),
+  //       },
+  //       data: {
+  //         channelName: activeChannel,
+  //       },
+  //     });
+  //     if (res.status) {
+  //       const channelName = channelInfos.channelName;
+  //       setFeedbackMessage("Channel update success!");
+  //     }
+  //   } catch (error: any) {
+  //     console.log(error.message);
+  //   }
+  // }
+
+  async function deleteChannel() {
+    try {
+      const response = await fetch(
+        `http://10.5.0.3:3001/channels/${activeChannel}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (response.ok) {
+        setFeedbackMessage("Channel successfully deleted!");
+      } else {
+        setFeedbackMessage("Problem occured when trying to delete channel!");
+      }
+    } catch (error) {
+      setFeedbackMessage("You can't delete this channel!");
+      console.error(error);
+    }
+  }
+
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
     setChannelInfos({ ...channelInfos, [name]: value });
   }
-
-  //------------------------------------------------------
-  //   async function getProfileDatas(
-  //     username: string
-  //   ): Promise<ProfileDatas | undefined> {
-  //     try {
-  //       const res = await axios.get("http://10.5.0.3:3001/users/profile", {
-  //         params: { username: username },
-  //         headers: {
-  //           Authorization: "Bearer " + localStorage.getItem("token"),
-  //         },
-  //       });
-  //       const profileDatas = res.data;
-  //       return profileDatas;
-  //     } catch (error) {
-  //       console.error("Error fetching profile datas", error);
-  //       return undefined;
-  //     }
-  //   }
-  //------------------------------------------------------
 
   async function handleSubmit(evt: any): Promise<void> {
     evt.preventDefault();
@@ -67,12 +88,11 @@ export default function AdministrateChannel({
         },
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         }
       );
-      if (res.ok) {
+      if (res.status) {
         const channelName = channelInfos.channelName;
         setChannelInfos({
           channelName: "",
@@ -83,8 +103,8 @@ export default function AdministrateChannel({
       } else {
         setFeedbackMessage("Channel update failed.");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.message);
     }
   }
 
@@ -122,6 +142,7 @@ export default function AdministrateChannel({
         ) : undefined}
         <input type="submit" value="Update" />
       </form>
+      <button onClick={deleteChannel}>Delete</button>
       <p>{feedbackMessage}</p>
     </div>
   );

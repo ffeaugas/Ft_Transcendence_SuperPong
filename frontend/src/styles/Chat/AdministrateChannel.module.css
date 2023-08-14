@@ -56,25 +56,22 @@
   border: solid 1px rgb(82, 80, 80);
 }
 
-.adminChannel input[type="submit"] {
+.adminChannel input[type="submit"],
+.adminChannel button {
   background-color: var(--backgroundColor2);
   border: none;
   color: var(--textColor1);
   padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
   font-weight: 400;
   font-family: "Teko", sans-serif;
-  font-size: 12px;
-  display: flex;
+  font-size: var(--textSize1);
   width: 50%;
   margin: 0 auto;
 }
 
-.adminChannel input[type="submit"]:hover {
+.adminChannel input[type="submit"]:hover,
+.adminChannel button:hover {
   background-color: var(--titleColor1);
-  color: var(--textColor1);
 }
 
 .adminChannel p {

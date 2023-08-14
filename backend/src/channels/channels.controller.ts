@@ -7,6 +7,8 @@ import {
   Patch,
   UseGuards,
   Req,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
 import { ChannelDto } from './dto';
@@ -88,5 +90,10 @@ export class ChannelsController {
   })
   async changeChannelMode(@Req() req: Request, @Body() dto: ChannelModifyDto) {
     return await this.channelsService.changeChannelMode(req, dto);
+  }
+
+  @Delete(':channelName')
+  async deleteChannel(@Param('channelName') channelName: string) {
+    return this.channelsService.deleteChannel(channelName);
   }
 }

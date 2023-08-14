@@ -198,4 +198,15 @@ export class ChannelsService {
     });
     return allMessages;
   }
+
+  async deleteChannel(channelName: string) {
+    // const deleteUsers = await this.prisma.message.deleteMany({
+    //   where: { channelName: channelName },
+    // });
+    //Probleme de boucle dans la DB : Channel inclu dans Message et Message inclus dans channel et quand je veux en supprimer un des deux ca chie, il faudrait casser la boucle ou jsp
+    const deletedChannel = await this.prisma.channel.delete({
+      where: { channelName: channelName },
+    });
+    return deletedChannel;
+  }
 }

@@ -27,12 +27,12 @@ export default function TargetUserMenu({
   closeUserInfos,
 }: TargetUserMenuProps) {
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
-    null
+    undefined
   );
 
   async function getProfileDatas(): Promise<ProfileDatas | undefined> {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/users/profile", {
+      const res = await axios.get("http://10.5.0.3:3001/profiles", {
         params: { username: targetUser },
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -51,6 +51,7 @@ export default function TargetUserMenu({
     if (targetUser) {
       getProfileDatas().then((datas) => setProfileDatas(datas));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUser]);
 
   if (!profileDatas) {
@@ -64,7 +65,7 @@ export default function TargetUserMenu({
       </div>
       <div className={styles.imgDiv}>
         <img
-          src={profileDatas.profilePicture}
+          src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
           alt={`${targetUser} profile picture`}
         />
       </div>

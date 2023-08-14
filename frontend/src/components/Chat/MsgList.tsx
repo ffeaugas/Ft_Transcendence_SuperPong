@@ -25,8 +25,8 @@ type Sender = {
 
 type Message = {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   content: string;
   senderId: number;
   channelId: number;
@@ -88,12 +88,12 @@ export default function MsgList({
     return undefined;
   }
 
-  function handleChange(evt) {
+  function handleChange(evt: any) {
     const { name, value } = evt.target;
     setTextInput(value);
   }
 
-  function handleSubmit(evt) {
+  function handleSubmit(evt: any) {
     evt.preventDefault();
     addMessage(textInput);
     setTextInput("");
