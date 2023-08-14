@@ -11,7 +11,6 @@ import { HttpModule } from '@nestjs/axios';
 import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
 import { ProfileService } from './profile/profile.service';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { MessageModule } from './message/message.module';
 
 @Module({

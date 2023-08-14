@@ -1,8 +1,18 @@
-import { Controller, Get, UseGuards, Query, Delete, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Query,
+  Delete,
+  Req,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserDto } from './dto';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -11,12 +21,10 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('profile')
-  async getProfileByUsername(
-    @Query('username') username: string,
-  ): Promise<any> {
-    return this.usersService.getProfileByUsername(username);
-  }
+  // @Post('addFriend')
+  // async addFriend(@Req() req: Request, @Body() dto: UserDto) {
+  //   return await this.usersService.addFriend(req, dto);
+  // }
 
   @Get('channels')
   async getPrivateChannels(@Query('username') username: string) {

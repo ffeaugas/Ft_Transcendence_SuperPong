@@ -1,7 +1,12 @@
-import { Body, ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProfileDto } from './dto';
+import { Request, Express } from 'express';
+import { Multer } from 'multer';
+import { HttpService } from '@nestjs/axios';
+import * as fs from 'node:fs';
+import { join } from 'path';
 
 @Injectable()
 export class ProfileService {
@@ -29,6 +34,39 @@ export class ProfileService {
     });
     if (!profile) throw new ForbiddenException('This profile did not exist');
     return profile;
+  }
+
+  private async saveImage(image: Express.Multer.File): Promise<string> {
+    const imageName = `${Date.now()}-${image.originalname}`;
+    const imagePath = join(__dirname, '..', 'uploads', 'avatar', imageName);
+
+    return new Promise((resolve, reject) => {
+      const writer = fs.createWriteStream(imagePath);
+      writer.on('finish', () => resolve(imageName));
+      writer.on('error', reject);
+      image.stream.pipe(writer);
+    });
+  }
+
+  private async updateUserProfilePicture(
+    userId: number,
+    imageUrl: string,
+  ): Promise<void> {
+    await this.prisma.profile.update({
+      where: { userId },
+      data: { profilePicture: imageUrl },
+    });
+  }
+
+  async updateProfilePicture(req: Request, image: any) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: req['user'].username },
+    });
+    if (!user) throw new ForbiddenException('User not found.');
+    const newImgUrl = await this.saveImage(image);
+    await this.updateUserProfilePicture(user.id, newImgUrl);
+
+    return { message: 'Profile picture updated successfully' };
   }
 
   async updateBioProfile(user: string, dto: ProfileDto) {
