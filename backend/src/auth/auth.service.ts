@@ -41,15 +41,20 @@ export class AuthService {
     const userFound = await this.prisma.user.findUnique({
       where: { username: userData.login },
     });
-    if (!userFound) {
+    if (!userFound || !userFound.user42) {
       user.username = userData.login;
       user.password = passwordHash;
       const newUser = await this.usersService.createUser(user, true);
       await this.prisma.profile.update({
         where: { userId: newUser.id },
-        data: { profilePicture: userData.image.link },
+        data: {
+          profilePicture: newUser.username + '_' + +newUser.id + '.jpeg',
+        },
       });
-      this.downloadImage(userData.image.link, userData.login);
+      this.downloadImage(
+        userData.image.link,
+        userData.login + '_' + +newUser.id,
+      );
     } else {
       user.username = userData.login;
       user.password = userFound.hash;
@@ -71,7 +76,11 @@ export class AuthService {
 
   async register(dto: AuthDto) {
     try {
-      const newUser = this.usersService.createUser(dto, false);
+      const newUser = await this.usersService.createUser(dto, false);
+      const profileUser = await this.prisma.profile.findUnique({
+        where: { userId: newUser.id },
+      });
+      console.log(profileUser.profilePicture);
       return newUser;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

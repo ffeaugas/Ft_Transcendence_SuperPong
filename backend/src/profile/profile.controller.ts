@@ -4,13 +4,21 @@ import {
   Delete,
   Get,
   Patch,
+  Post,
   Query,
+  Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ProfileDto } from './dto';
+import { Request } from 'express';
 import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
+import { Express } from 'express';
 
 @Controller('profiles')
 @ApiBearerAuth()
@@ -31,6 +39,15 @@ export class ProfileController {
     } else {
       return await this.profileService.getAllProfiles();
     }
+  }
+
+  @Post('update-profile-picture')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateProfilePicture(
+    @Req() req: Request,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return await this.profileService.updateProfilePicture(req, image);
   }
 
   @Patch()

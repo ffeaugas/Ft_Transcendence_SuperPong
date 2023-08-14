@@ -6,6 +6,7 @@ import { AuthDto } from 'src/auth/dto';
 import { Request } from 'express';
 import * as argon from 'argon2';
 import { ChannelMode } from '@prisma/client';
+import { UserDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -21,28 +22,50 @@ export class UsersService {
         username: dto.username,
         hash: passwordHash,
         user42: user42,
+        // friendList: {
+        //   create: {},
+        // },
       },
+      // include: {
+      //   friendList: true,
+      // },
     });
-    const user: Users = await this.getByUsername(dto.username);
+    // const updatedUser = await this.prismaService.user.update({
+    //   where: { id: newUser.id },
+    //   data: {
+    //     friendListId: newUser.friendList.id,
+    //   },
+    // });
     await this.prismaService.profile.create({
       data: {
-        userId: user.id,
+        userId: newUser.id,
       },
     });
     delete newUser.hash;
     return newUser;
   }
 
-  async getProfileByUsername(username: string): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
-      where: { username: username },
-    });
-    if (!user) throw new ForbiddenException('User not found');
-    const userProfile = await this.prismaService.profile.findUnique({
-      where: { userId: user.id },
-    });
-    return userProfile;
-  }
+  // async addFriend(req: any, dto: UserDto) {
+  //   const user = await this.prismaService.user.findUnique({
+  //     where: { username: req.user.username },
+  //   });
+  //   if (!user) throw new ForbiddenException('User not found.');
+  //   const friendListToUpdate = await this.prismaService.friendList.findUnique({
+  //     where: { id: user.friendListId },
+  //     include: { user: true },
+  //   });
+  //   if (!friendListToUpdate)
+  //     throw new ForbiddenException('Friend list not found.');
+  //   const friendToAdd = await this.prismaService.user.findUnique({
+  //     where: { username: dto.username },
+  //   });
+  //   if (!friendToAdd) throw new ForbiddenException('User not found.');
+  //   const updatedUsers = [friendToAdd];
+  //   await this.prismaService.friendList.update({
+  //     where: { id: friendListToUpdate.id },
+  //     data: { user: { connect: updatedUsers } },
+  //   });
+  // }
 
   async getPrivateChannels(username: string) {
     const user = await this.prismaService.user.findUnique({
