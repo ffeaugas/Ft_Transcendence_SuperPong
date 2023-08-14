@@ -8,6 +8,10 @@
   padding: var(--padding2);
 }
 
+.userItem b {
+  color: red;
+}
+
 .userItem:hover {
   background-color: rgba(125, 89, 136, 0.514);
 }
@@ -19,4 +23,8 @@
 .activeUserItem p {
   color: var(--titleColor2);
   font-weight: 600;
+}
+
+.online {
+  color: green !important;
 }

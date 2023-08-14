@@ -6,6 +6,7 @@ import ChannelList from "./ChannelList";
 import CreateChannel from "./CreateChannel";
 import UserList from "./UserList";
 import axios from "axios";
+import AdministrateChannel from "./AdministrateChannel";
 
 type ChannelItem = {
   id: string;
@@ -17,6 +18,13 @@ enum UserStatus {
   OFFLINE = "OFFLINE",
 }
 
+enum MenuType {
+  CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
+  USER_SELECTOR = "USER_SELECTOR",
+  CHANNEL_CREATION = "CHANNEL_CREATION",
+  CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
+}
+
 type User = {
   id: string;
   username: string;
@@ -24,9 +32,10 @@ type User = {
 };
 
 type MenuProps = {
-  selectedMenu: number;
+  selectedMenu: MenuType;
   activeChannel: string;
   switchChannel: (channelName: string) => void;
+  changeMenu: (menu: MenuType) => void;
 };
 
 type Channels = {
@@ -39,6 +48,7 @@ export default function Menu({
   selectedMenu,
   activeChannel,
   switchChannel,
+  changeMenu,
 }: MenuProps) {
   const [channels, setChannels] = useState<Channels>();
   const [users, setUsers] = useState<User[]>();
@@ -74,29 +84,33 @@ export default function Menu({
   }
 
   useEffect(() => {
-    if (selectedMenu === 0) {
+    if (selectedMenu === MenuType.CHANNEL_SELECTOR) {
       getChannels().then((channels) => setChannels(channels));
-    } else if (selectedMenu === 1) {
+    } else if (selectedMenu === MenuType.USER_SELECTOR) {
       getUsers().then((users) => setUsers(users));
     }
   }, [selectedMenu]);
 
-  if ((selectedMenu === 0 && !channels) || (selectedMenu === 1 && !users)) {
+  if (
+    (selectedMenu === MenuType.CHANNEL_SELECTOR && !channels) ||
+    (selectedMenu === MenuType.USER_SELECTOR && !users)
+  ) {
     return <p>channel loading...</p>;
   }
 
   switch (selectedMenu) {
-    case 0:
+    case MenuType.CHANNEL_SELECTOR:
       return (
         <div className={`${styles.menu}`}>
           <ChannelList
             channels={channels}
             activeChannel={activeChannel}
             switchChannel={switchChannel}
+            changeMenu={changeMenu}
           />
         </div>
       );
-    case 1:
+    case MenuType.USER_SELECTOR:
       return (
         <div className={`${styles.menu}`}>
           <UserList
@@ -106,10 +120,16 @@ export default function Menu({
           />
         </div>
       );
-    case 2:
+    case MenuType.CHANNEL_CREATION:
       return (
         <div className={`${styles.menu}`}>
           <CreateChannel />
+        </div>
+      );
+    case MenuType.CHANNEL_ADMINISTRATION:
+      return (
+        <div className={`${styles.menu}`}>
+          {<AdministrateChannel activeChannel={activeChannel} />}
         </div>
       );
   }

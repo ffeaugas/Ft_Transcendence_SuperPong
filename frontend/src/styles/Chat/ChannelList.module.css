@@ -1,6 +1,13 @@
 .channelList {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
   gap: var(--padding2);
 }
 
@@ -23,4 +30,23 @@
   user-select: none;
   cursor: pointer;
   font-size: var(--textSize1);
+}
+
+.channelList button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: var(--textSize1);
+  margin-bottom: 4px;
+}
+
+.channelList button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
 }
