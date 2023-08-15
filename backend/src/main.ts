@@ -4,6 +4,10 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
+import { PrismaService } from './prisma/prisma.service';
+import { create } from 'domain';
+
+const prisma = new PrismaService();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -25,6 +29,16 @@ async function bootstrap() {
     }),
   );
   app.enableCors();
+  const name = 'General';
+  try {
+    const general = await prisma.channel.create({
+      data: { channelName: name, password: '', mode: 'PUBLIC' },
+    });
+    console.log('New channel created:', general);
+    console.log(general);
+  } catch (error) {
+    console.error('Error creating channel:', error.message);
+  }
   await app.listen(3001);
 }
 bootstrap();

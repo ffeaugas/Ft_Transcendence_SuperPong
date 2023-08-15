@@ -74,33 +74,33 @@ export class ChannelsService {
     }
   }
 
-  async changeChannelMode(req: Request, channelName: string, mode: string) {
+  async changeChannelMode(req: Request, dto: any) {
     let updateChannel: any;
-    const channelOwner = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { username: req['user'].username },
     });
-    const verifyOwner = await this.prisma.channel.findUnique({
+    const channelToUpdate = await this.prisma.channel.findUnique({
       where: {
-        channelName: channelName,
-        ownerId: channelOwner.id,
+        channelName: dto.channelName,
       },
     });
-    if (!verifyOwner)
+    if (channelToUpdate.ownerId !== user.id)
       throw new ForbiddenException("This user is not channel's owner");
-    if (mode === 'private') {
+    if (dto.mode === ChannelMode.PRIVATE) {
       updateChannel = await this.prisma.channel.update({
-        where: { channelName: channelName },
+        where: { channelName: dto.channelName },
         data: { mode: ChannelMode.PRIVATE },
       });
-    } else if (mode === 'public') {
+    } else if (dto.mode === ChannelMode.PUBLIC) {
       updateChannel = await this.prisma.channel.update({
-        where: { channelName: channelName },
+        where: { channelName: dto.channelName },
         data: { mode: ChannelMode.PUBLIC },
       });
-    } else if (mode === 'protected') {
+    } else if (dto.mode === ChannelMode.PROTECTED) {
+      const hashPsswd = await argon.hash(dto.password);
       updateChannel = await this.prisma.channel.update({
-        where: { channelName: channelName },
-        data: { mode: ChannelMode.PROTECTED },
+        where: { channelName: dto.channelName },
+        data: { mode: ChannelMode.PROTECTED, password: hashPsswd },
       });
     } else {
       throw new ForbiddenException('mode not valid.');
@@ -126,16 +126,16 @@ export class ChannelsService {
   }
 
   async setChannelPassword(dto: ChannelModifyDto, req: Request) {
-    const channelOwner = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { username: req['user'].username },
     });
-    const verifyOwner = await this.prisma.channel.findUnique({
+    const channelToUpdate = await this.prisma.channel.findFirst({
       where: {
         channelName: dto.channelName,
-        ownerId: channelOwner.id,
+        ownerId: user.id,
       },
     });
-    if (!verifyOwner)
+    if (!channelToUpdate)
       throw new ForbiddenException("This user is not channel's owner");
     const hashPasswd = await argon.hash(dto.password);
     const updatedChannel = await this.prisma.channel.update({
@@ -198,5 +198,22 @@ export class ChannelsService {
       delete message.sender.hash;
     });
     return allMessages;
+  }
+
+  async deleteChannel(req: Request, channelName: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: req['user'].username },
+      include: { channelsOwned: true },
+    });
+    if (!user) throw new ForbiddenException('User not found.');
+    const isOwner = await this.prisma.channel.findFirst({
+      where: { ownerId: user.id },
+    });
+    if (!isOwner)
+      throw new ForbiddenException('Your not owner of this channel.');
+    const deletedChannel = await this.prisma.channel.delete({
+      where: { channelName: channelName },
+    });
+    return deletedChannel;
   }
 }

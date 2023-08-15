@@ -1,5 +1,4 @@
 .menu {
-  min-width: 20%;
-  max-width: 200px;
+  width: 23%;
   padding: clamp(0.1em, 0.1em + 0.5vw, 0.6em);
 }

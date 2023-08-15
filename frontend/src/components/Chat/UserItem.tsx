@@ -30,7 +30,16 @@ export default function UserItem({
       className={isActive ? styles.activeUserItem : styles.userItem}
       onClick={() => switchChannel(user.username)}
     >
-      <p>{user.username}</p>
+      <p>
+        {user.username}
+        <b
+          className={
+            user.status === UserStatus.ONLINE ? styles.online : undefined
+          }
+        >
+          &nbsp;&#8226;
+        </b>
+      </p>
     </div>
   );
 }

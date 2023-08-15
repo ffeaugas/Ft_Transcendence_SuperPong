@@ -16,6 +16,13 @@ type Message = {
   channelId: number;
 };
 
+enum MenuType {
+  CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
+  USER_SELECTOR = "USER_SELECTOR",
+  CHANNEL_CREATION = "CHANNEL_CREATION",
+  CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
+}
+
 type ChannelItem = {
   id: string;
   channelName: string;
@@ -33,13 +40,15 @@ enum ActiveChannelOption {
 
 export default function Chat() {
   const [targetUser, setTargetUser] = useState<string | null>(null);
-  const [selectedMenu, setSelectedMenu] = useState(0);
+  const [selectedMenu, setSelectedMenu] = useState<MenuType>(
+    MenuType.CHANNEL_SELECTOR
+  );
   const [activeChannel, setActiveChannel] = useState<string>("General");
   const [activeChannelOption, setActiveChannelOption] =
     useState<ActiveChannelOption>(ActiveChannelOption.CHANNEL);
 
-  function changeMenu(menuId: number) {
-    setSelectedMenu(menuId);
+  function changeMenu(menu: MenuType) {
+    setSelectedMenu(menu);
   }
 
   function switchChannel(channelName: string): void {
@@ -61,6 +70,7 @@ export default function Chat() {
         selectedMenu={selectedMenu}
         activeChannel={activeChannel}
         switchChannel={switchChannel}
+        changeMenu={changeMenu}
       />
       <MsgList
         activeChannel={activeChannel}

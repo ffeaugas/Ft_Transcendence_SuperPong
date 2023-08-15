@@ -1,0 +1,81 @@
+.adminChannel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.adminChannel h2 {
+  font-size: var(--titleSize3);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.adminChannel b {
+  color: var(--titleColor2);
+}
+
+.adminChannel form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.subform {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+}
+
+.adminChannel label {
+  font-size: var(--titleSize3);
+  color: var(--textColor1);
+  font-weight: 600;
+  margin: 0 auto;
+}
+
+.adminChannel input[type="text"] {
+  background-color: var(--backgroundColor1);
+  color: white;
+  border-style: none;
+  border: solid 1px rgb(82, 80, 80);
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 3px;
+}
+
+.adminChannel select {
+  background-color: var(--backgroundColor1);
+  border-style: none;
+  padding: 3px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 70%;
+  margin: 0 auto;
+  color: var(--textColor1);
+  border: solid 1px rgb(82, 80, 80);
+}
+
+.adminChannel input[type="submit"],
+.adminChannel button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: var(--textSize1);
+  width: 50%;
+  margin: 0 auto;
+}
+
+.adminChannel input[type="submit"]:hover,
+.adminChannel button:hover {
+  background-color: var(--titleColor1);
+}
+
+.adminChannel p {
+  color: rgb(136, 223, 136);
+  text-align: center;
+  font-size: var(--textSize1);
+}

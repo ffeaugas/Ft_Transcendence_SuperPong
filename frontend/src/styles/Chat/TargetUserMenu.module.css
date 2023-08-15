@@ -22,13 +22,11 @@
   font-weight: 700;
 }
 
-.targetUserMenu .imgDiv {
-  display: inline-block;
-  position: relative;
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
+.targetUserMenu img {
+  object-fit: cover;
   border-radius: 50%;
+  width: clamp(50px, 50px + 4vw, 200px);
+  height: clamp(50px, 50px + 4vw, 200px);
 }
 
 .targetUserMenu button {
