@@ -1,89 +1,54 @@
 import styles from "@/styles/FriendList/FriendList.module.css";
 import FriendItem from "./FriendItem";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 type FriendListProps = {
-  username: string;
+    username: string;
 };
 
 type FriendItem = {
-  id: string;
-  name: string;
-  profilePicture: string;
-  status: string;
+    id: string;
+    username: string;
+    profile: any;
+    status: string;
 };
 
 export default function FriendList({ username }: FriendListProps) {
-  const friends: FriendItem[] = [
-    {
-      id: "fefwe",
-      name: "fewfwe",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "offline",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "offline",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "waiting",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "waiting",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-    {
-      id: "aaaaaa",
-      name: "aaaaaaaaaaaa",
-      profilePicture: "catProfilePicture.jpg",
-      status: "online",
-    },
-  ];
+    const [friends, setFriends] = useState<FriendItem[] | undefined>(undefined);
 
-  return (
-    <div className={styles.friendList}>
-      <h3>{username}'s friend list :</h3>
-      <ul>
-        {friends.map((friend) => (
-          <FriendItem key={friend.id} friendDatas={friend} />
-        ))}
-      </ul>
-    </div>
-  );
+    async function getFriends(): Promise<FriendItem[] | undefined> {
+        try {
+            const res = await axios.get("http://10.5.0.3:3001/users/friends", {
+                params: { user: username },
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
+            });
+            const friends = res.data;
+            console.log(friends);
+            return friends;
+        } catch (error) {
+            console.error("Error fetching user friends", error);
+            return undefined;
+        }
+    }
+
+    useEffect(() => {
+        getFriends().then((friends) => {
+            setFriends(friends);
+        });
+    }, []);
+
+    if (!friends) return <p>...</p>;
+    return (
+        <div className={styles.friendList}>
+            <h3>{username}'s friend list :</h3>
+            <ul>
+                {friends.map((friend) => (
+                    <FriendItem key={friend.id} friendDatas={friend} />
+                ))}
+            </ul>
+        </div>
+    );
 }

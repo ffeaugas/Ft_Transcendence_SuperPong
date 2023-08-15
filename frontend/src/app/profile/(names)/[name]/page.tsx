@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
-import styles from "../../styles/page.module.css";
+import styles from "@/styles/page.module.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import FriendList from "@/components/FriendList/FriendList";
@@ -20,7 +20,7 @@ type ProfileDatas = {
     userId: number;
 };
 
-export default function Profile() {
+export default function Profile({ params }: { params: { name: string } }) {
     const [username, setUsername] = useState<string>("");
     const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
         undefined
@@ -42,7 +42,7 @@ export default function Profile() {
     ): Promise<ProfileDatas | undefined> {
         try {
             const res = await axios.get("http://10.5.0.3:3001/profiles", {
-                params: { username: username },
+                params: { username: params.name },
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("token"),
                 },
@@ -66,7 +66,7 @@ export default function Profile() {
     }, []);
 
     function isYourProfile(): boolean {
-        if (username === "ffeaugas") {
+        if (username === params.name) {
             return true;
         }
         return false;
@@ -88,7 +88,7 @@ export default function Profile() {
             <div className={styles.profile}>
                 <div className={styles.userInfos}>
                     <div className={styles.editProfile}>
-                        <h2>{username}</h2>
+                        <h2>{params.name}</h2>
                         {isYourProfile() ? <button>&#9998;</button> : undefined}
                     </div>
                     <div className={styles.editProfile}>
@@ -116,11 +116,12 @@ export default function Profile() {
                     </div>
                 </div>
                 <div className={styles.stats}>
-                    <FriendList username={username} />
-                    <GamesHistoric username={username} />
-                    <Achievements username={username} />
+                    <FriendList username={params.name} />
+                    <GamesHistoric username={params.name} />
+                    <Achievements username={params.name} />
                 </div>
             </div>
+            <p color="white">IAFJAJ ${params.name}</p>
         </section>
     );
 }

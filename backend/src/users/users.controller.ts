@@ -21,10 +21,15 @@ import { UserDto } from './dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @Post('addFriend')
-  // async addFriend(@Req() req: Request, @Body() dto: UserDto) {
-  //   return await this.usersService.addFriend(req, dto);
-  // }
+  @Get('friends')
+  async getFriends(@Req() req: Request, @Query('user') user: string) {
+    return this.usersService.getFriends(req, user);
+  }
+
+  @Post('addFriend')
+  async addFriend(@Req() req: Request, @Body() dto: UserDto) {
+    return await this.usersService.addFriend(req, dto);
+  }
 
   @Get('channels')
   async getPrivateChannels(@Query('username') username: string) {
