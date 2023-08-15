@@ -97,9 +97,10 @@ export class ChannelsService {
         data: { mode: ChannelMode.PUBLIC },
       });
     } else if (dto.mode === ChannelMode.PROTECTED) {
+      const hashPsswd = await argon.hash(dto.password);
       updateChannel = await this.prisma.channel.update({
         where: { channelName: dto.channelName },
-        data: { mode: ChannelMode.PROTECTED },
+        data: { mode: ChannelMode.PROTECTED, password: hashPsswd },
       });
     } else {
       throw new ForbiddenException('mode not valid.');
@@ -128,7 +129,7 @@ export class ChannelsService {
     const user = await this.prisma.user.findUnique({
       where: { username: req['user'].username },
     });
-    const channelToUpdate = await this.prisma.channel.findUnique({
+    const channelToUpdate = await this.prisma.channel.findFirst({
       where: {
         channelName: dto.channelName,
         ownerId: user.id,
@@ -199,11 +200,17 @@ export class ChannelsService {
     return allMessages;
   }
 
-  async deleteChannel(channelName: string) {
-    // const deleteUsers = await this.prisma.message.deleteMany({
-    //   where: { channelName: channelName },
-    // });
-    //Probleme de boucle dans la DB : Channel inclu dans Message et Message inclus dans channel et quand je veux en supprimer un des deux ca chie, il faudrait casser la boucle ou jsp
+  async deleteChannel(req: Request, channelName: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: req['user'].username },
+      include: { channelsOwned: true },
+    });
+    if (!user) throw new ForbiddenException('User not found.');
+    const isOwner = await this.prisma.channel.findFirst({
+      where: { ownerId: user.id },
+    });
+    if (!isOwner)
+      throw new ForbiddenException('Your not owner of this channel.');
     const deletedChannel = await this.prisma.channel.delete({
       where: { channelName: channelName },
     });
