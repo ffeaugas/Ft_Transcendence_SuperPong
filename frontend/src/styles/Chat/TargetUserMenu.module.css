@@ -1,61 +1,59 @@
 .targetUserMenu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(0.3em, 0.3em + 1vw, 1em);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.3em, 0.3em + 1vw, 1em);
 }
 
 .targetUserMenu .closeTargetUserMenu {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .targetUserMenu .closeTargetUserMenu p {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .targetUserMenu .closeTargetUserMenu p:hover {
-    cursor: pointer;
-    color: var(--titleColor1);
-    font-weight: 700;
-}
-
-.targetUserMenu .imgDiv {
-    display: inline-block;
-    position: relative;
-    overflow: hidden;
-    border-radius: 50%;
-    height: 60px;
-    width: 60px;
-}
-
-.targetUserMenu button {
-    background-color: var(--backgroundColor2);
-    border: none;
-    color: var(--textColor1);
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: 400;
-    font-family: "Teko", sans-serif;
-    font-size: 12px;
-    display: flex;
-}
-
-.targetUserMenu button:hover {
-    background-color: var(--titleColor1);
-    color: var(--textColor1);
+  cursor: pointer;
+  color: var(--titleColor1);
+  font-weight: 700;
 }
 
 .targetUserMenu img {
-    object-fit: cover;
-    display: inline-block;
-    position: relative;
-    width: clamp(50px, 50px + 5vw, 200px);
-    height: clamp(50px, 50px + 5vw, 200px);
-    overflow: hidden;
-    border-radius: 50%;
+  object-fit: cover;
+  border-radius: 50%;
+  width: clamp(50px, 50px + 4vw, 200px);
+  height: clamp(50px, 50px + 4vw, 200px);
+}
+
+.targetUserMenu button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+}
+
+.targetUserMenu button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
+}
+
+.targetUserMenu img {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
 }
