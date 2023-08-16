@@ -33,21 +33,23 @@ enum ChannelMode {
 }
 
 model User {
-    id            Int       @id @default(autoincrement())
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt()
-    role          Role      @default(USER)
-    username      String    @unique
-    hash          String    @unique
-    status        Status    @default(ONLINE)
-    user42        Boolean   @default(true)
-    profile       Profile?
-    channelsOwned Channel[] @relation(name: "OwnedChannel")
-    channelId     Int?
-    channels      Channel?  @relation(name: "ChannelIn", fields: [channelId], references: [id])
-    messages      Message[] @relation(name: "SenderMessage")
-    gameAsPlayer1 Game[]    @relation(name: "Player1")
-    gameAsPlayer2 Game[]    @relation(name: "Player2")
+    id             Int       @id @default(autoincrement())
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt()
+    role           Role      @default(USER)
+    username       String    @unique
+    hash           String    @unique
+    status         Status    @default(ONLINE)
+    user42         Boolean   @default(true)
+    profile        Profile?
+    channelsOwned  Channel[] @relation(name: "OwnedChannel")
+    channelId      Int?
+    channels       Channel?  @relation(name: "ChannelIn", fields: [channelId], references: [id])
+    messages       Message[] @relation(name: "SenderMessage")
+    gameAsPlayer1  Game[]    @relation(name: "Player1")
+    gameAsPlayer2  Game[]    @relation(name: "Player2")
+    friends        User[]    @relation(name: "friends")
+    friendsAddedMe User[]    @relation(name: "friends")
 
     @@map("users")
 }
