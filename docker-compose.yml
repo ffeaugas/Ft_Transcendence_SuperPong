@@ -1,82 +1,83 @@
-version: '3.9'
+version: "3.9"
 services:
-    backend:
-        hostname: nestjs
-        networks:
-            network:
-                ipv4_address: 10.5.0.3
-        build:
-            dockerfile: Dockerfile
-            context: ./backend
-        volumes:
-            - ./backend:/usr/src/app
-            - /usr/src/backend/app/node_modules
-        command: npm run start:dev
-        depends_on:
-            - postgres
-        environment:
-            DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
-        ports:
-            - 3001:3001
-            #prisma studio
-            - 5555:5555
+  backend:
+    hostname: nestjs
+    networks:
+      network:
+        ipv4_address: 10.5.0.3
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/backend/app/node_modules
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+    ports:
+      - 3001:3001
+      - 3002:3002
+      #prisma studio
+      - 5555:5555
 
-    frontend:
-        hostname: nextjs
-        networks:
-            network:
-                ipv4_address: 10.5.0.2
-        build:
-            dockerfile: Dockerfile
-            context: ./frontend
-        volumes:
-            - ./frontend:/usr/src/app
-            - /usr/src/app/node_modules
-        command: npm run dev
-        depends_on:
-            - backend
-        ports:
-            - 3000:3000
+  frontend:
+    hostname: nextjs
+    networks:
+      network:
+        ipv4_address: 10.5.0.2
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
 
-    postgres:
-        image: postgres:15.3-alpine3.18
-        hostname: postgres
-        networks:
-            network:
-                ipv4_address: 10.5.0.4
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: postgres
-        volumes:
-            - ./postgres-data:/var/lib/postgresql/data/
-        ports:
-            - 35000:5432
-        restart: unless-stopped
+  postgres:
+    image: postgres:15.3-alpine3.18
+    hostname: postgres
+    networks:
+      network:
+        ipv4_address: 10.5.0.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data/
+    ports:
+      - 35000:5432
+    restart: unless-stopped
 
-    postgres_admin:
-        build:
-            context: ./pgadmin
-            dockerfile: Dockerfile
-        hostname: pdadmin
-        networks:
-            network:
-                ipv4_address: 10.5.0.5
-        depends_on:
-            - postgres
-        environment:
-            PGADMIN_DEFAULT_EMAIL: admin@admin.fr
-            PGADMIN_DEFAULT_PASSWORD: password
-        volumes:
-            - ./pgadmin/servers.json:/pgadmin4/servers.json
-        ports:
-            - 5050:80
-        restart: unless-stopped
+  postgres_admin:
+    build:
+      context: ./pgadmin
+      dockerfile: Dockerfile
+    hostname: pdadmin
+    networks:
+      network:
+        ipv4_address: 10.5.0.5
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.fr
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - 5050:80
+    restart: unless-stopped
 
 networks:
-    network:
-        driver: bridge
-        ipam:
-            config:
-                - subnet: 10.5.0.0/16
-                  gateway: 10.5.0.1
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

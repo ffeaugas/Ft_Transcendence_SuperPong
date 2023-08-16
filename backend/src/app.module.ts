@@ -12,6 +12,7 @@ import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
 import { ProfileService } from './profile/profile.service';
 import { MessageModule } from './message/message.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MessageModule } from './message/message.module';
     ChannelsModule,
     HttpModule,
     MessageModule,
+    SocketModule,
   ],
   controllers: [AppController, ExchangeCodeController],
   providers: [AppService, AuthService, UsersService, ProfileService],
