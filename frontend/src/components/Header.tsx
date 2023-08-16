@@ -147,7 +147,7 @@ export default function Header() {
                                         </button>
                                         <Link
                                             className={styles.button}
-                                            href="/profile"
+                                            href={`/profile/${username}`}
                                         >
                                             Profile
                                         </Link>
