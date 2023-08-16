@@ -30,25 +30,6 @@ export default function AdministrateChannel({
     });
     const [feedbackMessage, setFeedbackMessage] = useState<string>("");
 
-    // async function deleteChannel(): Promise<void> {
-    //   try {
-    //     const res = await axios.delete("http://10.5.0.3:3001/channels/delete", {
-    //       headers: {
-    //         Authorization: "Bearer " + localStorage.getItem("token"),
-    //       },
-    //       data: {
-    //         channelName: activeChannel,
-    //       },
-    //     });
-    //     if (res.status) {
-    //       const channelName = channelInfos.channelName;
-    //       setFeedbackMessage("Channel update success!");
-    //     }
-    //   } catch (error: any) {
-    //     console.log(error.message);
-    //   }
-    // }
-
     async function deleteChannel() {
         try {
             const response = await fetch(

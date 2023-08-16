@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { MessageDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 @Injectable()
 export class MessageService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly socketGateway: SocketEvents,
+  ) {}
 
   async postMessage(dto: MessageDto, req: any) {
     const sender = await this.prisma.user.findUnique({
@@ -23,6 +27,7 @@ export class MessageService {
       },
       include: { sender: true },
     });
+    this.socketGateway.sendMessage(newMessage);
     return newMessage;
   }
 }

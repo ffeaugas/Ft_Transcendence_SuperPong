@@ -5,6 +5,7 @@ import {
   ConnectedSocket,
   MessageBody,
 } from '@nestjs/websockets';
+import { Channel, Message } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -20,14 +21,24 @@ export class SocketEvents {
     console.log(`client connected : ${client.id}`);
   }
 
-  handleDisconnection(client: Socket) {
+  handleDisconnect(client: Socket) {
     console.log(`client disconnected : ${client.id}`);
   }
 
-  //recevoir un event
   @SubscribeMessage('message')
-  handleEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    console.log('data : ', data);
-    this.server.emit('message', client.id, data);
+  handleEvent(@MessageBody() data: string, client: any) {
+    console.log('data:', data);
+  }
+
+  sendMessage(message: Message) {
+    this.server.emit('message', message);
+  }
+
+  deletedChannel(channel: Channel) {
+    this.server.emit('deleted-channel', channel);
+  }
+
+  createdChannel(channel: Channel) {
+    this.server.emit('created-channel', channel);
   }
 }
