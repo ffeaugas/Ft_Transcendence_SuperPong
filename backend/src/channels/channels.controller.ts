@@ -93,7 +93,10 @@ export class ChannelsController {
   }
 
   @Delete(':channelName')
-  async deleteChannel(@Param('channelName') channelName: string) {
-    return this.channelsService.deleteChannel(channelName);
+  async deleteChannel(
+    @Req() req: Request,
+    @Param('channelName') channelName: string,
+  ) {
+    return this.channelsService.deleteChannel(req, channelName);
   }
 }
