@@ -13,6 +13,9 @@ import { UsersService } from './users/users.service';
 import { ProfileService } from './profile/profile.service';
 import { MessageModule } from './message/message.module';
 import { SocketModule } from './socket/socket.module';
+import { AchievementController } from './achievement/achievement.controller';
+import { AchievementService } from './achievement/achievement.service';
+import { AchievementModule } from './achievement/achievement.module';
 
 @Module({
   imports: [
@@ -24,8 +27,15 @@ import { SocketModule } from './socket/socket.module';
     HttpModule,
     MessageModule,
     SocketModule,
+    AchievementModule,
   ],
-  controllers: [AppController, ExchangeCodeController],
-  providers: [AppService, AuthService, UsersService, ProfileService],
+  controllers: [AppController, ExchangeCodeController, AchievementController],
+  providers: [
+    AppService,
+    AuthService,
+    UsersService,
+    ProfileService,
+    AchievementService,
+  ],
 })
 export class AppModule {}

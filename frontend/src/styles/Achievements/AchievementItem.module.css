@@ -1,12 +1,10 @@
-.achievement {
+.achievement img {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .achievement img {
-  object-fit: cover;
-  display: inline-block;
-  position: relative;
   width: clamp(60px, 60px + 3vw, 100px);
   height: clamp(60px, 60px + 3vw, 100px);
   overflow: hidden;
@@ -17,9 +15,9 @@
 }
 
 .achievement h3 {
-  font-size: var(--titleSize2);
-  margin: 0 auto;
-  color: rgb(228, 150, 6);
+  font-size: clamp(0.4em, 0.4em + 3vw, 1em);
+  color: rgb(248, 192, 6);
+  text-align: center;
 }
 
 .achievement p {
@@ -27,4 +25,8 @@
   margin: 0 auto;
   color: grey;
   text-align: center;
+}
+
+.pageStyle p {
+  color: rgb(201, 131, 40);
 }

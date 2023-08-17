@@ -8,12 +8,23 @@ type AchievementItem = {
 
 type AchievementItemProps = {
   achievement: AchievementItem;
+  isPageDisplay: boolean;
 };
 
-export default function AchievementItem({ achievement }: AchievementItemProps) {
+export default function AchievementItem({
+  achievement,
+  isPageDisplay,
+}: AchievementItemProps) {
   return (
-    <div className={styles.achievement}>
-      <img src={achievement.picture} />
+    <div
+      className={`${styles.achievement} ${
+        isPageDisplay ? styles.pageStyle : undefined
+      }`}
+    >
+      <img
+        src={`http://10.5.0.3:3001/uploads/avatar/${achievement.picture}`}
+        alt={`${achievement.title} profile picture`}
+      />
       <h3>{achievement.title}</h3>
       <p>{achievement.description}</p>
     </div>

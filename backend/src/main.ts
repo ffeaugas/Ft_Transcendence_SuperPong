@@ -36,8 +36,66 @@ async function bootstrap() {
     });
     console.log('New channel created:', general);
     console.log(general);
+
+    const achievements = await prisma.achievement.createMany({
+      data: [
+        {
+          title: 'Gros naaaze',
+          description: 'etre un gros nul',
+          picture: 'default.png',
+        },
+        {
+          title: 'Moyen naaaze',
+          description: 'etre un peu un gros nul',
+          picture: 'default.png',
+        },
+        {
+          title: 'Pierre',
+          description: 'etre Pierre',
+          picture: 'default.png',
+        },
+        {
+          title: 'QueryLord',
+          description: 'Faire trop de Query',
+          picture: 'default.png',
+        },
+        {
+          title: 'Serial Looser',
+          description: 'Perdre 5 fois de suite',
+          picture: 'default.png',
+        },
+        {
+          title: 'Serial Winner',
+          description: 'Perdre 5 fois de suite',
+          picture: 'default.png',
+        },
+        {
+          title: 'Boutonneux',
+          description: "Ce connecter via l'intra 42",
+          picture: 'default.png',
+        },
+        {
+          title: 'Ami de Roger',
+          description: 'Etre ami avec Roger',
+          picture: 'default.png',
+        },
+        {
+          title: 'English Man',
+          description:
+            'Pas oublier de traduire tous les achievements en anglais',
+          picture: 'default.png',
+        },
+        {
+          title: 'Type sympa',
+          description: 'Dire Bonjour dans le chat general',
+          picture: 'default.png',
+        },
+      ],
+    });
+    console.log('New channel created:', achievements);
+    console.log(achievements);
   } catch (error) {
-    console.error('Error creating channel:', error.message);
+    console.error('Error creating :', error.message);
   }
   await app.listen(3001);
 }
