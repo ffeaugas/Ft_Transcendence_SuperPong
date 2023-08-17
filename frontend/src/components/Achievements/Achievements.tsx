@@ -38,7 +38,7 @@ export default function Achievements({ username }: AchievementsProps) {
 
   return (
     <div className={styles.achievements}>
-      <h3>`{username}'s achievements :</h3>
+      <h3>{username}'s achievements :</h3>
       <ul>
         {achievements.map((achievement) => (
           <AchievementItem
