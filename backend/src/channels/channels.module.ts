@@ -5,10 +5,12 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { ProfileModule } from 'src/profile/profile.module';
+import { SocketModule } from 'src/socket/socket.module';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 @Module({
-  imports: [UsersModule, ProfileModule],
+  imports: [UsersModule, ProfileModule, SocketModule],
   controllers: [ChannelsController],
-  providers: [ChannelsService, UsersService, ProfileService],
+  providers: [ChannelsService, UsersService, ProfileService, SocketEvents],
 })
 export class ChannelsModule {}

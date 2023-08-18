@@ -5,10 +5,14 @@ import { ChannelMode, Prisma } from '@prisma/client';
 import { Request } from 'express';
 import { ChannelModifyDto } from './dto/channelModify.dto';
 import * as argon from 'argon2';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 @Injectable()
 export class ChannelsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly socketEvents: SocketEvents,
+  ) {}
 
   private async createPublicChannel(owner: any, dto: ChannelDto) {
     return await this.prisma.channel.create({
@@ -214,6 +218,7 @@ export class ChannelsService {
     const deletedChannel = await this.prisma.channel.delete({
       where: { channelName: channelName },
     });
+    this.socketEvents.deletedChannel(deletedChannel);
     return deletedChannel;
   }
 }
