@@ -1,0 +1,51 @@
+img.rounded {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.userInfos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 30%;
+  background-color: rgba(250, 235, 215, 0.205);
+  padding: var(--padding1);
+}
+
+.editProfile {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.editProfile button {
+  border-style: none;
+  background: none;
+  color: rgb(214, 133, 197);
+  padding: 0;
+  font-size: var(--titleSize2);
+}
+
+.editProfile button:hover {
+  color: rgb(191, 197, 195);
+}
+
+.editProfile p {
+  text-align: center;
+}
+
+.profile {
+  display: flex;
+  flex-direction: row;
+}
+
+.hidden {
+  display: none;
+}
