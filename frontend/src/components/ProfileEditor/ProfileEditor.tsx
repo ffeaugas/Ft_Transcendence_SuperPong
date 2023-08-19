@@ -1,6 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "@/styles/ProfileEditor/ProfileEditor.module.css";
+import { number } from "yup";
+
+const USERNAME_MAX_LENGTH: number = 12;
+const BIO_MAX_LENGTH: number = 150;
 
 type ProfileDatas = {
   id: number;
@@ -22,8 +26,8 @@ type EditorModes = {
 
 type EditedDatas = {
   username: string;
-  bio: string;
   profilePicture?: string;
+  bio: string;
 };
 
 export default function ProfileEditor() {
@@ -33,10 +37,10 @@ export default function ProfileEditor() {
   );
   const [editedDatas, setEditedDatas] = useState<EditedDatas>({
     username: "",
-    bio: "",
     profilePicture: "",
+    bio: "",
   });
-  const [usernameEditor, setUsernameEditor] = useState<EditorModes>({
+  const [datasEditor, setDatasEditor] = useState<EditorModes>({
     username: false,
     profilePicture: false,
     bio: false,
@@ -64,7 +68,6 @@ export default function ProfileEditor() {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data);
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {
@@ -74,6 +77,11 @@ export default function ProfileEditor() {
   }
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
+    if (
+      (name === "username" && value.length > USERNAME_MAX_LENGTH) ||
+      (name === "bio" && value.length > BIO_MAX_LENGTH)
+    )
+      return;
     setEditedDatas({
       ...editedDatas,
       [name]: value,
@@ -92,7 +100,6 @@ export default function ProfileEditor() {
       const res = await fetch("http://10.5.0.3:3001/profiles", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: JSON.stringify(data),
@@ -102,28 +109,63 @@ export default function ProfileEditor() {
       } else {
         setFeedbackMessage("Profile update failed.");
         console.log("NOT OK");
+        setDatasEditor({
+          ...datasEditor,
+          username: !datasEditor.username,
+        });
+        setEditedDatas({
+          ...editedDatas,
+          username: username,
+        });
       }
     } catch (error) {
       console.log(error);
     }
+    setDatasEditor({
+      ...datasEditor,
+      username: !datasEditor.username,
+    });
+  }
+
+  async function changeBio() {
+    try {
+      const dataBody = {
+        bio: editedDatas.bio,
+      };
+      const res = await fetch("http://10.5.0.3:3001/profiles", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify(data),
+      });
+    } catch (error) {}
   }
 
   useEffect(() => {
-    getUsername()
-      .then((username) => {
-        setUsername(username);
-        getProfileDatas(username).then((datas) => {
-          setProfileDatas(datas);
-        });
-      })
-      .then(() => {
-        if (username && profileDatas) {
-          editedDatas.username = username;
-          editedDatas.bio = profileDatas.bio;
-          editedDatas.profilePicture = profileDatas.profilePicture;
-        }
+    getUsername().then((username) => {
+      setUsername(username);
+      getProfileDatas(username).then((datas) => {
+        setProfileDatas(datas);
       });
+    });
   }, []);
+
+  useEffect(() => {
+    if (username && profileDatas) {
+      setEditedDatas({
+        username: username,
+        profilePicture: profileDatas.profilePicture,
+        bio: profileDatas.bio,
+      });
+      console.log("EDITED DATAS: ", editedDatas);
+    }
+    setDatasEditor({
+      username: false,
+      profilePicture: false,
+      bio: false,
+    });
+  }, [username, profileDatas]);
 
   if (!profileDatas) {
     return (
@@ -134,34 +176,62 @@ export default function ProfileEditor() {
   }
   return (
     <>
-      <form onSubmit={(evt) => handleSubmit(evt)}>
-        <input
-          className={usernameEditor.username ? styles.hidden : undefined}
-          type="text"
-          name="username"
-          id="username"
-          value={editedDatas.username}
-          onChange={(evt) => handleChange(evt)}
-        />
-      </form>
-      <h2 className={usernameEditor.username ? undefined : styles.hidden}>
-        {editedDatas.username}
-      </h2>
-      <button
-        onClick={() =>
-          setUsernameEditor({
-            ...usernameEditor,
-            username: !usernameEditor.username,
-          })
-        }
-      >
-        &#9998;
-      </button>
+      <div className={styles.editProfile}>
+        {datasEditor.username ? (
+          <form onSubmit={(evt) => handleSubmit(evt)}>
+            <input
+              type="text"
+              name="username"
+              value={editedDatas.username}
+              onChange={(evt) => handleChange(evt)}
+            />
+          </form>
+        ) : (
+          <h2>{editedDatas.username}</h2>
+        )}
+        <button
+          onClick={() =>
+            setDatasEditor({
+              ...datasEditor,
+              username: !datasEditor.username,
+            })
+          }
+        >
+          &#9998;
+        </button>
+      </div>
+
       <img
         className={styles.rounded}
         src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
       />
-      <p>"{profileDatas["bio"]}Jojo a pas mis de bio ce looser"</p>
+
+      <div className={styles.editProfile}>
+        {datasEditor.bio ? (
+          <form onSubmit={(evt) => changeBio(evt)}>
+            <textarea
+              cols={25}
+              rows={6}
+              name="bio"
+              id="bio"
+              value={editedDatas.bio}
+              onChange={(evt) => handleChange(evt)}
+            />
+          </form>
+        ) : (
+          <p>"{profileDatas["bio"]}Jojo a pas mis de bio ce looser"</p>
+        )}
+        <button
+          onClick={() =>
+            setDatasEditor({
+              ...datasEditor,
+              bio: !datasEditor.bio,
+            })
+          }
+        >
+          &#9998;
+        </button>
+      </div>
       <p>{feedbackMessage}</p>
     </>
   );

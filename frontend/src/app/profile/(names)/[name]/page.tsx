@@ -48,7 +48,6 @@ export default function Profile({ params }: { params: { name: string } }) {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data);
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {
@@ -87,7 +86,7 @@ export default function Profile({ params }: { params: { name: string } }) {
       <h3>PROFILE </h3>
       <div className={styles.profile}>
         <div className={styles.userInfos}>
-          {isYourProfile ? (
+          {isYourProfile() ? (
             <ProfileEditor />
           ) : (
             <>
