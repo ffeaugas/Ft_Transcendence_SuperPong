@@ -7,12 +7,13 @@ import {
   Req,
   Post,
   Body,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserDto } from './dto';
+import { UserDto, UsernameUpdateDto } from './dto';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -54,6 +55,11 @@ export class UsersController {
     if (username) return await this.usersService.getByUsername(username);
     else if (id) return await this.usersService.getById(+id);
     else return await this.usersService.getAllUsers();
+  }
+
+  @Patch('update-username')
+  async updateUsername(@Body() dto: UsernameUpdateDto) {
+    return await this.usersService.updateUsername(dto);
   }
 
   @Delete()

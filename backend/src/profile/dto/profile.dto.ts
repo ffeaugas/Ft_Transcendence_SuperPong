@@ -15,3 +15,14 @@ export class ProfileDto {
   @ApiProperty({ description: 'profilePicture' })
   profilePicture: string;
 }
+
+export class ProfileBioUpdateDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'username' })
+  username: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'bio' })
+  bio: string;
+}

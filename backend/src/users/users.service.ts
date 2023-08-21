@@ -6,7 +6,7 @@ import { AuthDto } from 'src/auth/dto';
 import { Request } from 'express';
 import * as argon from 'argon2';
 import { ChannelMode } from '@prisma/client';
-import { UserDto } from './dto';
+import { UserDto, UsernameUpdateDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -131,6 +131,16 @@ export class UsersService {
       delete user.hash;
     });
     return users;
+  }
+
+  async updateUsername(dto: UsernameUpdateDto) {
+    const userFounded = await this.prismaService.user.findUnique({
+      where: { username: dto.oldUsername },
+    });
+    return await this.prismaService.user.update({
+      where: { id: userFounded.id },
+      data: { username: dto.newUsername },
+    });
   }
 
   async deleteByUsername(username: string) {

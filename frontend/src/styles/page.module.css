@@ -35,8 +35,9 @@ img.rounded {
   align-items: center;
   gap: 10px;
   width: 30%;
-  background-color: rgba(250, 235, 215, 0.205);
+  background-color: rgba(151, 59, 236, 0.151);
   padding: var(--padding1);
+  border-radius: 10px;
 }
 
 .editProfile {

@@ -88,57 +88,84 @@ export default function ProfileEditor() {
     });
   }
 
-  async function handleSubmit(evt: any): Promise<void> {
-    evt.preventDefault();
-    console.log("Change username : ", editedDatas.username);
-    try {
-      const data = {
-        username: editedDatas.username,
-        bio: editedDatas.bio,
-        profilePicture: editedDatas.profilePicture,
-      };
-      const res = await fetch("http://10.5.0.3:3001/profiles", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        setFeedbackMessage("Profile successfully updated !");
-      } else {
-        setFeedbackMessage("Profile update failed.");
-        console.log("NOT OK");
-        setDatasEditor({
-          ...datasEditor,
-          username: !datasEditor.username,
-        });
-        setEditedDatas({
-          ...editedDatas,
-          username: username,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    setDatasEditor({
-      ...datasEditor,
-      username: !datasEditor.username,
-    });
-  }
+  // async function handleChangeUsername(evt: any): Promise<void> {
+  //   evt.preventDefault();
+  //   console.log("Change username : ", editedDatas.username);
+  //   try {
+  //     const data = {
+  //       username: editedDatas.username,
+  //       bio: editedDatas.bio,
+  //       profilePicture: editedDatas.profilePicture,
+  //     };
+  //     const res = await fetch("http://10.5.0.3:3001/profiles", {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: "Bearer " + localStorage.getItem("token"),
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
+  //     if (res.ok) {
+  //       setFeedbackMessage("Profile successfully updated !");
+  //     } else {
+  //       setFeedbackMessage("Profile update failed.");
+  //       console.log("NOT OK");
+  //       setDatasEditor({
+  //         ...datasEditor,
+  //         username: !datasEditor.username,
+  //       });
+  //       setEditedDatas({
+  //         ...editedDatas,
+  //         username: username,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   setDatasEditor({
+  //     ...datasEditor,
+  //     username: !datasEditor.username,
+  //   });
+  // }
 
-  async function changeBio() {
+  async function handleChangeUsername(evt: any) {
+    evt.preventDefault();
     try {
       const dataBody = {
-        bio: editedDatas.bio,
+        oldUsername: username,
+        newUsername: editedDatas.username,
       };
-      const res = await fetch("http://10.5.0.3:3001/profiles", {
-        method: "POST",
+      const res = await fetch("http://10.5.0.3:3001/users/update-username", {
+        method: "PATCH",
         headers: {
+          "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataBody),
       });
+      if (res.ok) {
+        setUsername(editedDatas.username);
+      }
+    } catch (error) {}
+  }
+
+  async function handleChangeBio(evt: any) {
+    evt.preventDefault();
+    try {
+      const dataBody = {
+        username: username,
+        bio: editedDatas.bio,
+      };
+      const res = await fetch("http://10.5.0.3:3001/profiles/update-bio", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify(dataBody),
+      });
+      if (res.ok) {
+        setProfileDatas({ ...profileDatas, bio: editedDatas.bio });
+      }
     } catch (error) {}
   }
 
@@ -175,10 +202,10 @@ export default function ProfileEditor() {
     );
   }
   return (
-    <>
+    <div className={styles.profileEditor}>
       <div className={styles.editProfile}>
         {datasEditor.username ? (
-          <form onSubmit={(evt) => handleSubmit(evt)}>
+          <form onSubmit={(evt) => handleChangeUsername(evt)}>
             <input
               type="text"
               name="username"
@@ -208,7 +235,7 @@ export default function ProfileEditor() {
 
       <div className={styles.editProfile}>
         {datasEditor.bio ? (
-          <form onSubmit={(evt) => changeBio(evt)}>
+          <form onSubmit={(evt) => handleChangeBio(evt)}>
             <textarea
               cols={25}
               rows={6}
@@ -217,9 +244,10 @@ export default function ProfileEditor() {
               value={editedDatas.bio}
               onChange={(evt) => handleChange(evt)}
             />
+            <button type="input">update</button>
           </form>
         ) : (
-          <p>"{profileDatas["bio"]}Jojo a pas mis de bio ce looser"</p>
+          <p>"{profileDatas.bio}"</p>
         )}
         <button
           onClick={() =>
@@ -233,6 +261,6 @@ export default function ProfileEditor() {
         </button>
       </div>
       <p>{feedbackMessage}</p>
-    </>
+    </div>
   );
 }

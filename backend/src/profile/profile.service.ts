@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProfileDto } from './dto';
+import { ProfileBioUpdateDto, ProfileDto } from './dto';
 import { Request, Express } from 'express';
 import { Multer } from 'multer';
 import { HttpService } from '@nestjs/axios';
@@ -69,9 +69,9 @@ export class ProfileService {
     return { message: 'Profile picture updated successfully' };
   }
 
-  async updateBioProfile(user: string, dto: ProfileDto) {
+  async updateProfileBio(dto: ProfileBioUpdateDto) {
     const userFounded = await this.prisma.user.findUnique({
-      where: { username: user },
+      where: { username: dto.username },
     });
     return await this.prisma.profile.update({
       where: { userId: userFounded.id },
