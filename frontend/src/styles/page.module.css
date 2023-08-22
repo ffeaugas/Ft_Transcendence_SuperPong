@@ -121,3 +121,22 @@ img.rounded {
   justify-content: center;
   gap: 30px;
 }
+
+/*================ 1st LOGIN PROFILE PAGE ================*/
+
+.profilePage {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.customProfilePage {
+  margin: 0 auto;
+  background-color: var(--backgroundColor1);
+  width: 40%;
+  border-radius: 5%;
+  padding: var(--padding1);
+}

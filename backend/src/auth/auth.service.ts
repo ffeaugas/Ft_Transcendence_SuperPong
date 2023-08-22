@@ -81,7 +81,7 @@ export class AuthService {
         where: { userId: newUser.id },
       });
       console.log(profileUser.profilePicture);
-      return newUser;
+      return this.login(dto);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

@@ -190,6 +190,9 @@ export default function ProfileEditor() {
               value={editedDatas.username}
               onChange={(evt) => handleChange(evt)}
             />
+            <button type="submit" className={styles.customButton}>
+              update
+            </button>
           </form>
         ) : (
           <h2>{editedDatas.username}</h2>
@@ -261,7 +264,7 @@ export default function ProfileEditor() {
               value={editedDatas.bio}
               onChange={(evt) => handleChange(evt)}
             />
-            <button type="input" className={styles.customButton}>
+            <button type="submit" className={styles.customButton}>
               update
             </button>
           </form>
