@@ -2,7 +2,6 @@ import styles from "@/styles/page.module.css";
 import Header from "@/components/Header";
 import AchievementItem from "@/components/Achievements/AchievementItem";
 import axios from "axios";
-import { useEffect, useState } from "react";
 
 type Achievement = {
   id: number;
