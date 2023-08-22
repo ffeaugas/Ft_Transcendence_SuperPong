@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "@/styles/ProfileEditor/ProfileEditor.module.css";
-import { number } from "yup";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
@@ -31,6 +30,7 @@ type EditedDatas = {
 };
 
 export default function ProfileEditor() {
+  const [createObjectURL, setCreateObjectURL] = useState(undefined);
   const [username, setUsername] = useState<string>("");
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
@@ -88,45 +88,6 @@ export default function ProfileEditor() {
     });
   }
 
-  // async function handleChangeUsername(evt: any): Promise<void> {
-  //   evt.preventDefault();
-  //   console.log("Change username : ", editedDatas.username);
-  //   try {
-  //     const data = {
-  //       username: editedDatas.username,
-  //       bio: editedDatas.bio,
-  //       profilePicture: editedDatas.profilePicture,
-  //     };
-  //     const res = await fetch("http://10.5.0.3:3001/profiles", {
-  //       method: "POST",
-  //       headers: {
-  //         Authorization: "Bearer " + localStorage.getItem("token"),
-  //       },
-  //       body: JSON.stringify(data),
-  //     });
-  //     if (res.ok) {
-  //       setFeedbackMessage("Profile successfully updated !");
-  //     } else {
-  //       setFeedbackMessage("Profile update failed.");
-  //       console.log("NOT OK");
-  //       setDatasEditor({
-  //         ...datasEditor,
-  //         username: !datasEditor.username,
-  //       });
-  //       setEditedDatas({
-  //         ...editedDatas,
-  //         username: username,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  //   setDatasEditor({
-  //     ...datasEditor,
-  //     username: !datasEditor.username,
-  //   });
-  // }
-
   async function handleChangeUsername(evt: any) {
     evt.preventDefault();
     try {
@@ -169,6 +130,24 @@ export default function ProfileEditor() {
     } catch (error) {}
   }
 
+  const uploadToClient = (evt: any) => {
+    if (evt.target.files && evt.target.files[0]) {
+      const localImage = evt.target.files[0];
+
+      setEditedDatas({ ...editedDatas, profilePicture: localImage });
+      setCreateObjectURL(URL.createObjectURL(localImage));
+    }
+  };
+
+  const uploadToServer = async (event) => {
+    const body = new FormData();
+    body.append("file", image);
+    const response = await fetch("/api/file", {
+      method: "POST",
+      body,
+    });
+  };
+
   useEffect(() => {
     getUsername().then((username) => {
       setUsername(username);
@@ -185,7 +164,6 @@ export default function ProfileEditor() {
         profilePicture: profileDatas.profilePicture,
         bio: profileDatas.bio,
       });
-      console.log("EDITED DATAS: ", editedDatas);
     }
     setDatasEditor({
       username: false,
@@ -228,10 +206,49 @@ export default function ProfileEditor() {
         </button>
       </div>
 
-      <img
-        className={styles.rounded}
-        src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
-      />
+      <div className={styles.editProfile}>
+        {datasEditor.profilePicture ? (
+          <div className={styles.imageUploader}>
+            {createObjectURL ? (
+              <img className={styles.rounded} src={createObjectURL} />
+            ) : (
+              <img
+                className={styles.rounded}
+                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+              />
+            )}
+            <input
+              type="file"
+              id="uploadImg"
+              name="uploadImg"
+              className={styles.imageUploaderInput}
+              onChange={uploadToClient}
+            />
+            <button
+              type="submit"
+              onClick={uploadToServer}
+              className={styles.customButton}
+            >
+              update
+            </button>
+          </div>
+        ) : (
+          <img
+            className={styles.rounded}
+            src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+          />
+        )}
+        <button
+          onClick={() =>
+            setDatasEditor({
+              ...datasEditor,
+              profilePicture: !datasEditor.profilePicture,
+            })
+          }
+        >
+          &#9998;
+        </button>
+      </div>
 
       <div className={styles.editProfile}>
         {datasEditor.bio ? (
@@ -244,7 +261,9 @@ export default function ProfileEditor() {
               value={editedDatas.bio}
               onChange={(evt) => handleChange(evt)}
             />
-            <button type="input">update</button>
+            <button type="input" className={styles.customButton}>
+              update
+            </button>
           </form>
         ) : (
           <p>"{profileDatas.bio}"</p>

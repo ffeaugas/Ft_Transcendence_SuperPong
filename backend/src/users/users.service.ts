@@ -93,6 +93,7 @@ export class UsersService {
   }
 
   async getMe(req: Request): Promise<Users> {
+    console.log('REQ: ', req);
     const username = req['user'].username;
     const user = await this.prismaService.user.findUnique({
       where: { username: username },
