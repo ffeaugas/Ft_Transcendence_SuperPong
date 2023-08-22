@@ -19,7 +19,8 @@ export class UsersService {
     const passwordHash: string = await argon.hash(dto.password);
     const newUser = await this.prismaService.user.create({
       data: {
-        username: dto.username,
+        username: dto.login + '_' + Math.random().toString(36).slice(-16),
+        login: dto.login,
         hash: passwordHash,
         user42: user42,
       },
@@ -35,7 +36,7 @@ export class UsersService {
 
   async addFriend(req: any, dto: UserDto) {
     const userReq = await this.prismaService.user.findUnique({
-      where: { username: req.user.username },
+      where: { id: req.user.sub },
     });
     if (!userReq) throw new ForbiddenException('User not found');
     const user = await this.prismaService.user.update({
@@ -56,6 +57,7 @@ export class UsersService {
     user.friends.forEach((friend) => {
       delete friend.hash;
     });
+    delete user.hash;
     return user;
   }
 
@@ -84,18 +86,19 @@ export class UsersService {
     return privateChannels;
   }
 
-  async getByUsername(username: string): Promise<Users> {
+  async getByUsername(login: string): Promise<Users> {
     const user = await this.prismaService.user.findUnique({
-      where: { username: username },
+      where: { login: login },
     });
     if (!user) throw new ForbiddenException('User not found');
     return user;
   }
 
   async getMe(req: Request): Promise<Users> {
-    const username = req['user'].username;
+    // console.log('REQ: ', req);
+    const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
-      where: { username: username },
+      where: { id: id },
       include: { channels: true },
     });
     if (!user) throw new ForbiddenException('User not found');
