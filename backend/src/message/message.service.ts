@@ -12,7 +12,7 @@ export class MessageService {
 
   async postMessage(dto: MessageDto, req: any) {
     const sender = await this.prisma.user.findUnique({
-      where: { username: req.user.username },
+      where: { id: req.user.sub },
     });
     if (!sender) throw new ForbiddenException('Sender not found.');
     const channelToSend = await this.prisma.channel.findUnique({

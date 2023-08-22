@@ -10,7 +10,7 @@ export default function Register() {
     const { initialValues, handleRegister } = useRegister();
 
     const formSchema = object().shape({
-        username: string().min(2).required("Required"),
+        login: string().min(2).required("Required"),
         password: string().min(8).required("Required"),
         confirmPassword: string().oneOf(
             [ref("password")],
@@ -25,16 +25,16 @@ export default function Register() {
                 onSubmit={handleRegister}
             >
                 <Form>
-                    <h1 className={styles.fieldName}>Username</h1>
+                    <h1 className={styles.fieldName}>Login</h1>
                     <div className={styles.fieldContainer}>
                         <Field
                             type="text"
-                            name="username"
-                            id="username"
+                            name="login"
+                            id="login"
                             className={styles.fieldInput}
                         />
                         <ErrorMessage
-                            name="username"
+                            name="login"
                             component="div"
                             className={styles.fieldError}
                         />

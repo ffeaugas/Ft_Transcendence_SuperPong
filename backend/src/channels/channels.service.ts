@@ -54,7 +54,7 @@ export class ChannelsService {
   async createChannel(req: Request, dto: ChannelDto) {
     try {
       const owner = await this.prisma.user.findUnique({
-        where: { username: req['user'].username },
+        where: { id: req['user'].sub },
       });
       if (!owner) throw new ForbiddenException('User not found.');
       let newChannel: any;
@@ -81,7 +81,7 @@ export class ChannelsService {
   async changeChannelMode(req: Request, dto: any) {
     let updateChannel: any;
     const user = await this.prisma.user.findUnique({
-      where: { username: req['user'].username },
+      where: { id: req['user'].sub },
     });
     const channelToUpdate = await this.prisma.channel.findUnique({
       where: {
@@ -131,7 +131,7 @@ export class ChannelsService {
 
   async setChannelPassword(dto: ChannelModifyDto, req: Request) {
     const user = await this.prisma.user.findUnique({
-      where: { username: req['user'].username },
+      where: { id: req['user'].sub },
     });
     const channelToUpdate = await this.prisma.channel.findFirst({
       where: {
@@ -206,7 +206,7 @@ export class ChannelsService {
 
   async deleteChannel(req: Request, channelName: string) {
     const user = await this.prisma.user.findUnique({
-      where: { username: req['user'].username },
+      where: { id: req['user'].sub },
       include: { channelsOwned: true },
     });
     if (!user) throw new ForbiddenException('User not found.');

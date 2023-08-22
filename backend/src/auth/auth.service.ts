@@ -39,16 +39,16 @@ export class AuthService {
     const passwordHash: string = await argon.hash(password);
     const user = new AuthDto();
     const userFound = await this.prisma.user.findUnique({
-      where: { username: userData.login },
+      where: { login: userData.login },
     });
     if (!userFound || !userFound.user42) {
-      user.username = userData.login;
+      user.login = userData.login;
       user.password = passwordHash;
       const newUser = await this.usersService.createUser(user, true);
       await this.prisma.profile.update({
         where: { userId: newUser.id },
         data: {
-          profilePicture: newUser.username + '_' + +newUser.id + '.jpeg',
+          profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
       this.downloadImage(
@@ -56,8 +56,9 @@ export class AuthService {
         userData.login + '_' + +newUser.id,
       );
     } else {
-      user.username = userData.login;
+      user.login = userData.login;
       user.password = userFound.hash;
+      console.log(userData.email);
     }
     return await this.login(user);
   }
@@ -77,10 +78,6 @@ export class AuthService {
   async register(dto: AuthDto) {
     try {
       const newUser = await this.usersService.createUser(dto, false);
-      const profileUser = await this.prisma.profile.findUnique({
-        where: { userId: newUser.id },
-      });
-      console.log(profileUser.profilePicture);
       return newUser;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -93,8 +90,8 @@ export class AuthService {
   }
 
   async login(dto: AuthDto) {
-    const user = await this.usersService.getByUsername(dto.username);
-    const payload = { sub: user.id, username: user.username, role: user.role };
+    const user = await this.usersService.getByUsername(dto.login);
+    const payload = { sub: user.id, login: user.login, role: user.role };
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
