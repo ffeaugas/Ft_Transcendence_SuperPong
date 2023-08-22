@@ -23,15 +23,15 @@ export default function Login() {
         <div className={styles.login}>
             <Formik initialValues={initialValues} onSubmit={handleLogin}>
                 <Form>
-                    <h1 className={styles.fieldName}>Username</h1>
+                    <h1 className={styles.fieldName}>Login</h1>
                     <div className={styles.fieldContainer}>
                         <Field
                             type="text"
-                            name="username"
-                            id="username"
+                            name="login"
+                            id="login"
                             className={styles.fieldInput}
                         />
-                        <ErrorMessage name="username" component="div" />
+                        <ErrorMessage name="login" component="div" />
                     </div>
                     <h1 className={styles.fieldName}>Password</h1>
                     <div className={styles.fieldContainer}>

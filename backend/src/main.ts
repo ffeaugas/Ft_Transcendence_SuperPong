@@ -28,7 +28,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  app.enableCors();
+  app.enableCors({ origin: '*' });
   const name = 'General';
   try {
     const general = await prisma.channel.create({

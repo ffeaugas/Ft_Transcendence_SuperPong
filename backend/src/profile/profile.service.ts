@@ -60,7 +60,7 @@ export class ProfileService {
 
   async updateProfilePicture(req: Request, image: any) {
     const user = await this.prisma.user.findUnique({
-      where: { username: req['user'].username },
+      where: { id: req['user'].sub },
     });
     if (!user) throw new ForbiddenException('User not found.');
     const newImgUrl = await this.saveImage(image);
