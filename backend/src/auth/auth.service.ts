@@ -34,6 +34,7 @@ export class AuthService {
   }
 
   async handleSuccessful42Auth(accessToken: string) {
+    let isFirstConnection: boolean = false;
     const userData = await this.get42UserData(accessToken);
     const password = Math.random().toString(36).slice(-16);
     const passwordHash: string = await argon.hash(password);
@@ -44,6 +45,7 @@ export class AuthService {
     if (!userFound || !userFound.user42) {
       user.username = userData.login;
       user.password = passwordHash;
+      isFirstConnection = true;
       const newUser = await this.usersService.createUser(user, true);
       await this.prisma.profile.update({
         where: { userId: newUser.id },
@@ -59,7 +61,8 @@ export class AuthService {
       user.username = userData.login;
       user.password = userFound.hash;
     }
-    return await this.login(user);
+    const res = await this.login(user);
+    return [res, isFirstConnection];
   }
 
   async get42UserData(accessToken: string) {

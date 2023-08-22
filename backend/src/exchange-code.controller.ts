@@ -35,10 +35,13 @@ export class ExchangeCodeController {
       });
       const data = await response.json();
       const accessToken = data.access_token;
-      const access_token = await this.authService.handleSuccessful42Auth(
-        accessToken,
-      );
-      return res.status(200).json(access_token);
+      const [access_token, isFirstConnection] =
+        await this.authService.handleSuccessful42Auth(accessToken);
+      return {
+        ...res
+          .status(200)
+          .json({ access_token, isFirstConnection: isFirstConnection }),
+      };
     } catch (error) {
       console.error('Error exchanging code for access token:', error);
       return res
