@@ -145,14 +145,43 @@ img.rounded {
 
 /*================ LEADERBOARD PAGE ================*/
 
-.datas {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  background-color: rgba(0, 255, 255, 0.301);
-  padding: var(--padding1) 10%;
+.leaderboard {
 }
 
-.datas h2 {
+.titles {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--backgroundColor3);
+  border-radius: 1em 1em 0 0;
+  overflow: hidden;
+  gap: 1px;
+}
+
+.titles h2 {
+  font-family: var(--fontStyle1);
   color: var(--titleColor1);
+}
+
+.rankTitle,
+.winsTitle,
+.loosesTitle,
+.playerTitle,
+.eloTitle {
+  background-color: var(--backgroundColor2);
+  padding: var(--padding1) 0;
+  text-align: center;
+}
+
+.rankTitle,
+.winsTitle,
+.loosesTitle {
+  flex: 2;
+}
+
+.playerTitle {
+  flex: 4;
+}
+
+.eloTitle {
+  flex: 1;
 }

@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Vibur");
+@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap");
 
 :root {
   /* [COLORS] */
@@ -19,6 +20,10 @@
   --titleSize4: clamp(0.5em, 0.5em + 2vw, 2em);
   --textSize1: clamp(0.3em, 0.3em + 1vw, 1em);
   --textSize2: clamp(0.2em, 0.2em + 1vw, 0.5em);
+
+  /* [FONT STYLE] */
+  --fontStyle1: "Teko", sans-serif;
+  --fontStyle2: "Black Ops One", cursive;
 
   /* [ICON SIZES] */
   --iconSize1: clamp(0.5em, 0.5em + 2vw, 1.8em);

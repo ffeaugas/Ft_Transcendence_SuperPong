@@ -38,13 +38,23 @@ export default async function Leaderboard() {
     <section className={styles.page}>
       <Header />
       <h1>Leaderboard</h1>
-      <div className={styles.profiles}>
-        <div className={styles.datas}>
-          <h2>Rank</h2>
-          <h2>Player</h2>
-          <h2>Wins</h2>
-          <h2>Looses</h2>
-          <h2>Elo</h2>
+      <div className={styles.leaderboard}>
+        <div className={styles.titles}>
+          <div className={styles.rankTitle}>
+            <h2>Rank</h2>
+          </div>
+          <div className={styles.playerTitle}>
+            <h2>Player</h2>
+          </div>
+          <div className={styles.winsTitle}>
+            <h2>Wins</h2>
+          </div>
+          <div className={styles.loosesTitle}>
+            <h2>Looses</h2>
+          </div>
+          <div className={styles.eloTitle}>
+            <h2>Elo</h2>
+          </div>
         </div>
         <ul>
           {profiles.map((profile, index) => (
