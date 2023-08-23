@@ -14,7 +14,9 @@ export default async function Achievements() {
   const achievements: Achievement[] | undefined = await getAchievements();
 
   async function getAchievements(): Promise<Achievement[] | undefined> {
-    const res = await fetch("http://10.5.0.3:3001/achievement/all");
+    const res = await fetch("http://10.5.0.3:3001/achievement/all", {
+      cache: "no-store",
+    });
     if (!res.ok) {
       console.log(res);
       throw new Error("Failed fetching achievements");

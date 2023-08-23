@@ -142,3 +142,17 @@ img.rounded {
   border-radius: 5%;
   padding: var(--padding1);
 }
+
+/*================ LEADERBOARD PAGE ================*/
+
+.datas {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: rgba(0, 255, 255, 0.301);
+  padding: var(--padding1) 10%;
+}
+
+.datas h2 {
+  color: var(--titleColor1);
+}

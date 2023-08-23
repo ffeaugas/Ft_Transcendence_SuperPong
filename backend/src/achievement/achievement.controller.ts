@@ -1,6 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AchievementService } from './achievement.service';
 
 @ApiTags('achievement')

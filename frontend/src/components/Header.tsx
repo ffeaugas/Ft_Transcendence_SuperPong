@@ -118,6 +118,14 @@ export default function Header() {
               Achievements
             </Link>
           </li>
+          <li>
+            <Link
+              href="/leaderboard"
+              className={pathname == "/leaderboard" ? styles.isActive : ""}
+            >
+              Leaderboard
+            </Link>
+          </li>
         </ul>
         <ul>
           {!auth ? (

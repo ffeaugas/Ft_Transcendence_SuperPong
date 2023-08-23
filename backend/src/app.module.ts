@@ -16,6 +16,7 @@ import { SocketModule } from './socket/socket.module';
 import { AchievementController } from './achievement/achievement.controller';
 import { AchievementService } from './achievement/achievement.service';
 import { AchievementModule } from './achievement/achievement.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AchievementModule } from './achievement/achievement.module';
     MessageModule,
     SocketModule,
     AchievementModule,
+    LeaderboardModule,
   ],
   controllers: [AppController, ExchangeCodeController, AchievementController],
   providers: [
