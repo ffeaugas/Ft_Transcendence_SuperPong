@@ -5,6 +5,7 @@
   gap: 5px;
   padding: clamp(0.3em, 0.3em + 1vw, 1em);
   border-radius: var(--borderRadius1);
+  text-align: left;
 }
 
 .msg p {

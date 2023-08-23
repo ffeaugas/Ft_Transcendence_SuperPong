@@ -1,4 +1,4 @@
-import styles from "@/styles/Leaderboard/Leaderboard.module.css";
+import styles from "@/styles/Leaderboard/LeaderboardItem.module.css";
 
 type Profile = {
   id: number;
@@ -20,17 +20,25 @@ export default function LeaderboardItem({
 }: LeaderboardItemProps) {
   return (
     <div className={styles.leaderboardItem}>
-      <h2>{rank}</h2>
-      <div>
+      <div className={styles.rank}>
+        <h3>{rank}</h3>
+      </div>
+      <div className={styles.player}>
         <img
           className={`${styles.rounded}`}
           src={`http://10.5.0.3:3001/uploads/avatar/${profile.profilePicture}`}
         />
         <h4>{profile.username}</h4>
       </div>
-      <p className={styles.wins}>{profile.winCount}</p>
-      <p className={styles.looses}>{profile.loseCount}</p>
-      <p className={styles.elo}>{profile.eloMatchMaking}</p>
+      <div className={styles.wins}>
+        <h3>{profile.winCount}</h3>
+      </div>
+      <div className={styles.looses}>
+        <h3>{profile.loseCount}</h3>
+      </div>
+      <div className={styles.elo}>
+        <h3>{profile.eloMatchMaking}</h3>
+      </div>
     </div>
   );
 }

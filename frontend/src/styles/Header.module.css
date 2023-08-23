@@ -1,8 +1,8 @@
 .header {
   background-color: var(--backgroundColor2);
   display: flex;
-  justify-content: center;
-  border-radius: 20px;
+  justify-content: space-between;
+  border-radius: 15px;
   margin-top: -3%;
 }
 
@@ -22,12 +22,20 @@
   text-decoration: none;
 }
 
+@media screen and (max-width: 650px) {
+  .header .menu {
+    flex-wrap: wrap;
+    max-width: 40%;
+    gap: 7px;
+  }
+}
+
 .header li {
   list-style: none;
 }
 
 .header span {
-  color: #007e97;
+  color: var(--titleColor1);
   font-size: 13px;
 }
 
@@ -73,18 +81,17 @@
 
 img.rounded {
   object-fit: cover;
+  width: clamp(30px, 30px + 3vw, 50px);
+  height: clamp(30px, 30px + 3vw, 50px);
   border-radius: 50%;
-  height: 60px;
-  width: 60px;
-  margin-right: 8px;
+  margin: 0 auto;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 750px) {
   img.rounded {
     display: none;
   }
 }
-
 .button {
   background-color: var(--backgroundColor2);
   border: none;

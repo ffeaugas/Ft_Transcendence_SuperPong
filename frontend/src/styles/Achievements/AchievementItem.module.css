@@ -1,7 +1,9 @@
-.achievement img {
+.achievement {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: baseline;
+  width: clamp(60px, 60px + 3vw, 100px);
+  height: 170px;
 }
 
 .achievement img {
@@ -26,6 +28,7 @@
   margin: 0 auto;
   color: grey;
   text-align: center;
+  overflow-wrap: break-word;
 }
 
 .pageStyle p {

@@ -3,6 +3,8 @@
   margin: 1em auto;
   display: flex;
   flex-direction: column;
+  text-align: center;
+  gap: 20px;
 }
 
 .alternativePage {
@@ -108,18 +110,19 @@ img.rounded {
 /*================ ACHIEVEMENT PAGE ================*/
 
 .achievements {
-  background-color: var(--backgroundColor1);
+  /* background-color: var(--backgroundColor1); */
+  background-color: #03121da4;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .achievements ul {
-  padding: 15px 20%;
+  padding: 30px 20%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 30px;
+  gap: 10px;
 }
 
 /*================ 1st LOGIN PROFILE PAGE ================*/
@@ -172,16 +175,16 @@ img.rounded {
   text-align: center;
 }
 
-.rankTitle,
+.eloTitle,
 .winsTitle,
 .loosesTitle {
-  flex: 2;
-}
-
-.playerTitle {
   flex: 4;
 }
 
-.eloTitle {
-  flex: 1;
+.playerTitle {
+  flex: 8;
+}
+
+.rankTitle {
+  flex: 3;
 }

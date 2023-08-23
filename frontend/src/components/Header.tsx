@@ -88,7 +88,7 @@ export default function Header() {
         <h1>
           Super<b>Pong</b>
         </h1>
-        <ul>
+        <ul className={styles.menu}>
           <li>
             <Link href="/" className={pathname == "/" ? styles.isActive : ""}>
               Home
@@ -146,7 +146,7 @@ export default function Header() {
                   />
                 )}
                 <div className={styles.userInfo}>
-                  <span>{`Bonjour ${username}`}</span>
+                  <span>{` Hi ${username}`}</span>
                   <div className={styles.loggedOptions}>
                     <button className={styles.button} onClick={handleLogout}>
                       Logout
