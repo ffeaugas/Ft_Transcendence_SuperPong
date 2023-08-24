@@ -27,9 +27,9 @@ export class UsersController {
     return this.usersService.getFriends(req, user);
   }
 
-  @Post('addFriend')
-  async addFriend(@Req() req: Request, @Body() dto: UserDto) {
-    return await this.usersService.addFriend(req, dto);
+  @Post('addOrRemoveFriend')
+  async addOrRemoveFriend(@Req() req: Request, @Body() dto: UserDto) {
+    return await this.usersService.addOrRemoveFriend(req, dto);
   }
 
   @Get('channels')

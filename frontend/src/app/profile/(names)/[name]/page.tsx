@@ -83,7 +83,7 @@ export default function Profile({ params }: { params: { name: string } }) {
   return (
     <section className={styles.page}>
       <Header />
-      <h3>PROFILE </h3>
+      <h3>Profile </h3>
       <div className={styles.profile}>
         <div className={styles.userInfos}>
           {isYourProfile() ? (
@@ -93,9 +93,9 @@ export default function Profile({ params }: { params: { name: string } }) {
               <h2>{params.name}</h2>
               <img
                 className={styles.rounded}
-                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
               />
-              <p>"{profileDatas["bio"]}Jojo a pas mis de bio ce looseur"</p>
+              <p>"{profileDatas.bio}"</p>
             </>
           )}
           <div className={styles.winslooses}>
