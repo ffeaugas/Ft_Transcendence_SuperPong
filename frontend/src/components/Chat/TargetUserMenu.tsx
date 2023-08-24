@@ -18,8 +18,34 @@ export default function TargetUserMenu({
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
-
+  const [friendship, setFrienship] = useState<boolean>(false);
   const route = useRouter();
+
+  async function getFriendship() {
+    const userRes = await fetch("http://10.5.0.3:3001/users/me", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    const user = await userRes.json();
+    const friends = await axios.get("http://10.5.0.3:3001/users/friends", {
+      params: { user: user.username },
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    const isFriend = friends.data.find(
+      (friend: any) => friend.username === targetUser
+    );
+    if (isFriend) {
+      console.log("FRIENDS : OUI");
+      return true;
+    }
+
+    console.log("FRIENDS : ", " NON");
+    return false;
+  }
 
   async function getProfileDatas(): Promise<ProfileDatas | undefined> {
     try {
@@ -29,7 +55,6 @@ export default function TargetUserMenu({
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      console.log(res.data);
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {
@@ -41,7 +66,7 @@ export default function TargetUserMenu({
   const handleInvitFriend = async () => {
     try {
       const res = await axios.post(
-        "http://10.5.0.3:3001/users/addFriend",
+        "http://10.5.0.3:3001/users/addOrRemoveFriend",
         {
           username: targetUser,
         },
@@ -53,6 +78,7 @@ export default function TargetUserMenu({
       );
       console.log(res.data);
       const profileDatas = res.data;
+      setFrienship(!friendship);
       return profileDatas;
     } catch (error) {
       console.error("Error fetching profile datas", error);
@@ -68,6 +94,7 @@ export default function TargetUserMenu({
     if (targetUser) {
       getProfileDatas().then((datas) => setProfileDatas(datas));
     }
+    getFriendship().then((friendship) => setFrienship(friendship));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUser]);
 
@@ -90,7 +117,9 @@ export default function TargetUserMenu({
       <button onClick={goToProfile}>Profile</button>
       {/* {profileDatas.isKickable ? <button>kick</button> : undefined} */}
       <button>Invite in game</button>
-      <button onClick={handleInvitFriend}>Add friend</button>
+      <button onClick={handleInvitFriend}>
+        {friendship ? "Remove friend" : "Add friend"}
+      </button>
     </div>
   );
 }
