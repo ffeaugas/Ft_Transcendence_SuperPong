@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import styles from "../../styles/Chat/UserItem.module.css";
@@ -7,12 +6,6 @@ enum UserStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
 }
-
-type User = {
-  id: string;
-  username: string;
-  status: UserStatus.ONLINE;
-};
 
 type UserItemProps = {
   user: User;

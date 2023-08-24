@@ -10,6 +10,8 @@
   flex-direction: column;
   gap: var(--padding2);
   text-align: left;
+  overflow-y: scroll;
+  max-height: 400px;
 }
 
 .channelList .displayedChannels {

@@ -36,6 +36,14 @@ export class ChannelsController {
     return await this.channelsService.getAllUsers(channelName);
   }
 
+  @Get('is-owner')
+  async isOwner(
+    @Query('channelName') channelName: string,
+    @Query('userId') userId: number,
+  ) {
+    return await this.channelsService.isOwner(channelName, userId);
+  }
+
   @Get('publics') //NOT USED
   async getAllPublic() {
     return await this.channelsService.getAllPublic();

@@ -2,19 +2,12 @@
 
 import { useState } from "react";
 import styles from "../../styles/Chat/CreateChannel.module.css";
-import axios from "axios";
 
 enum ChannelMode {
   PRIVATE = "PRIVATE",
   PUBLIC = "PUBLIC",
   PROTECTED = "PROTECTED",
 }
-
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
 
 async function getUsername(): Promise<string> {
   const res = await fetch("http://10.5.0.3:3001/users/me", {
@@ -33,7 +26,10 @@ export default function ChannelList() {
     password: "password",
     mode: ChannelMode.PUBLIC,
   });
-  const [feedbackMessage, setFeedbackMessage] = useState<string>("");
+  const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage>({
+    success: undefined,
+    failure: undefined,
+  });
 
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
@@ -74,13 +70,22 @@ export default function ChannelList() {
           password: "",
           mode: ChannelMode.PUBLIC,
         });
-        setFeedbackMessage("Channel successfully created!");
+        setFeedbackMessage({
+          success: "Channel successfully created!",
+          failure: undefined,
+        });
       } else {
-        setFeedbackMessage("Creation channel failed.");
-        console.log("NOT OK");
+        const errorResponse = await res.json();
+        setFeedbackMessage({
+          success: undefined,
+          failure: errorResponse.message,
+        });
       }
     } catch (error) {
-      console.log(error);
+      setFeedbackMessage({
+        success: undefined,
+        failure: "Error occured when trying to create channel",
+      });
     }
   }
 
@@ -125,7 +130,12 @@ export default function ChannelList() {
         ) : undefined}
         <input type="submit" value="Create" />
       </form>
-      <p>{feedbackMessage}</p>
+      {feedbackMessage.success ? (
+        <p className={styles.success}>{feedbackMessage.success}</p>
+      ) : undefined}
+      {feedbackMessage.failure ? (
+        <p className={styles.failure}>{feedbackMessage.failure}</p>
+      ) : undefined}
     </div>
   );
 }
