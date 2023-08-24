@@ -9,17 +9,6 @@ enum ChannelMode {
   PROTECTED = "PROTECTED",
 }
 
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
-
-type FeedbackMessage = {
-  success: string | undefined;
-  failure: string | undefined;
-};
-
 async function getUsername(): Promise<string> {
   const res = await fetch("http://10.5.0.3:3001/users/me", {
     method: "GET",

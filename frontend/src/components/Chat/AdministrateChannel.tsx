@@ -10,23 +10,12 @@ enum ChannelMode {
   PROTECTED = "PROTECTED",
 }
 
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
-
-type FeedbackMessage = {
-  success: string | undefined;
-  failure: string | undefined;
-};
-
 type AdministrateChannelProps = {
-  activeChannel: string;
+  activeDiscussion: string | undefined;
 };
 
 export default function AdministrateChannel({
-  activeChannel,
+  activeDiscussion,
 }: AdministrateChannelProps) {
   const [channelInfos, setChannelInfos] = useState<ChannelInfos>({
     channelName: "",
@@ -41,7 +30,7 @@ export default function AdministrateChannel({
   async function deleteChannel() {
     try {
       const response = await fetch(
-        `http://10.5.0.3:3001/channels/${activeChannel}`,
+        `http://10.5.0.3:3001/channels/${activeDiscussion}`,
         {
           method: "DELETE",
           headers: {
@@ -81,7 +70,7 @@ export default function AdministrateChannel({
       const res = await axios.patch(
         "http://10.5.0.3:3001/channels/change-mode",
         {
-          channelName: activeChannel,
+          channelName: activeDiscussion,
           mode: channelInfos.mode,
           password: "",
         },
@@ -120,7 +109,7 @@ export default function AdministrateChannel({
     <div className={styles.adminChannel}>
       <h2>
         Manage Channel<br></br>
-        <b>{activeChannel}</b>
+        <b>{activeDiscussion}</b>
       </h2>
       <form onSubmit={(evt) => handleSubmit(evt)}>
         <div className={styles.subform}>

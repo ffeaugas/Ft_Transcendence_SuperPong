@@ -8,16 +8,7 @@ import UserList from "./UserList";
 import axios from "axios";
 import AdministrateChannel from "./AdministrateChannel";
 
-type ChannelItem = {
-  id: string;
-  channelName: string;
-};
-
-enum UserStatus {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
-}
-
+//J'arrive pas a le virer alors qu'il est dans index.ts :()
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
   USER_SELECTOR = "USER_SELECTOR",
@@ -25,28 +16,16 @@ enum MenuType {
   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
 }
 
-type User = {
-  id: string;
-  username: string;
-  status: UserStatus;
-};
-
 type MenuProps = {
   selectedMenu: MenuType;
-  activeChannel: ChannelItem;
+  activeDiscussion: string | undefined;
   switchChannel: (channelName: string) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
-type Channels = {
-  publics: ChannelItem[];
-  privates: ChannelItem[];
-  protecteds: ChannelItem[];
-};
-
 export default function Menu({
   selectedMenu,
-  activeChannel,
+  activeDiscussion,
   switchChannel,
   changeMenu,
 }: MenuProps) {
@@ -106,7 +85,7 @@ export default function Menu({
         <div className={`${styles.menu}`}>
           <ChannelList
             channels={channels}
-            activeChannel={activeChannel}
+            activeDiscussion={activeDiscussion}
             switchChannel={switchChannel}
             changeMenu={changeMenu}
           />
@@ -117,7 +96,7 @@ export default function Menu({
         <div className={`${styles.menu}`}>
           <UserList
             users={users}
-            activeChannel={activeChannel}
+            activeDiscussion={activeDiscussion}
             switchChannel={switchChannel}
           />
         </div>
@@ -131,7 +110,7 @@ export default function Menu({
     case MenuType.CHANNEL_ADMINISTRATION:
       return (
         <div className={`${styles.menu}`}>
-          {<AdministrateChannel activeChannel={activeChannel} />}
+          {<AdministrateChannel activeDiscussion={activeDiscussion} />}
         </div>
       );
   }

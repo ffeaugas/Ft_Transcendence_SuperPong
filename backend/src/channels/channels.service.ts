@@ -153,6 +153,22 @@ export class ChannelsService {
     return updatedChannel;
   }
 
+  async isOwner(channelName: string, userId: number) {
+    const channel = await this.prisma.channel.findUnique({
+      where: { channelName: channelName },
+    });
+    if (!channel) throw new ForbiddenException('Channel not found');
+    console.log(
+      'USER ID : ',
+      userId,
+      ' CHANNEL OWNER ID : ',
+      channel.ownerId,
+      ' REESULT : ',
+      userId == channel.ownerId,
+    );
+    return userId == channel.ownerId;
+  }
+
   async getAllUsers(channelName: string) {
     const channel = await this.prisma.channel.findUnique({
       where: { channelName: channelName },

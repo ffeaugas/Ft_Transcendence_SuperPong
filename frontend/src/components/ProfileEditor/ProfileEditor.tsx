@@ -1,21 +1,12 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "@/styles/ProfileEditor/ProfileEditor.module.css";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
-
-type ProfileDatas = {
-  id: number;
-  createdAt?: string;
-  updatedAt?: string;
-  bio: string;
-  winCount?: number;
-  loseCount?: number;
-  profilePicture?: string;
-  eloMatchMaking?: number;
-  userId: number;
-};
 
 type EditorModes = {
   username: boolean;
@@ -269,7 +260,7 @@ export default function ProfileEditor() {
             </button>
           </form>
         ) : (
-          <p>"{profileDatas.bio}"</p>
+          <p>{profileDatas.bio}</p>
         )}
         <button
           onClick={() =>

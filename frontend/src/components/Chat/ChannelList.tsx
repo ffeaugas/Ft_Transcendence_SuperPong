@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "@/styles/Chat/ChannelList.module.css";
 import ChannelItem from "./ChannelItem";
+import axios from "axios";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -11,34 +12,16 @@ enum MenuType {
   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
 }
 
-type ChannelItem = {
-  id: string;
-  channelName: string;
-  owner: string;
-};
-
-type Channels = {
-  publics: ChannelItem[];
-  privates: ChannelItem[];
-  protecteds: ChannelItem[];
-};
-
-type ChannelDisplay = {
-  publicChannels: boolean;
-  privateChannels: boolean;
-  protectedChannels: boolean;
-};
-
 type ChannelListProps = {
   channels: Channels | undefined;
-  activeChannel: ChannelItem;
+  activeDiscussion: string | undefined;
   switchChannel: (channelName: string) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
 export default function ChannelList({
   channels,
-  activeChannel,
+  activeDiscussion,
   switchChannel,
   changeMenu,
 }: ChannelListProps) {
@@ -47,18 +30,7 @@ export default function ChannelList({
     privateChannels: false,
     protectedChannels: false,
   });
-  const [username, setUsername] = useState("");
-
-  async function getUsername(): Promise<string> {
-    const res = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await res.json();
-    return user["username"];
-  }
+  const [isChannelOwner, setIsChannelOwner] = useState<boolean>(false);
 
   function toggleChannelDisplay(channelMode: keyof ChannelDisplay): void {
     setChannelDisplay((prevState) => ({
@@ -68,15 +40,31 @@ export default function ChannelList({
   }
 
   function isActive(channelName: string): boolean {
-    if (channelName === activeChannel.channelName) {
-      return true;
-    }
+    if (channelName === activeDiscussion) return true;
     return false;
   }
 
+  async function isOwner(): Promise<boolean> {
+    const userRes = await fetch("http://10.5.0.3:3001/users/me", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    const user = await userRes.json();
+    const userId = user.id;
+    const res = await axios.get("http://10.5.0.3:3001/channels/is-owner", {
+      params: { channelName: activeDiscussion, userId: userId },
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    return res.data;
+  }
+
   useEffect(() => {
-    getUsername().then((username) => setUsername(username));
-  }, []);
+    isOwner().then((isChannelOwner) => setIsChannelOwner(isChannelOwner));
+  }, [activeDiscussion]);
 
   if (!channels) {
     return undefined;
@@ -159,7 +147,7 @@ export default function ChannelList({
           </ul>
         ) : undefined}
       </div>
-      {username !== activeChannel.owner ? (
+      {isChannelOwner ? (
         <button onClick={() => changeMenu(MenuType.CHANNEL_ADMINISTRATION)}>
           Manage Channel
         </button>
