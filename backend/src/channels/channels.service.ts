@@ -57,7 +57,11 @@ export class ChannelsService {
         where: { id: req['user'].sub },
       });
       if (!owner) throw new ForbiddenException('User not found.');
-      let newChannel: any;
+      let newChannel = await this.prisma.channel.findUnique({
+        where: { channelName: dto.channelName },
+      });
+      if (newChannel) throw new ForbiddenException('Channel already exists');
+      // let newChannel: any;
       switch (dto.mode) {
         case 'PUBLIC':
           newChannel = await this.createPublicChannel(owner, dto);
@@ -71,9 +75,6 @@ export class ChannelsService {
       }
       return newChannel;
     } catch (error) {
-      if (error.code === 'P2002') {
-        throw new ForbiddenException('Channel already exists.');
-      }
       throw error;
     }
   }
@@ -89,7 +90,9 @@ export class ChannelsService {
       },
     });
     if (channelToUpdate.ownerId !== user.id)
-      throw new ForbiddenException("This user is not channel's owner");
+      throw new ForbiddenException(
+        'You must be the channel owner to do this operation',
+      );
     if (dto.mode === ChannelMode.PRIVATE) {
       updateChannel = await this.prisma.channel.update({
         where: { channelName: dto.channelName },
@@ -205,20 +208,24 @@ export class ChannelsService {
   }
 
   async deleteChannel(req: Request, channelName: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-      include: { channelsOwned: true },
-    });
-    if (!user) throw new ForbiddenException('User not found.');
-    const isOwner = await this.prisma.channel.findFirst({
-      where: { ownerId: user.id },
-    });
-    if (!isOwner)
-      throw new ForbiddenException('Your not owner of this channel.');
-    const deletedChannel = await this.prisma.channel.delete({
-      where: { channelName: channelName },
-    });
-    this.socketEvents.deletedChannel(deletedChannel);
-    return deletedChannel;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: req['user'].sub },
+        include: { channelsOwned: true },
+      });
+      if (!user) throw new ForbiddenException('User not found.');
+      const isOwner = await this.prisma.channel.findFirst({
+        where: { ownerId: user.id },
+      });
+      if (!isOwner)
+        throw new ForbiddenException('Your not owner of this channel.');
+      const deletedChannel = await this.prisma.channel.delete({
+        where: { channelName: channelName },
+      });
+      this.socketEvents.deletedChannel(deletedChannel);
+      return deletedChannel;
+    } catch (error) {
+      return error;
+    }
   }
 }

@@ -38,6 +38,12 @@ export class UsersService {
     const userReq = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
     });
+    console.log(req);
+    const userFriend = await this.prismaService.user.findUnique({
+      where: { username: dto.username },
+    });
+    if (req.user.sub === userFriend.id)
+      throw new ForbiddenException("You can't be friend with yourself");
     if (!userReq) throw new ForbiddenException('User not found');
     const user = await this.prismaService.user.update({
       where: {
