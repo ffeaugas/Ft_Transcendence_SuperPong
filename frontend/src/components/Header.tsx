@@ -4,47 +4,19 @@
 
 import styles from "../styles/Header.module.css";
 import Link from "next/link";
+import axios from "axios";
 import { usePathname } from "next/navigation";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { RootState } from "@/app/GlobalRedux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
 
-type ProfileDatas = {
-  id: number;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  bio: string;
-  winCount?: number;
-  loseCount?: number;
-  profilePicture?: string;
-  eloMatchMaking?: number;
-  userId: number;
-};
-
-export default function Header() {
-  const router = useRouter();
-
-  const [auth, setAuth] = useState(false);
-  const [username, setUsername] = useState("");
-  const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
-    undefined
-  );
-
-  async function getUsername(): Promise<string> {
-    const res = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await res.json();
-    return user["username"];
-  }
-
-  async function getProfileDatas(
-    username: string
-  ): Promise<ProfileDatas | undefined> {
+async function getProfileDatas(
+  username: string | undefined
+): Promise<ProfileDatas | undefined> {
+  if (username) {
     try {
       const res = await axios.get("http://10.5.0.3:3001/profiles", {
         params: { username: username },
@@ -58,6 +30,27 @@ export default function Header() {
       console.error("Error fetching profile datas", error);
       return undefined;
     }
+  }
+}
+
+export default function Header() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [auth, setAuth] = useState(false);
+  const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
+    undefined
+  );
+  const username = useSelector((state: RootState) => state.user.username);
+
+  async function getUsername(): Promise<string> {
+    const res = await fetch("http://10.5.0.3:3001/users/me", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    const user = await res.json();
+    return user["username"];
   }
 
   const pathname: string | null = usePathname();
@@ -75,9 +68,9 @@ export default function Header() {
     const auth = localStorage.getItem("Authenticate") === "true";
     setAuth(auth);
     if (auth) {
-      getUsername().then((user) => {
-        setUsername(user);
-        getProfileDatas(user).then((profileDatas) => {
+      getUsername().then((username) => {
+        dispatch(setUsername(username));
+        getProfileDatas(username).then((profileDatas) => {
           setProfileDatas(profileDatas);
         });
       });

@@ -5,6 +5,8 @@ import axios from "axios";
 import styles from "../../styles/Chat/TargetUserMenu.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 type TargetUserMenuProps = {
   targetUser: string;
@@ -20,6 +22,7 @@ export default function TargetUserMenu({
   );
   const [friendship, setFrienship] = useState<boolean>(false);
   const route = useRouter();
+  const username = useSelector((state: RootState) => state.user.username);
 
   async function getFriendship() {
     const userRes = await fetch("http://10.5.0.3:3001/users/me", {
@@ -116,10 +119,14 @@ export default function TargetUserMenu({
       <h1>{targetUser}</h1>
       <button onClick={goToProfile}>Profile</button>
       {/* {profileDatas.isKickable ? <button>kick</button> : undefined} */}
-      <button>Invite in game</button>
-      <button onClick={handleInvitFriend}>
-        {friendship ? "Remove friend" : "Add friend"}
-      </button>
+      {username === targetUser ? undefined : (
+        <>
+          <button>Invite in game</button>
+          <button onClick={handleInvitFriend}>
+            {friendship ? "Remove friend" : "Add friend"}
+          </button>
+        </>
+      )}
     </div>
   );
 }

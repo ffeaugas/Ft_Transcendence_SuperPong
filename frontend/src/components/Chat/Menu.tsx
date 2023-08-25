@@ -67,8 +67,6 @@ export default function Menu({
       getChannels().then((channels) => setChannels(channels));
     } else if (selectedMenu === MenuType.USER_SELECTOR) {
       getUsers().then((users) => setUsers(users));
-    } else {
-      // console.log("coucou");
     }
   }, [selectedMenu]);
 
@@ -114,5 +112,4 @@ export default function Menu({
         </div>
       );
   }
-  return <div className={`${styles.menu}`}></div>;
 }

@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 
 export class ChannelDto {
-  @Matches(RegExp('^[a-zA-Z0-9\\-]+$'), {
+  @Matches(RegExp('^[a-zA-Z0-9]+$'), {
     message: 'Channelname should be alpha-numeric',
   })
   @IsString()

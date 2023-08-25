@@ -8,6 +8,8 @@ import FriendList from "@/components/FriendList/FriendList";
 import GamesHistoric from "@/components/GamesHistoric/GamesHistoric";
 import Achievements from "@/components/Achievements/Achievements";
 import ProfileEditor from "@/components/ProfileEditor/ProfileEditor";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 type ProfileDatas = {
   id: number;
@@ -22,25 +24,12 @@ type ProfileDatas = {
 };
 
 export default function Profile({ params }: { params: { name: string } }) {
-  const [username, setUsername] = useState<string>("");
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
+  const username = useSelector((state: RootState) => state.user.username);
 
-  async function getUsername(): Promise<string> {
-    const res = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await res.json();
-    return user["username"];
-  }
-
-  async function getProfileDatas(
-    username: string
-  ): Promise<ProfileDatas | undefined> {
+  async function getProfileDatas(): Promise<ProfileDatas | undefined> {
     try {
       const res = await axios.get("http://10.5.0.3:3001/profiles", {
         params: { username: params.name },
@@ -56,21 +45,20 @@ export default function Profile({ params }: { params: { name: string } }) {
     }
   }
 
-  useEffect(() => {
-    getUsername().then((username) => {
-      setUsername(username);
-      getProfileDatas(username).then((datas) => {
-        setProfileDatas(datas);
-      });
-    });
-  }, []);
-
   function isYourProfile(): boolean {
     if (username === params.name) {
       return true;
     }
     return false;
   }
+
+  useEffect(() => {
+    if (username) {
+      getProfileDatas().then((datas) => {
+        setProfileDatas(datas);
+      });
+    }
+  }, []);
 
   if (!profileDatas) {
     return (

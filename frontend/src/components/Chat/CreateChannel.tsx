@@ -2,22 +2,13 @@
 
 import { useState } from "react";
 import styles from "../../styles/Chat/CreateChannel.module.css";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 enum ChannelMode {
   PRIVATE = "PRIVATE",
   PUBLIC = "PUBLIC",
   PROTECTED = "PROTECTED",
-}
-
-async function getUsername(): Promise<string> {
-  const res = await fetch("http://10.5.0.3:3001/users/me", {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-  });
-  const user = await res.json();
-  return user["username"];
 }
 
 export default function ChannelList() {
@@ -30,6 +21,7 @@ export default function ChannelList() {
     success: undefined,
     failure: undefined,
   });
+  const username = useSelector((state: RootState) => state.user.username);
 
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
@@ -40,18 +32,9 @@ export default function ChannelList() {
     evt.preventDefault();
 
     try {
-      const ownerName = await (async () => {
-        try {
-          const user = await getUsername();
-          return user;
-        } catch (error) {
-          console.log(error);
-          throw error;
-        }
-      })();
       const data = {
         channelName: channelInfos.channelName,
-        ownerName: ownerName,
+        ownerName: username,
         mode: channelInfos.mode,
         password: channelInfos.password,
       };
@@ -64,7 +47,6 @@ export default function ChannelList() {
         body: JSON.stringify(data),
       });
       if (res.ok) {
-        const channelName = channelInfos.channelName;
         setChannelInfos({
           channelName: "",
           password: "",
