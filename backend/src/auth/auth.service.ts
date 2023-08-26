@@ -81,7 +81,8 @@ export class AuthService {
   async register(dto: AuthDto) {
     try {
       const newUser = await this.usersService.createUser(dto, false);
-      return newUser;
+      if (!newUser) throw new ForbiddenException('Error when creating user.');
+      return this.login(dto);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
