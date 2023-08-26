@@ -10,30 +10,27 @@ enum ChannelMode {
   PROTECTED = "PROTECTED",
 }
 
-type ChannelInfos = {
-  channelName: string;
-  password?: string;
-  mode: ChannelMode;
-};
-
 type AdministrateChannelProps = {
-  activeChannel: string;
+  activeDiscussion: string | undefined;
 };
 
 export default function AdministrateChannel({
-  activeChannel,
+  activeDiscussion,
 }: AdministrateChannelProps) {
   const [channelInfos, setChannelInfos] = useState<ChannelInfos>({
     channelName: "",
     password: "",
     mode: ChannelMode.PUBLIC,
   });
-  const [feedbackMessage, setFeedbackMessage] = useState<string>("");
+  const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage>({
+    success: undefined,
+    failure: undefined,
+  });
 
   async function deleteChannel() {
     try {
       const response = await fetch(
-        `http://10.5.0.3:3001/channels/${activeChannel}`,
+        `http://10.5.0.3:3001/channels/${activeDiscussion}`,
         {
           method: "DELETE",
           headers: {
@@ -42,12 +39,22 @@ export default function AdministrateChannel({
         }
       );
       if (response.ok) {
-        setFeedbackMessage("Channel successfully deleted!");
+        setFeedbackMessage({
+          success: "Channel successfully deleted!",
+          failure: undefined,
+        });
       } else {
-        setFeedbackMessage("Problem occured when trying to delete channel!");
+        setFeedbackMessage({
+          success: undefined,
+          failure: "Problem occured when trying to delete channel!",
+        });
       }
     } catch (error) {
-      setFeedbackMessage("You can't delete this channel!");
+      alert("lol");
+      setFeedbackMessage({
+        success: undefined,
+        failure: "You can't delete this channel!",
+      });
       console.error(error);
     }
   }
@@ -63,7 +70,7 @@ export default function AdministrateChannel({
       const res = await axios.patch(
         "http://10.5.0.3:3001/channels/change-mode",
         {
-          channelName: activeChannel,
+          channelName: activeDiscussion,
           mode: channelInfos.mode,
           password: "",
         },
@@ -80,12 +87,21 @@ export default function AdministrateChannel({
           password: "",
           mode: ChannelMode.PUBLIC,
         });
-        setFeedbackMessage("Channel update success!");
+        setFeedbackMessage({
+          success: "Channel update success!",
+          failure: undefined,
+        });
       } else {
-        setFeedbackMessage("Channel update failed.");
+        setFeedbackMessage({
+          success: undefined,
+          failure: res.data.message,
+        });
       }
     } catch (error: any) {
-      console.log(error.message);
+      setFeedbackMessage({
+        success: undefined,
+        failure: "Error occured during channel update",
+      });
     }
   }
 
@@ -93,7 +109,7 @@ export default function AdministrateChannel({
     <div className={styles.adminChannel}>
       <h2>
         Manage Channel<br></br>
-        <b>{activeChannel}</b>
+        <b>{activeDiscussion}</b>
       </h2>
       <form onSubmit={(evt) => handleSubmit(evt)}>
         <div className={styles.subform}>
@@ -124,7 +140,12 @@ export default function AdministrateChannel({
         <input type="submit" value="Update" />
       </form>
       <button onClick={deleteChannel}>Delete</button>
-      <p>{feedbackMessage}</p>
+      {feedbackMessage.success ? (
+        <p className={styles.success}>{feedbackMessage.success}</p>
+      ) : undefined}
+      {feedbackMessage.failure ? (
+        <p className={styles.failure}>{feedbackMessage.failure}</p>
+      ) : undefined}
     </div>
   );
 }
