@@ -34,31 +34,64 @@ export class UsersService {
     return newUser;
   }
 
-  async addFriend(req: any, dto: UserDto) {
+  async addOrRemoveFriend(req: any, dto: UserDto) {
     const userReq = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
+      include: { friends: { include: { profile: true } } },
     });
-    if (!userReq) throw new ForbiddenException('User not found');
-    const user = await this.prismaService.user.update({
-      where: {
-        id: userReq.id,
-      },
-      data: {
-        friends: {
-          connect: {
-            username: dto.username,
+    if (!userReq) {
+      throw new ForbiddenException('User not found');
+    }
+    const userFriend = await this.prismaService.user.findUnique({
+      where: { username: dto.username },
+    });
+    if (!userFriend) {
+      throw new ForbiddenException('Friend user not found');
+    }
+    if (req.user.sub === userFriend.id) {
+      throw new ForbiddenException("You can't be friend with yourself");
+    }
+    const isFriend = userReq.friends.find(
+      (friend) => friend.username === dto.username,
+    );
+    if (isFriend) {
+      console.log('REMOVE FRIEND');
+
+      const updatedUser = await this.prismaService.user.update({
+        where: { id: userReq.id },
+        data: {
+          friends: {
+            disconnect: { username: dto.username },
           },
         },
-      },
-      include: {
-        friends: true,
-      },
-    });
-    user.friends.forEach((friend) => {
-      delete friend.hash;
-    });
-    delete user.hash;
-    return user;
+        include: {
+          friends: true,
+        },
+      });
+      updatedUser.friends.forEach((friend) => {
+        delete friend.hash;
+      });
+      delete updatedUser.hash;
+      return updatedUser;
+    } else {
+      console.log('ADD FRIEND');
+      const updatedUser = await this.prismaService.user.update({
+        where: { id: userReq.id },
+        data: {
+          friends: {
+            connect: { username: dto.username },
+          },
+        },
+        include: {
+          friends: true,
+        },
+      });
+      updatedUser.friends.forEach((friend) => {
+        delete friend.hash;
+      });
+      delete updatedUser.hash;
+      return updatedUser;
+    }
   }
 
   async getFriends(req: any, user: string) {
@@ -95,7 +128,6 @@ export class UsersService {
   }
 
   async getMe(req: Request): Promise<Users> {
-    // console.log('REQ: ', req);
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },

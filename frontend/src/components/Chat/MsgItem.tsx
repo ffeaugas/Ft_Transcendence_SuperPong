@@ -2,26 +2,6 @@
 
 import styles from "../../styles/Chat/MsgItem.module.css";
 
-type Sender = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  role: string;
-  username: string;
-  status: string;
-  user42: boolean;
-};
-
-type Message = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  content: string;
-  senderId: number;
-  channelId: number;
-  sender: Sender;
-};
-
 type MsgItemProps = {
   message: Message;
   showUserInfos: (username: string | null) => void;

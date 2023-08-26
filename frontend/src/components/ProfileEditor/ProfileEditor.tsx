@@ -1,21 +1,16 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "@/styles/ProfileEditor/ProfileEditor.module.css";
+import { useRouter } from "next/navigation";
+import { RootState } from "@/app/GlobalRedux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
-
-type ProfileDatas = {
-  id: number;
-  createdAt?: string;
-  updatedAt?: string;
-  bio: string;
-  winCount?: number;
-  loseCount?: number;
-  profilePicture?: string;
-  eloMatchMaking?: number;
-  userId: number;
-};
 
 type EditorModes = {
   username: boolean;
@@ -30,8 +25,9 @@ type EditedDatas = {
 };
 
 export default function ProfileEditor() {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [createObjectURL, setCreateObjectURL] = useState(undefined);
-  const [username, setUsername] = useState<string>("");
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
@@ -46,17 +42,7 @@ export default function ProfileEditor() {
     bio: false,
   });
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
-
-  async function getUsername(): Promise<string> {
-    const res = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await res.json();
-    return user["username"];
-  }
+  const username = useSelector((state: RootState) => state.user.username);
 
   async function getProfileDatas(
     username: string
@@ -104,7 +90,8 @@ export default function ProfileEditor() {
         body: JSON.stringify(dataBody),
       });
       if (res.ok) {
-        setUsername(editedDatas.username);
+        dispatch(setUsername(editedDatas.username));
+        router.push(`/profile/${editedDatas.username}`);
       }
     } catch (error) {}
   }
@@ -149,12 +136,11 @@ export default function ProfileEditor() {
   };
 
   useEffect(() => {
-    getUsername().then((username) => {
-      setUsername(username);
+    if (username) {
       getProfileDatas(username).then((datas) => {
         setProfileDatas(datas);
       });
-    });
+    }
   }, []);
 
   useEffect(() => {
@@ -217,7 +203,7 @@ export default function ProfileEditor() {
             ) : (
               <img
                 className={styles.rounded}
-                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
               />
             )}
             <input
@@ -238,7 +224,7 @@ export default function ProfileEditor() {
         ) : (
           <img
             className={styles.rounded}
-            src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+            src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
           />
         )}
         <button

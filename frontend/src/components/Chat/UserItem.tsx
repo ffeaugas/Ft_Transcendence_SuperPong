@@ -1,18 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import styles from "../../styles/Chat/UserItem.module.css";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 enum UserStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",
 }
-
-type User = {
-  id: string;
-  username: string;
-  status: UserStatus.ONLINE;
-};
 
 type UserItemProps = {
   user: User;
@@ -25,6 +20,10 @@ export default function UserItem({
   isActive,
   switchChannel,
 }: UserItemProps) {
+  const username = useSelector((state: RootState) => state.user.username);
+
+  if (username === user.username) return undefined;
+
   return (
     <div
       className={isActive ? styles.activeUserItem : styles.userItem}
