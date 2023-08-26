@@ -153,11 +153,11 @@ export default function MsgList({
     });
   }, [activeDiscussion]);
 
-  useEffect(() => {
-    getMessages().then((messages) => {
-      setMessages(messages);
-    });
-  }, [activeDiscussionType]);
+  // useEffect(() => {
+  //   getMessages().then((messages) => {
+  //     setMessages(messages);
+  //   });
+  // }, [activeDiscussionType]);
 
   useEffect(() => {
     if (msgListRef.current) {

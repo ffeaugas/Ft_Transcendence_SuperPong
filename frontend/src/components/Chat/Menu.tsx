@@ -16,16 +16,23 @@ enum MenuType {
   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
 }
 
+enum ActiveDiscussionType {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
+}
+
 type MenuProps = {
   selectedMenu: MenuType;
   activeDiscussion: string | undefined;
-  switchChannel: (channelName: string) => void;
+  activeDiscussionType: ActiveDiscussionType;
+  switchChannel: (discussionName: string) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
 export default function Menu({
   selectedMenu,
   activeDiscussion,
+  activeDiscussionType,
   switchChannel,
   changeMenu,
 }: MenuProps) {
@@ -83,6 +90,7 @@ export default function Menu({
         <div className={`${styles.menu}`}>
           <ChannelList
             channels={channels}
+            activeDiscussionType={activeDiscussionType}
             activeDiscussion={activeDiscussion}
             switchChannel={switchChannel}
             changeMenu={changeMenu}

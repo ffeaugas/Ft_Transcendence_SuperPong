@@ -12,7 +12,7 @@ enum UserStatus {
 type UserItemProps = {
   user: User;
   isActive: boolean;
-  switchChannel: (channelName: string) => void;
+  switchChannel: (discussionName: string) => void;
 };
 
 export default function UserItem({

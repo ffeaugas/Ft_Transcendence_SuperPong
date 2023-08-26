@@ -12,15 +12,28 @@ enum MenuType {
   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
 }
 
+enum ChannelType {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+  PROTECTED = "PROTECTED",
+}
+
+enum ActiveDiscussionType {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
+}
+
 type ChannelListProps = {
   channels: Channels | undefined;
+  activeDiscussionType: ActiveDiscussionType;
   activeDiscussion: string | undefined;
-  switchChannel: (channelName: string) => void;
+  switchChannel: (discussionName: string) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
 export default function ChannelList({
   channels,
+  activeDiscussionType,
   activeDiscussion,
   switchChannel,
   changeMenu,
@@ -63,7 +76,9 @@ export default function ChannelList({
   }
 
   useEffect(() => {
-    isOwner().then((isChannelOwner) => setIsChannelOwner(isChannelOwner));
+    if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
+      isOwner().then((isChannelOwner) => setIsChannelOwner(isChannelOwner));
+    }
   }, [activeDiscussion]);
 
   if (!channels) {
@@ -92,6 +107,7 @@ export default function ChannelList({
               <ChannelItem
                 key={channel.id}
                 {...channel}
+                channelType={ChannelType.PUBLIC}
                 isActive={isActive(channel.channelName) ? true : false}
                 switchChannel={switchChannel}
               />
@@ -116,6 +132,7 @@ export default function ChannelList({
               <ChannelItem
                 key={channel.id}
                 {...channel}
+                channelType={ChannelType.PRIVATE}
                 isActive={isActive(channel.channelName) ? true : false}
                 switchChannel={switchChannel}
               />
@@ -140,6 +157,7 @@ export default function ChannelList({
               <ChannelItem
                 key={channel.id}
                 {...channel}
+                channelType={ChannelType.PROTECTED}
                 isActive={isActive(channel.channelName) ? true : false}
                 switchChannel={switchChannel}
               />

@@ -15,39 +15,31 @@ export class MessageService {
       where: { id: req.user.sub },
     });
     if (!sender) throw new ForbiddenException('Sender not found.');
+    const newMessageDatas = {
+      senderId: sender.id,
+      content: dto.content,
+    };
     if (!dto.isPrivMessage) {
       const channelToSend = await this.prisma.channel.findUnique({
         where: { channelName: dto.channelName },
       });
       if (!channelToSend) throw new ForbiddenException('Channel not found.');
-      const newMessage = await this.prisma.message.create({
-        data: {
-          isPrivMessage: false,
-          senderId: sender.id,
-          content: dto.content,
-          channelId: channelToSend.id,
-        },
-        include: { sender: true },
-      });
-      this.socketGateway.sendMessage(newMessage);
-      return newMessage;
+      (newMessageDatas['isPrivMessage'] = false),
+        (newMessageDatas['channelId'] = channelToSend.id);
     } else {
       const userToSend = await this.prisma.user.findUnique({
         where: { username: dto.receiver },
       });
       if (!userToSend) throw new ForbiddenException('Channel not found.');
-      const newMessage = await this.prisma.message.create({
-        data: {
-          isPrivMessage: true,
-          senderId: sender.id,
-          content: dto.content,
-          receiverId: userToSend.id,
-        },
-        include: { sender: true },
-      });
-      this.socketGateway.sendMessage(newMessage);
-      return newMessage;
+      (newMessageDatas['isPrivMessage'] = true),
+        (newMessageDatas['receiverId'] = userToSend.id);
     }
+    const newMessage = await this.prisma.message.create({
+      data: newMessageDatas,
+      include: { sender: true },
+    });
+    this.socketGateway.sendMessage(newMessage);
+    return newMessage;
   }
 
   async getPrivMessage(username: string, req: any) {
@@ -67,7 +59,12 @@ export class MessageService {
       where: { senderId: userToSend.id, receiverId: sender.id },
       include: { sender: true },
     });
-    //ADD A STEP TO SORT MESSAGES BY DATE
-    return [...messagesSent, ...messagesReceived];
+    const messages = [...messagesSent, ...messagesReceived];
+
+    //Sort messages by date
+    const sortedMessages = messages.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
+    return sortedMessages;
   }
 }

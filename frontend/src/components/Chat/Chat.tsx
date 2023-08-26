@@ -32,12 +32,12 @@ export default function Chat() {
 
   function changeMenu(menu: MenuType) {
     setSelectedMenu(menu);
-    setActiveDiscussion(activeDiscussion);
+    // setActiveDiscussion(activeDiscussion);
     setTargetUser(null);
   }
 
-  function switchChannel(channelName: string): void {
-    setActiveDiscussion(channelName);
+  function switchChannel(discussionName: string): void {
+    setActiveDiscussion(discussionName);
     if (selectedMenu === MenuType.CHANNEL_SELECTOR)
       setActiveDiscussionType(ActiveDiscussionType.CHANNEL);
     else setActiveDiscussionType(ActiveDiscussionType.PRIV_MSG);
@@ -58,6 +58,7 @@ export default function Chat() {
       <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
       <Menu
         selectedMenu={selectedMenu}
+        activeDiscussionType={activeDiscussionType}
         activeDiscussion={activeDiscussion}
         switchChannel={switchChannel}
         changeMenu={changeMenu}

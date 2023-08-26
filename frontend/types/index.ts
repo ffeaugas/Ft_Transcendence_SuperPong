@@ -49,8 +49,8 @@ type Sender = {
 
 type Message = {
   id: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   content: string;
   senderId: number;
   channelId: number;

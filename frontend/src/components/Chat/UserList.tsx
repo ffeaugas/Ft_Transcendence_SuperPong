@@ -11,7 +11,7 @@ enum UserStatus {
 type UserListProps = {
   users: User[] | undefined;
   activeDiscussion: string | undefined;
-  switchChannel: (channelName: string) => void;
+  switchChannel: (discussionName: string) => void;
 };
 
 export default function UserList({
