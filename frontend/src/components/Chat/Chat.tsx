@@ -38,6 +38,9 @@ export default function Chat() {
 
   function switchChannel(channelName: string): void {
     setActiveDiscussion(channelName);
+    if (selectedMenu === MenuType.CHANNEL_SELECTOR)
+      setActiveDiscussionType(ActiveDiscussionType.CHANNEL);
+    else setActiveDiscussionType(ActiveDiscussionType.PRIV_MSG);
   }
 
   function showUserInfos(username: string | null): void {

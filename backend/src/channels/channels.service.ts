@@ -208,19 +208,25 @@ export class ChannelsService {
     return channels;
   }
 
-  async getAllMessageFromChannelName(channelName: string) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { channelName: channelName },
-    });
-    if (!channel) throw new ForbiddenException('Channel not found.');
-    const allMessages = await this.prisma.message.findMany({
-      where: { channelId: channel.id },
-      include: { sender: true },
-    });
-    allMessages.forEach((message) => {
-      delete message.sender.hash;
-    });
-    return allMessages;
+  async getAllMessageFromChannelName(
+    channelName: string,
+    isPrivMessage: boolean,
+  ) {
+    if (!isPrivMessage) {
+      const channel = await this.prisma.channel.findUnique({
+        where: { channelName: channelName },
+      });
+      if (!channel) throw new ForbiddenException('Channel not found.');
+      const allMessages = await this.prisma.message.findMany({
+        where: { channelId: channel.id, isPrivMessage: false },
+        include: { sender: true },
+      });
+      allMessages.forEach((message) => {
+        delete message.sender.hash;
+      });
+      return allMessages;
+    }
+    return undefined;
   }
 
   async deleteChannel(req: Request, channelName: string) {

@@ -25,7 +25,7 @@ export default async function Achievements() {
   }
 
   if (!achievements) {
-    return <p>prout</p>;
+    return <p>...</p>;
   }
 
   return (

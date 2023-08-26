@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import React from "react";
 import { Socket, io } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 enum ActiveDiscussionType {
   PRIV_MSG = "PRIV_MSG",
@@ -27,8 +29,8 @@ export default function MsgList({
   const [textInput, setTextInput] = useState<string>("");
   const [socket, setSocket] = useState<Socket>();
   const [messages, setMessages] = useState<Message[] | undefined>(undefined);
-
   const msgListRef = useRef(null);
+  const username = useSelector((state: RootState) => state.user.username);
 
   async function socketInitializer(): Promise<any> {
     const socket = io("http://10.5.0.3:3001");
@@ -48,22 +50,44 @@ export default function MsgList({
   }, [setSocket]);
 
   async function addMessage(content: string) {
-    try {
-      const data = {
-        channelName: activeDiscussion,
-        content: textInput,
-      };
-
-      const res = await fetch("http://10.5.0.3:3001/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      console.error("Error adding a new message", error);
+    if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
+      try {
+        const data = {
+          isPrivMessage: false,
+          channelName: activeDiscussion,
+          content: textInput,
+          receiver: "",
+        };
+        const res = await fetch("http://10.5.0.3:3001/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(data),
+        });
+      } catch (error) {
+        console.error("Error adding a new message", error);
+      }
+    } else {
+      try {
+        const data = {
+          isPrivMessage: true,
+          channelName: "",
+          content: textInput,
+          receiver: activeDiscussion,
+        };
+        const res = await fetch("http://10.5.0.3:3001/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(data),
+        });
+      } catch (error) {
+        console.error("Error adding a new message", error);
+      }
     }
   }
 
@@ -82,8 +106,23 @@ export default function MsgList({
         console.error("Error fetching channel messages", error);
         return undefined;
       }
+    } else {
+      try {
+        const res = await axios.get(
+          `http://10.5.0.3:3001/message/${activeDiscussion}`,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        const privMessages = res.data;
+        return privMessages;
+      } catch (error) {
+        console.error("Error fetching private messages", error);
+        return undefined;
+      }
     }
-    return undefined;
   }
 
   function handleChange(evt: any) {

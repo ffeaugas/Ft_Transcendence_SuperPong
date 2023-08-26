@@ -1,5 +1,12 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { MessageDto } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -16,5 +23,13 @@ export class MessageController {
   @Post()
   async postMessage(@Body() dto: MessageDto, @Req() req: Request) {
     return this.messageService.postMessage(dto, req);
+  }
+
+  @Get(':username')
+  async getPrivMessage(
+    @Param('username') username: string,
+    @Req() req: Request,
+  ) {
+    return this.messageService.getPrivMessage(username, req);
   }
 }

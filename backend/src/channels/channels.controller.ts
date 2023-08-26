@@ -57,8 +57,12 @@ export class ChannelsController {
   @Get('messages')
   async getAllMessageFromChannelName(
     @Query('channelName') channelName: string,
+    @Query('isPrivMessage') isPrivMessage: boolean,
   ) {
-    return this.channelsService.getAllMessageFromChannelName(channelName);
+    return this.channelsService.getAllMessageFromChannelName(
+      channelName,
+      isPrivMessage,
+    );
   }
 
   @Post()
