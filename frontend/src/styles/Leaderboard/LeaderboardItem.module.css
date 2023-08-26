@@ -1,27 +1,27 @@
 .leaderboardItem {
-  display: flex;
-  flex-direction: row;
-  background-color: rgb(48, 47, 47);
-  overflow: hidden;
-  gap: 1px;
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(48, 47, 47);
+    overflow: hidden;
+    gap: 1px;
 }
 
 img.rounded {
-  object-fit: cover;
-  border-radius: 50%;
-  width: clamp(20px, 20px + 3vw, 50px);
-  height: clamp(20px, 20px + 3vw, 50px);
-  margin-right: 8px;
+    object-fit: cover;
+    border-radius: 50%;
+    width: clamp(20px, 20px + 3vw, 50px);
+    height: clamp(20px, 20px + 3vw, 50px);
+    margin-right: 8px;
 }
 
 .leaderboardItem h4 {
-  color: rgb(255, 255, 255);
-  font-size: var(--titleSize2);
+    color: rgb(255, 255, 255);
+    font-size: var(--titleSize2);
 }
 
 .leaderboardItem h3 {
-  font-size: var(--titleSize2);
-  transform: translateY(30%);
+    font-size: var(--titleSize2);
+    transform: translateY(30%);
 }
 
 .rank,
@@ -29,43 +29,43 @@ img.rounded {
 .looses,
 .player,
 .elo {
-  background-color: var(--backgroundColor1);
-  padding: var(--padding1) 0;
-  text-align: center;
+    background-color: var(--backgroundColor1);
+    padding: var(--padding1) 0;
+    text-align: center;
 }
 
 .elo,
 .wins,
 .looses {
-  flex: 4;
+    flex: 4;
 }
 
 .player {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  gap: 10%;
-  flex: 8;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 10%;
+    flex: 8;
 }
 
 .rank h3 {
-  color: rgb(240, 187, 42) !important;
+    color: rgb(240, 187, 42) !important;
 }
 
 .rank {
-  flex: 3;
+    flex: 3;
 }
 
 .wins h3 {
-  color: rgb(93, 218, 93) !important;
+    color: rgb(93, 218, 93) !important;
 }
 
 .looses h3 {
-  color: rgb(235, 108, 108) !important;
+    color: rgb(235, 108, 108) !important;
 }
 
 .elo h3 {
-  color: rgb(128, 111, 111) !important;
+    color: rgb(128, 111, 111) !important;
 }
