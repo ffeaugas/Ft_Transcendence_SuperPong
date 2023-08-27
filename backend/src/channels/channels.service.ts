@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { ChannelModifyDto } from './dto/channelModify.dto';
 import * as argon from 'argon2';
 import { SocketEvents } from 'src/socket/socketEvents';
+import { ChannelJoinDto } from './dto/channelJoin.dto';
 
 @Injectable()
 export class ChannelsService {
@@ -227,6 +228,22 @@ export class ChannelsService {
       return allMessages;
     }
     return undefined;
+  }
+
+  async getAuthorization(dto: ChannelJoinDto, req: any) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: req['user'].sub },
+      });
+      const channel = await this.prisma.channel.findUnique({
+        where: { channelName: dto.channelName },
+      });
+      if (!channel) throw new ForbiddenException('Channel not found.');
+      if (channel.ownerId === user.id) return 'true';
+      return false;
+    } catch (error) {
+      return error;
+    }
   }
 
   async deleteChannel(req: Request, channelName: string) {

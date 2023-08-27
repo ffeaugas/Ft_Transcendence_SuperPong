@@ -1,7 +1,7 @@
 .channelItem,
 .activeChannelItem {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 5px;
   min-height: 24px;
   cursor: pointer;
@@ -19,4 +19,8 @@
 .activeChannelItem p {
   color: var(--titleColor2);
   font-weight: 600;
+}
+
+.feedbackMessage {
+  color: rgb(223, 136, 136);
 }

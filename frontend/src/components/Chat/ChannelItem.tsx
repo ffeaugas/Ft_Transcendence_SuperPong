@@ -1,6 +1,8 @@
 "use client";
 
+import axios from "axios";
 import styles from "../../styles/Chat/ChannelItem.module.css";
+import { useEffect, useState } from "react";
 
 enum ChannelType {
   PUBLIC = "PUBLIC",
@@ -21,27 +23,40 @@ export default function ChannelItem({
   isActive,
   switchChannel,
 }: ChannelItemProps) {
+  const [feedbackMessage, setFeedbackMessage] = useState<String | undefined>(
+    undefined
+  );
   async function tryJoinChannel(channelName: string) {
     if (channelType === ChannelType.PUBLIC) switchChannel(channelName);
     else {
-      console.log("PRIVER OU PROTECTED");
       try {
-        const canJoinChannel = await fetch(
-          "http://10.5.0.3:3001/channel/join",
+        const res = await axios.patch(
+          "http://10.5.0.3:3001/channels/get-authorization",
           {
-            method: "GET",
+            channelName: channelName,
+          },
+          {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token"),
             },
           }
         );
-        const user = await canJoinChannel.json();
-        if (canJoinChannel) switchChannel(channelName);
+        console.log(res);
+        if (res.data) switchChannel(channelName);
+        else setFeedbackMessage("Can't join channel");
       } catch (e) {
-        console.log(e);
+        console.log("JOINING CHANNEL FAILED", e);
       }
     }
   }
+
+  useEffect(() => {
+    if (feedbackMessage) {
+      setTimeout(() => {
+        setFeedbackMessage(undefined);
+      }, 3000);
+    }
+  }, [feedbackMessage]);
 
   return (
     <div
@@ -49,6 +64,9 @@ export default function ChannelItem({
       onClick={() => tryJoinChannel(channelName)}
     >
       <p>{channelName}</p>
+      {feedbackMessage ? (
+        <p className={styles.feedbackMessage}>{feedbackMessage}</p>
+      ) : undefined}
     </div>
   );
 }

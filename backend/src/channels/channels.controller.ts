@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { ChannelModifyDto } from './dto/channelModify.dto';
 import { ChannelMode } from '@prisma/client';
+import { ChannelJoinDto } from './dto/channelJoin.dto';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -52,6 +53,11 @@ export class ChannelsController {
   @Get('all')
   async getAllChannels() {
     return await this.channelsService.getAllChannels();
+  }
+
+  @Patch('get-authorization')
+  async getAuthorization(@Body() dto: ChannelJoinDto, @Req() req: Request) {
+    return await this.channelsService.getAuthorization(dto, req);
   }
 
   @Get('messages')

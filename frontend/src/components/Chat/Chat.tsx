@@ -32,7 +32,6 @@ export default function Chat() {
 
   function changeMenu(menu: MenuType) {
     setSelectedMenu(menu);
-    // setActiveDiscussion(activeDiscussion);
     setTargetUser(null);
   }
 
