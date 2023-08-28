@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../../styles/Chat/AdministrateChannel.module.css";
 import axios from "axios";
 
@@ -28,7 +28,13 @@ export default function AdministrateChannel({
     success: undefined,
     failure: undefined,
   });
-  const [invitedUser, setInvitedUser] = useState<string | undefined>(undefined);
+  const [userToInvite, setUserToInvite] = useState<string | undefined>(
+    undefined
+  );
+  const [userToKick, setUserToKick] = useState<string | undefined>(undefined);
+  const [invitedUsers, setInvitedUsers] = useState<User[] | undefined>(
+    undefined
+  );
 
   async function deleteChannel() {
     try {
@@ -69,8 +75,12 @@ export default function AdministrateChannel({
 
   function handleChangeInvitation(evt: any): void {
     const { name, value } = evt.target;
-    setInvitedUser(value);
-    console.log(invitedUser);
+    setUserToInvite(value);
+  }
+
+  function handleChangeKick(evt: any): void {
+    const { name, value } = evt.target;
+    setUserToKick(value);
   }
 
   async function handleInvitation(evt: any): Promise<void> {
@@ -80,7 +90,7 @@ export default function AdministrateChannel({
         "http://10.5.0.3:3001/channels/invite",
         {
           channelName: activeDiscussion,
-          invitedUser: invitedUser,
+          userToInvite: userToInvite,
         },
         {
           headers: {
@@ -93,6 +103,9 @@ export default function AdministrateChannel({
           success: "User successfully invited!",
           failure: undefined,
         });
+        getInvitedUsers().then((invitedUsers) => {
+          setInvitedUsers(invitedUsers);
+        });
       } else {
         setFeedbackMessage({
           success: undefined,
@@ -103,6 +116,43 @@ export default function AdministrateChannel({
       setFeedbackMessage({
         success: undefined,
         failure: "Error occured when trying to invite user",
+      });
+    }
+  }
+
+  async function handleKick(evt: any): Promise<void> {
+    evt.preventDefault();
+    try {
+      const res = await axios.patch(
+        "http://10.5.0.3:3001/channels/kick",
+        {
+          channelName: activeDiscussion,
+          userToKick: userToInvite,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (res.status) {
+        setFeedbackMessage({
+          success: "User successfully kicked!",
+          failure: undefined,
+        });
+        getInvitedUsers().then((invitedUsers) => {
+          setInvitedUsers(invitedUsers);
+        });
+      } else {
+        setFeedbackMessage({
+          success: undefined,
+          failure: res.data.message,
+        });
+      }
+    } catch (error: any) {
+      setFeedbackMessage({
+        success: undefined,
+        failure: "Error occured when trying to kick user",
       });
     }
   }
@@ -124,7 +174,6 @@ export default function AdministrateChannel({
         }
       );
       if (res.status) {
-        const channelName = channelInfos.channelName;
         setChannelInfos({
           channelName: "",
           password: "",
@@ -148,66 +197,119 @@ export default function AdministrateChannel({
     }
   }
 
+  async function getInvitedUsers() {
+    try {
+      const res = await axios.get(
+        "http://10.5.0.3:3001/channels/invited-users",
+        {
+          params: { channelName: activeDiscussion },
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const invitedUsers = res.data;
+      return invitedUsers;
+    } catch (error) {
+      console.error("Error fetching user list", error);
+      return undefined;
+    }
+  }
+
+  useEffect(() => {
+    getInvitedUsers().then((invitedUsers) => {
+      setInvitedUsers(invitedUsers);
+    });
+  }, []);
+
   return (
     <div className={styles.adminChannel}>
       <h2>
         Manage Channel<br></br>
         <b>{activeDiscussion}</b>
       </h2>
-      <form onSubmit={(evt) => handleSubmit(evt)}>
-        <div className={styles.subform}>
-          <label htmlFor="channelmode">Change mode :</label>
-          <select
-            name="mode"
-            id="channelmode"
-            value={channelInfos.mode}
-            onChange={(evt) => handleChange(evt)}
-          >
-            <option value="PUBLIC">Public</option>
-            <option value="PRIVATE">Private</option>
-            <option value="PROTECTED">Protected</option>
-          </select>
-        </div>
-        {channelInfos.mode === ChannelMode.PROTECTED ? (
+      <div className={styles.forms}>
+        <form onSubmit={(evt) => handleSubmit(evt)}>
           <div className={styles.subform}>
-            <label htmlFor="password">Change password :</label>
-            <input
-              type="text"
-              name="password"
-              id="password"
-              value={channelInfos.password}
-              onChange={(evt) => handleChange(evt)}
-            />
-          </div>
-        ) : undefined}
-        <input type="submit" value="Update" />
-      </form>
-
-      {channelInfos.mode === ChannelMode.PRIVATE ? (
-        <form onSubmit={(evt) => handleInvitation(evt)}>
-          <div className={styles.subform}>
-            <label htmlFor="invitation">Invite to channel:</label>
+            <label htmlFor="channelmode">Change mode :</label>
             <select
               name="mode"
-              id="invitation"
-              value={invitedUser}
-              onChange={(evt) => handleChangeInvitation(evt)}
+              id="channelmode"
+              value={channelInfos.mode}
+              onChange={(evt) => handleChange(evt)}
             >
-              <option value=""></option>
-              {users
-                ? users.map((user) => (
-                    <option key={user.id} value={user.username}>
-                      {user.username}
-                    </option>
-                  ))
-                : undefined}
+              <option value="PUBLIC">Public</option>
+              <option value="PRIVATE">Private</option>
+              <option value="PROTECTED">Protected</option>
             </select>
           </div>
-          <input type="submit" value="Invite" />
+          {channelInfos.mode === ChannelMode.PROTECTED ? (
+            <div className={styles.subform}>
+              <label htmlFor="password">Change password :</label>
+              <input
+                type="text"
+                name="password"
+                id="password"
+                value={channelInfos.password}
+                onChange={(evt) => handleChange(evt)}
+              />
+            </div>
+          ) : undefined}
+          <input type="submit" value="Update" />
         </form>
-      ) : undefined}
 
-      <button onClick={deleteChannel}>Delete</button>
+        {channelInfos.mode === ChannelMode.PRIVATE ? (
+          <>
+            <form onSubmit={(evt) => handleInvitation(evt)}>
+              <div className={styles.subform}>
+                <label htmlFor="invitation">Invite to channel:</label>
+                <select
+                  name="invitation"
+                  id="invitation"
+                  value={userToInvite}
+                  onChange={(evt) => handleChangeInvitation(evt)}
+                >
+                  <option value=""></option>
+                  {users
+                    ? users.map((user) => (
+                        <option key={user.id} value={user.username}>
+                          {user.username}
+                        </option>
+                      ))
+                    : undefined}
+                </select>
+              </div>
+              <input type="submit" value="Invite" />
+            </form>
+            <form onSubmit={(evt) => handleKick(evt)}>
+              <div className={styles.subform}>
+                <label htmlFor="kick">Kick from channel:</label>
+                <select
+                  name="kick"
+                  id="kick"
+                  value={userToKick}
+                  onChange={(evt) => handleChangeKick(evt)}
+                >
+                  <option value=""></option>
+                  {invitedUsers
+                    ? invitedUsers.map((invitedUser) => (
+                        <option
+                          key={invitedUser.id}
+                          value={invitedUser.username}
+                        >
+                          {invitedUser.username}
+                        </option>
+                      ))
+                    : undefined}
+                </select>
+              </div>
+              <input type="submit" value="Kick" />
+            </form>
+          </>
+        ) : undefined}
+
+        <button onClick={deleteChannel}>Delete</button>
+      </div>
       {feedbackMessage.success ? (
         <p className={styles.success}>{feedbackMessage.success}</p>
       ) : undefined}

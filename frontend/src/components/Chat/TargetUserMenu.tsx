@@ -118,7 +118,7 @@ export default function TargetUserMenu({
       </div>
       <h1>{targetUser}</h1>
       <button onClick={goToProfile}>Profile</button>
-      {/* {profileDatas.isKickable ? <button>kick</button> : undefined} */}
+      {profileDatas.isKickable ? <button>kick</button> : undefined}
       {username === targetUser ? undefined : (
         <>
           <button>Invite in game</button>

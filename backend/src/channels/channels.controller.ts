@@ -25,6 +25,7 @@ import { ChannelModifyDto } from './dto/channelModify.dto';
 import { ChannelMode } from '@prisma/client';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
 import { ChannelInvitationDto } from './dto/channelInvitation.dto';
+import { ChannelKickDto } from './dto/channelKick.dto ';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -32,11 +33,6 @@ import { ChannelInvitationDto } from './dto/channelInvitation.dto';
 @UseGuards(AuthGuard)
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
-
-  // @Get()
-  // async getAllUsers(@Query('name') channelName: string) {
-  //   return await this.channelsService.getAllUsers(channelName);
-  // }
 
   @Get('is-owner')
   async isOwner(
@@ -46,10 +42,10 @@ export class ChannelsController {
     return await this.channelsService.isOwner(channelName, userId);
   }
 
-  @Get('publics') //NOT USED
-  async getAllPublic() {
-    return await this.channelsService.getAllPublic();
-  }
+  // @Get('publics') //NOT USED
+  // async getAllPublic() {
+  //   return await this.channelsService.getAllPublic();
+  // }
 
   @Get('all')
   async getAllChannels() {
@@ -72,6 +68,14 @@ export class ChannelsController {
     );
   }
 
+  @Get('invited-users')
+  async getInvitedUsers(
+    @Query('channelName') channelName: string,
+    @Req() req: Request,
+  ) {
+    return await this.channelsService.getInvitedUsers(channelName, req);
+  }
+
   @Post()
   async createChannel(@Req() req: Request, @Body() dto: ChannelDto) {
     return await this.channelsService.createChannel(req, dto);
@@ -81,22 +85,6 @@ export class ChannelsController {
   async setChannelPassword(@Body() dto: ChannelModifyDto, @Req() req: Request) {
     return await this.channelsService.setChannelPassword(dto, req);
   }
-
-  // @Patch('add')
-  // @ApiQuery({
-  //   name: 'channelName',
-  //   description: 'Channel name for adding user.',
-  // })
-  // @ApiQuery({
-  //   name: 'userName',
-  //   description: 'The username to add in the channel.',
-  // })
-  // async addUserByUsername(
-  //   @Query('channelName') channelName: string,
-  //   @Query('userName') userName: string,
-  // ) {
-  //   return await this.channelsService.addUserByUsername(channelName, userName);
-  // }
 
   @Patch('change-mode')
   @ApiResponse({
@@ -117,6 +105,11 @@ export class ChannelsController {
     @Body() dto: ChannelInvitationDto,
   ) {
     return await this.channelsService.inviteInChannel(req, dto);
+  }
+
+  @Patch('kick')
+  async kickFromChannel(@Req() req: Request, @Body() dto: ChannelKickDto) {
+    return await this.channelsService.kickFromChannel(req, dto);
   }
 
   @Delete(':channelName')

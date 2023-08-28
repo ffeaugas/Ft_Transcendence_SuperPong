@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class ChannelInvitationDto {
+export class ChannelKickDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Name of the channel' })
   channelName: string;
   @IsString({
-    message: 'Invited user must be a string ',
+    message: 'Kicked user must be a string ',
   })
-  @ApiProperty({ description: 'User invited to the channel' })
-  userToInvite?: string;
+  @ApiProperty({ description: 'User kicked from the channel' })
+  userToKick?: string;
 }

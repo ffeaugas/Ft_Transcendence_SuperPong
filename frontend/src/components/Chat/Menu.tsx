@@ -75,7 +75,10 @@ export default function Menu({
   useEffect(() => {
     if (selectedMenu === MenuType.CHANNEL_SELECTOR) {
       getChannels().then((channels) => setChannels(channels));
-    } else if (selectedMenu === MenuType.USER_SELECTOR) {
+    } else if (
+      selectedMenu === MenuType.USER_SELECTOR ||
+      selectedMenu === MenuType.CHANNEL_ADMINISTRATION
+    ) {
       getOtherUsers().then((users) => setUsers(users));
     }
   }, [selectedMenu]);
