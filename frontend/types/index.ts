@@ -52,9 +52,13 @@ type Message = {
   createdAt: Date;
   updatedAt: Date;
   content: string;
+  isPrivMessage: boolean;
   senderId: number;
-  channelId: number;
   sender: Sender;
+  receiverId?: number;
+  receiver?: any;
+  channelId?: number;
+  Channel?: any;
 };
 
 type ProfileDatas = {

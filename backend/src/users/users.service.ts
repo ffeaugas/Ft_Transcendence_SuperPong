@@ -131,7 +131,6 @@ export class UsersService {
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
-      include: { channels: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;
@@ -157,8 +156,8 @@ export class UsersService {
   async getAllUsers(): Promise<Users[]> {
     const users = await this.prismaService.user.findMany({
       include: {
-        channels: true,
         channelsOwned: true,
+        channelsInvited: true,
       },
     });
     if (users.length <= 0) throw new ForbiddenException('No users found');

@@ -44,8 +44,7 @@ model User {
     user42           Boolean   @default(true)
     profile          Profile?
     channelsOwned    Channel[] @relation(name: "OwnedChannel")
-    channelId        Int?
-    channels         Channel?  @relation(name: "ChannelIn", fields: [channelId], references: [id])
+    channelsInvited  Channel[] @relation(name: "Whitelist")
     messagesSent     Message[] @relation("sender")
     messagesReceived Message[] @relation("receiver")
     gameAsPlayer1    Game[]    @relation(name: "Player1")
@@ -90,16 +89,16 @@ model Message {
 }
 
 model Channel {
-    id          Int         @id @default(autoincrement())
-    createdAt   DateTime    @default(now())
-    updatedAt   DateTime    @updatedAt()
-    channelName String      @unique
-    ownerId     Int?
-    owner       User?       @relation(name: "OwnedChannel", fields: [ownerId], references: [id])
-    users       User[]      @relation(name: "ChannelIn")
-    password    String?
-    messages    Message[]   @relation(name: "Channel")
-    mode        ChannelMode @default(PUBLIC)
+    id           Int         @id @default(autoincrement())
+    createdAt    DateTime    @default(now())
+    updatedAt    DateTime    @updatedAt()
+    channelName  String      @unique
+    ownerId      Int?
+    owner        User?       @relation(name: "OwnedChannel", fields: [ownerId], references: [id])
+    invitedUsers User[]      @relation(name: "Whitelist")
+    password     String?
+    messages     Message[]   @relation(name: "Channel")
+    mode         ChannelMode @default(PUBLIC)
 
     @@map("channels")
 }

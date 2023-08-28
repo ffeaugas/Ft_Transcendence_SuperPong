@@ -101,6 +101,7 @@ export default function MsgList({
           },
         });
         const messages = res.data;
+        console.log("MESSAGES RECUUUUU : ", messages);
         return messages;
       } catch (error) {
         console.error("Error fetching channel messages", error);
@@ -138,8 +139,22 @@ export default function MsgList({
   }
 
   function messageListner(message: Message) {
-    console.log(message);
-    if (messages) setMessages([...messages, message]);
+    // console.log(message);
+    if (!messages) return;
+    if (
+      !message.isPrivMessage &&
+      message.Channel.channelName === activeDiscussion
+    )
+      setMessages([...messages, message]);
+    if (
+      message.isPrivMessage &&
+      ((message.receiver.username === activeDiscussion &&
+        message.sender.username === username) ||
+        (message.receiver.username === username &&
+          message.sender.username === activeDiscussion))
+    )
+      setMessages([...messages, message]);
+    return;
   }
 
   useEffect((): any => {

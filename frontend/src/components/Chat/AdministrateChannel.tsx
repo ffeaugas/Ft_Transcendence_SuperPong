@@ -12,10 +12,12 @@ enum ChannelMode {
 
 type AdministrateChannelProps = {
   activeDiscussion: string | undefined;
+  users: User[] | undefined;
 };
 
 export default function AdministrateChannel({
   activeDiscussion,
+  users,
 }: AdministrateChannelProps) {
   const [channelInfos, setChannelInfos] = useState<ChannelInfos>({
     channelName: "",
@@ -26,6 +28,7 @@ export default function AdministrateChannel({
     success: undefined,
     failure: undefined,
   });
+  const [invitedUser, setInvitedUser] = useState<string | undefined>(undefined);
 
   async function deleteChannel() {
     try {
@@ -62,6 +65,46 @@ export default function AdministrateChannel({
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
     setChannelInfos({ ...channelInfos, [name]: value });
+  }
+
+  function handleChangeInvitation(evt: any): void {
+    const { name, value } = evt.target;
+    setInvitedUser(value);
+    console.log(invitedUser);
+  }
+
+  async function handleInvitation(evt: any): Promise<void> {
+    evt.preventDefault();
+    try {
+      const res = await axios.patch(
+        "http://10.5.0.3:3001/channels/invite",
+        {
+          channelName: activeDiscussion,
+          invitedUser: invitedUser,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      if (res.status) {
+        setFeedbackMessage({
+          success: "User successfully invited!",
+          failure: undefined,
+        });
+      } else {
+        setFeedbackMessage({
+          success: undefined,
+          failure: res.data.message,
+        });
+      }
+    } catch (error: any) {
+      setFeedbackMessage({
+        success: undefined,
+        failure: "Error occured when trying to invite user",
+      });
+    }
   }
 
   async function handleSubmit(evt: any): Promise<void> {
@@ -139,6 +182,31 @@ export default function AdministrateChannel({
         ) : undefined}
         <input type="submit" value="Update" />
       </form>
+
+      {channelInfos.mode === ChannelMode.PRIVATE ? (
+        <form onSubmit={(evt) => handleInvitation(evt)}>
+          <div className={styles.subform}>
+            <label htmlFor="invitation">Invite to channel:</label>
+            <select
+              name="mode"
+              id="invitation"
+              value={invitedUser}
+              onChange={(evt) => handleChangeInvitation(evt)}
+            >
+              <option value=""></option>
+              {users
+                ? users.map((user) => (
+                    <option key={user.id} value={user.username}>
+                      {user.username}
+                    </option>
+                  ))
+                : undefined}
+            </select>
+          </div>
+          <input type="submit" value="Invite" />
+        </form>
+      ) : undefined}
+
       <button onClick={deleteChannel}>Delete</button>
       {feedbackMessage.success ? (
         <p className={styles.success}>{feedbackMessage.success}</p>

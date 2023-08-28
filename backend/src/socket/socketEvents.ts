@@ -31,6 +31,7 @@ export class SocketEvents {
   }
 
   sendMessage(message: Message) {
+    console.log(message);
     this.server.emit('message', message);
   }
 
