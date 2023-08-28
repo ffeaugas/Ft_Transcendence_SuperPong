@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "../../styles/Chat/MenuSelector.module.css";
+import Image from "next/image";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -26,7 +27,13 @@ export default function MenuSelector({
           selectedMenu === MenuType.CHANNEL_SELECTOR ? styles.isActive : ""
         }
       >
-        &#x274B;
+        <Image
+          className={styles.icon}
+          src="/channels-icon.png"
+          width={20}
+          height={20}
+          alt="Channels icon"
+        />
       </button>
       <button
         onClick={() => changeMenu(MenuType.USER_SELECTOR)}
@@ -34,7 +41,13 @@ export default function MenuSelector({
           selectedMenu === MenuType.USER_SELECTOR ? styles.isActive : ""
         }
       >
-        &#x2727;
+        <Image
+          className={styles.icon}
+          src="/privmsg-icon.png"
+          width={20}
+          height={20}
+          alt="Channels icon"
+        />
       </button>
       <button
         onClick={() => changeMenu(MenuType.CHANNEL_CREATION)}
@@ -42,7 +55,13 @@ export default function MenuSelector({
           selectedMenu === MenuType.CHANNEL_CREATION ? styles.isActive : ""
         }
       >
-        &#x271A;
+        <Image
+          className={styles.icon}
+          src="/newchannel-icon.png"
+          width={20}
+          height={20}
+          alt="Channels icon"
+        />
       </button>
     </div>
   );
