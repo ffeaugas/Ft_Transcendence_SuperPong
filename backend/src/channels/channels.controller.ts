@@ -24,6 +24,7 @@ import {
 import { ChannelModifyDto } from './dto/channelModify.dto';
 import { ChannelMode } from '@prisma/client';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
+import { ChannelInvitationDto } from './dto/channelInvitation.dto';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -32,10 +33,10 @@ import { ChannelJoinDto } from './dto/channelJoin.dto';
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
 
-  @Get()
-  async getAllUsers(@Query('name') channelName: string) {
-    return await this.channelsService.getAllUsers(channelName);
-  }
+  // @Get()
+  // async getAllUsers(@Query('name') channelName: string) {
+  //   return await this.channelsService.getAllUsers(channelName);
+  // }
 
   @Get('is-owner')
   async isOwner(
@@ -81,21 +82,21 @@ export class ChannelsController {
     return await this.channelsService.setChannelPassword(dto, req);
   }
 
-  @Patch('add')
-  @ApiQuery({
-    name: 'channelName',
-    description: 'Channel name for adding user.',
-  })
-  @ApiQuery({
-    name: 'userName',
-    description: 'The username to add in the channel.',
-  })
-  async addUserByUsername(
-    @Query('channelName') channelName: string,
-    @Query('userName') userName: string,
-  ) {
-    return await this.channelsService.addUserByUsername(channelName, userName);
-  }
+  // @Patch('add')
+  // @ApiQuery({
+  //   name: 'channelName',
+  //   description: 'Channel name for adding user.',
+  // })
+  // @ApiQuery({
+  //   name: 'userName',
+  //   description: 'The username to add in the channel.',
+  // })
+  // async addUserByUsername(
+  //   @Query('channelName') channelName: string,
+  //   @Query('userName') userName: string,
+  // ) {
+  //   return await this.channelsService.addUserByUsername(channelName, userName);
+  // }
 
   @Patch('change-mode')
   @ApiResponse({
@@ -108,6 +109,14 @@ export class ChannelsController {
   })
   async changeChannelMode(@Req() req: Request, @Body() dto: ChannelModifyDto) {
     return await this.channelsService.changeChannelMode(req, dto);
+  }
+
+  @Patch('invite')
+  async inviteInChannel(
+    @Req() req: Request,
+    @Body() dto: ChannelInvitationDto,
+  ) {
+    return await this.channelsService.inviteInChannel(req, dto);
   }
 
   @Delete(':channelName')

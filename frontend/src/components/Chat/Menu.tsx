@@ -7,6 +7,8 @@ import CreateChannel from "./CreateChannel";
 import UserList from "./UserList";
 import axios from "axios";
 import AdministrateChannel from "./AdministrateChannel";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 //J'arrive pas a le virer alors qu'il est dans index.ts :()
 enum MenuType {
@@ -38,6 +40,7 @@ export default function Menu({
 }: MenuProps) {
   const [channels, setChannels] = useState<Channels>();
   const [users, setUsers] = useState<User[]>();
+  const username = useSelector((state: RootState) => state.user.username);
 
   async function getChannels(): Promise<Channels | undefined> {
     try {
@@ -54,7 +57,7 @@ export default function Menu({
     }
   }
 
-  async function getUsers(): Promise<User[] | undefined> {
+  async function getOtherUsers(): Promise<User[] | undefined> {
     try {
       const res = await axios.get("http://10.5.0.3:3001/users/all", {
         headers: {
@@ -62,7 +65,7 @@ export default function Menu({
         },
       });
       const users = res.data;
-      return users;
+      return users.filter((user: User) => user.username !== username);
     } catch (error) {
       console.error("Error fetching user list", error);
       return undefined;
@@ -73,7 +76,7 @@ export default function Menu({
     if (selectedMenu === MenuType.CHANNEL_SELECTOR) {
       getChannels().then((channels) => setChannels(channels));
     } else if (selectedMenu === MenuType.USER_SELECTOR) {
-      getUsers().then((users) => setUsers(users));
+      getOtherUsers().then((users) => setUsers(users));
     }
   }, [selectedMenu]);
 
@@ -116,7 +119,12 @@ export default function Menu({
     case MenuType.CHANNEL_ADMINISTRATION:
       return (
         <div className={`${styles.menu}`}>
-          {<AdministrateChannel activeDiscussion={activeDiscussion} />}
+          {
+            <AdministrateChannel
+              activeDiscussion={activeDiscussion}
+              users={users}
+            />
+          }
         </div>
       );
   }

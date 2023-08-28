@@ -7,6 +7,5 @@ export class Channel implements Prisma.ChannelCreateInput {
   password?: string;
   mode?: $Enums.ChannelMode;
   owner: Prisma.UserCreateNestedOneWithoutChannelsOwnedInput;
-  users?: Prisma.UserCreateNestedManyWithoutChannelsInput;
   messages?: Prisma.MessageCreateNestedManyWithoutChannelInput;
 }

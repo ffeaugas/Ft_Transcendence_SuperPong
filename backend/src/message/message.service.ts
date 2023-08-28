@@ -36,7 +36,7 @@ export class MessageService {
     }
     const newMessage = await this.prisma.message.create({
       data: newMessageDatas,
-      include: { sender: true },
+      include: { sender: true, Channel: true, receiver: true },
     });
     this.socketGateway.sendMessage(newMessage);
     return newMessage;

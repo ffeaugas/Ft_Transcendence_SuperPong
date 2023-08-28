@@ -1,13 +1,13 @@
-import { Prisma, Role } from '@prisma/client';
+import { $Enums, Prisma, Role, Status } from '@prisma/client';
 
 export class Users implements Prisma.UserCreateInput {
   id: number;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-  user42: boolean;
-  role: Role;
+  role?: Role;
   login: string;
   username: string;
   hash: string;
-  profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
+  status?: Status;
+  user42?: boolean;
 }

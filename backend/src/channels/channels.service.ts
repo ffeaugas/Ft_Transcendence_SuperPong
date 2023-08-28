@@ -1,12 +1,13 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ChannelDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChannelMode, Prisma } from '@prisma/client';
+import { ChannelMode } from '@prisma/client';
 import { Request } from 'express';
 import { ChannelModifyDto } from './dto/channelModify.dto';
 import * as argon from 'argon2';
 import { SocketEvents } from 'src/socket/socketEvents';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
+import { ChannelInvitationDto } from './dto/channelInvitation.dto';
 
 @Injectable()
 export class ChannelsService {
@@ -20,7 +21,6 @@ export class ChannelsService {
       data: {
         ownerId: owner.id,
         channelName: dto.channelName,
-        users: { connect: [owner] },
         password: '',
         mode: ChannelMode.PUBLIC,
       },
@@ -32,7 +32,6 @@ export class ChannelsService {
       data: {
         ownerId: owner.id,
         channelName: dto.channelName,
-        users: { connect: [owner] },
         password: '',
         mode: ChannelMode.PRIVATE,
       },
@@ -47,7 +46,6 @@ export class ChannelsService {
         channelName: dto.channelName,
         mode: ChannelMode.PROTECTED,
         password: hashPasswd,
-        users: { connect: [owner] },
       },
     });
   }
@@ -116,22 +114,52 @@ export class ChannelsService {
     return updateChannel;
   }
 
-  async addUserByUsername(channelName: string, username: string) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { channelName: channelName },
-      include: { users: true },
+  async inviteInChannel(req: Request, dto: ChannelInvitationDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: req['user'].sub },
     });
-    if (!channel) throw new ForbiddenException('Channel not found.');
-    const userToAdd = await this.prisma.user.findUnique({
-      where: { username: username },
+    const channelToInviteIn = await this.prisma.channel.findUnique({
+      where: { channelName: dto.channelName },
+      include: { invitedUsers: true },
     });
-    if (!userToAdd) throw new ForbiddenException('User not found.');
-    const updatedUsers = [...channel.users, userToAdd];
-    await this.prisma.channel.update({
-      where: { channelName: channel.channelName },
-      data: { users: { connect: updatedUsers } },
+    const userToInvite = await this.prisma.user.findUnique({
+      where: { username: dto.invitedUser },
     });
+    if (channelToInviteIn.ownerId !== user.id)
+      throw new ForbiddenException(
+        'You must be the channel owner to invite anyone',
+      );
+    if (channelToInviteIn.mode !== ChannelMode.PRIVATE)
+      throw new ForbiddenException(
+        'Invitations only works with private channel',
+      );
+    const updatedInvitations = [
+      ...channelToInviteIn.invitedUsers,
+      userToInvite,
+    ];
+    const updateChannelInvitations = await this.prisma.channel.update({
+      where: { channelName: dto.channelName },
+      data: { invitedUsers: { connect: updatedInvitations } },
+    });
+    return updateChannelInvitations;
   }
+
+  // async addUserByUsername(channelName: string, username: string) {
+  //   const channel = await this.prisma.channel.findUnique({
+  //     where: { channelName: channelName },
+  //     include: { users: true },
+  //   });
+  //   if (!channel) throw new ForbiddenException('Channel not found.');
+  //   const userToAdd = await this.prisma.user.findUnique({
+  //     where: { username: username },
+  //   });
+  //   if (!userToAdd) throw new ForbiddenException('User not found.');
+  //   const updatedUsers = [...channel.users, userToAdd];
+  //   await this.prisma.channel.update({
+  //     where: { channelName: channel.channelName },
+  //     data: { users: { connect: updatedUsers } },
+  //   });
+  // }
 
   async setChannelPassword(dto: ChannelModifyDto, req: Request) {
     const user = await this.prisma.user.findUnique({
@@ -159,29 +187,21 @@ export class ChannelsService {
       where: { channelName: channelName },
     });
     if (!channel) throw new ForbiddenException('Channel not found');
-    console.log(
-      'USER ID : ',
-      userId,
-      ' CHANNEL OWNER ID : ',
-      channel.ownerId,
-      ' REESULT : ',
-      userId == channel.ownerId,
-    );
     return userId == channel.ownerId;
   }
 
-  async getAllUsers(channelName: string) {
-    const channel = await this.prisma.channel.findUnique({
-      where: { channelName: channelName },
-      include: { users: true, owner: true },
-    });
-    if (!channel) throw new ForbiddenException('Channel not found');
-    const allUsers = [...channel.users];
-    allUsers.forEach((user) => {
-      delete user.hash;
-    });
-    return allUsers;
-  }
+  // async getAllUsers(channelName: string) {
+  //   const channel = await this.prisma.channel.findUnique({
+  //     where: { channelName: channelName },
+  //     include: { users: true, owner: true },
+  //   });
+  //   if (!channel) throw new ForbiddenException('Channel not found');
+  //   const allUsers = [...channel.users];
+  //   allUsers.forEach((user) => {
+  //     delete user.hash;
+  //   });
+  //   return allUsers;
+  // }
 
   async getAllPublic() {
     const publicChannels = await this.prisma.channel.findMany({
@@ -220,7 +240,7 @@ export class ChannelsService {
       if (!channel) throw new ForbiddenException('Channel not found.');
       const allMessages = await this.prisma.message.findMany({
         where: { channelId: channel.id, isPrivMessage: false },
-        include: { sender: true },
+        include: { sender: true, Channel: true },
       });
       allMessages.forEach((message) => {
         delete message.sender.hash;
@@ -230,17 +250,42 @@ export class ChannelsService {
     return undefined;
   }
 
+  // isInvited(userId: number, channel: any): boolean {
+  //   console.log(
+  //     'USER : ',
+  //     userId,
+  //     ' ESSAIE DE VENIR DANS ',
+  //     channel.channelName,
+  //   );
+  //   return false;
+  // }
+
   async getAuthorization(dto: ChannelJoinDto, req: any) {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: req['user'].sub },
       });
+      if (!user) throw new ForbiddenException('User not found.');
       const channel = await this.prisma.channel.findUnique({
         where: { channelName: dto.channelName },
+        include: { invitedUsers: true },
       });
       if (!channel) throw new ForbiddenException('Channel not found.');
-      if (channel.ownerId === user.id) return 'true';
-      return false;
+      if (channel.ownerId === user.id) return { authorization: true };
+      switch (channel.mode) {
+        case 'PUBLIC':
+          return { authorization: true };
+        case 'PRIVATE':
+          if (
+            channel.invitedUsers.find(
+              (invitedUser) => invitedUser.username === user.username,
+            )
+          )
+            return { authorization: true };
+          return { authorization: false, reason: 'Invitation needed' };
+        case 'PROTECTED':
+      }
+      return { authorization: false, reason: 'Invitation needed' };
     } catch (error) {
       return error;
     }
