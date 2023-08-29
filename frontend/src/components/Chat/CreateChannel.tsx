@@ -14,7 +14,7 @@ enum ChannelMode {
 export default function ChannelList() {
   const [channelInfos, setChannelInfos] = useState<ChannelInfos>({
     channelName: "",
-    password: "password",
+    password: "",
     mode: ChannelMode.PUBLIC,
   });
   const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage>({

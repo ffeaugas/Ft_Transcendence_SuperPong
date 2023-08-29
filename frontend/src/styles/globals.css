@@ -29,7 +29,7 @@
   --iconSize1: clamp(0.5em, 0.5em + 2vw, 1.8em);
 
   /* [BORDER RADIUS] */
-  --borderRadius1: 14px;
+  --borderRadius1: 7px;
 
   /* [PADDING] */
   --padding1: clamp(0.3em, 0.3em + 1vw, 1em);

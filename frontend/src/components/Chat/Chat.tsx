@@ -35,11 +35,15 @@ export default function Chat() {
     setTargetUser(null);
   }
 
-  function switchChannel(discussionName: string): void {
+  function switchChannel(
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ): void {
     setActiveDiscussion(discussionName);
-    if (selectedMenu === MenuType.CHANNEL_SELECTOR)
-      setActiveDiscussionType(ActiveDiscussionType.CHANNEL);
-    else setActiveDiscussionType(ActiveDiscussionType.PRIV_MSG);
+    setActiveDiscussionType(discussionType);
+    // if (selectedMenu === MenuType.CHANNEL_SELECTOR)
+    //   setActiveDiscussionType(ActiveDiscussionType.CHANNEL);
+    // else setActiveDiscussionType(ActiveDiscussionType.PRIV_MSG);
   }
 
   function showUserInfos(username: string | null): void {

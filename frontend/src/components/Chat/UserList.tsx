@@ -8,10 +8,18 @@ enum UserStatus {
   OFFLINE = "OFFLINE",
 }
 
+enum ActiveDiscussionType {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
+}
+
 type UserListProps = {
   users: User[] | undefined;
   activeDiscussion: string | undefined;
-  switchChannel: (discussionName: string) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
 };
 
 export default function UserList({

@@ -27,7 +27,10 @@ type ChannelListProps = {
   channels: Channels | undefined;
   activeDiscussionType: ActiveDiscussionType;
   activeDiscussion: string | undefined;
-  switchChannel: (discussionName: string) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
   changeMenu: (menu: MenuType) => void;
 };
 

@@ -10,14 +10,33 @@ enum ChannelMode {
   PROTECTED = "PROTECTED",
 }
 
+enum MenuType {
+  CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
+  USER_SELECTOR = "USER_SELECTOR",
+  CHANNEL_CREATION = "CHANNEL_CREATION",
+  CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
+}
+
+enum ActiveDiscussionType {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
+}
+
 type AdministrateChannelProps = {
   activeDiscussion: string | undefined;
   users: User[] | undefined;
+  changeMenu: (menu: MenuType) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
 };
 
 export default function AdministrateChannel({
   activeDiscussion,
   users,
+  changeMenu,
+  switchChannel,
 }: AdministrateChannelProps) {
   const [channelInfos, setChannelInfos] = useState<ChannelInfos>({
     channelName: "",
@@ -52,6 +71,8 @@ export default function AdministrateChannel({
           success: "Channel successfully deleted!",
           failure: undefined,
         });
+        switchChannel("General", ActiveDiscussionType.CHANNEL);
+        setTimeout(() => changeMenu(MenuType.CHANNEL_SELECTOR), 1000);
       } else {
         setFeedbackMessage({
           success: undefined,

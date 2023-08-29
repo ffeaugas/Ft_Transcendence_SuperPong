@@ -269,7 +269,7 @@ export class ChannelsService {
   async getAuthorization(dto: ChannelJoinDto, req: any) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { id: req['user'].sub },
+        where: { id: req.user.sub },
       });
       if (!user) throw new ForbiddenException('User not found.');
       const channel = await this.prisma.channel.findUnique({
@@ -277,11 +277,11 @@ export class ChannelsService {
         include: { invitedUsers: true },
       });
       if (!channel) throw new ForbiddenException('Channel not found.');
-      if (channel.ownerId === user.id) return { authorization: true };
       switch (channel.mode) {
         case 'PUBLIC':
           return { authorization: true };
         case 'PRIVATE':
+          if (channel.ownerId === user.id) return { authorization: true };
           if (
             channel.invitedUsers.find(
               (invitedUser) => invitedUser.username === user.username,
@@ -290,17 +290,23 @@ export class ChannelsService {
             return { authorization: true };
           return { authorization: false, reason: 'Invitation needed' };
         case 'PROTECTED':
+          try {
+            const verified = await argon.verify(channel.password, dto.password);
+            if (!verified) throw new ForbiddenException('Invalid password');
+          } catch (error) {
+            return { authorization: false, reason: error.message };
+          }
+          return { authorization: true };
       }
-      return { authorization: false, reason: 'Invitation needed' };
     } catch (error) {
       return error;
     }
   }
 
-  async deleteChannel(req: Request, channelName: string) {
+  async deleteChannel(req: any, channelName: string) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { id: req['user'].sub },
+        where: { id: req.user.sub },
         include: { channelsOwned: true },
       });
       if (!user) throw new ForbiddenException('User not found.');
