@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styles from "../../styles/Chat/AdministrateChannel.module.css";
 
 enum ChannelMode {
@@ -5,15 +6,6 @@ enum ChannelMode {
   PUBLIC = "PUBLIC",
   PROTECTED = "PROTECTED",
 }
-
-type ChannelAdminFormDatas = {
-  password: "";
-  channelMode: ChannelMode;
-  userToInvite: string;
-  userToKick: string;
-  userToAddAdmin: string;
-  userToRemoveAdmin: string;
-};
 
 enum UpdateType {
   KICK_PLAYER = "KICK_PLAYER",
@@ -23,44 +15,42 @@ enum UpdateType {
 }
 
 type AdministrateChannelFormProps = {
+  formLabel: string;
+  formOption: string;
+  submitMessage: string;
+  updateType: UpdateType;
+  optionUsers: User[] | undefined;
   handleUpdate: (
     evt: any,
     targetUser: string | undefined,
     updateType: UpdateType
   ) => void;
-  handleChangeForm: (evt: any) => void;
-  updateType: UpdateType;
-  formOption: string;
-  formDatas: ChannelAdminFormDatas;
-  optionUsers: User[] | undefined;
-  label: string;
 };
 
 export default function AdministrateChannelForm({
-  handleUpdate,
-  handleChangeForm,
+  formLabel,
   formOption,
-  formDatas,
+  submitMessage,
+  updateType,
   optionUsers,
-  label,
+  handleUpdate,
 }: AdministrateChannelFormProps) {
+  const [targetUser, setTargetUser] = useState("");
+
+  function handleChange(evt: any) {
+    const { name, value } = evt.target;
+    setTargetUser(value);
+  }
+
   return (
-    <form
-      onSubmit={(evt) =>
-        handleUpdate(
-          evt,
-          formDatas.userToRemoveAdmin,
-          UpdateType.UNSET_PLAYER_ADMIN
-        )
-      }
-    >
+    <form onSubmit={(evt) => handleUpdate(evt, targetUser, updateType)}>
       <div className={styles.subform}>
-        <label htmlFor={formOption}>{label}</label>
+        <label htmlFor={formOption}>{formLabel}</label>
         <select
           name={formOption}
           id={formOption}
-          value={formDatas.userToRemoveAdmin}
-          onChange={(evt) => handleChangeForm(evt)}
+          value={targetUser}
+          onChange={(evt) => handleChange(evt)}
         >
           <option value=""></option>
           {optionUsers
@@ -72,7 +62,7 @@ export default function AdministrateChannelForm({
             : undefined}
         </select>
       </div>
-      <input type="submit" value="Remove" />
+      <input type="submit" value={submitMessage} />
     </form>
   );
 }

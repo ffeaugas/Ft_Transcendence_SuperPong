@@ -30,15 +30,6 @@ enum ActiveDiscussionType {
   CHANNEL = "CHANNEL",
 }
 
-type ChannelAdminFormDatas = {
-  password: "";
-  channelMode: ChannelMode;
-  userToInvite: string;
-  userToKick: string;
-  userToAddAdmin: string;
-  userToRemoveAdmin: string;
-};
-
 type AdministrateChannelProps = {
   activeDiscussion: string | undefined;
   users: User[] | undefined;
@@ -58,16 +49,10 @@ export default function AdministrateChannel({
   const [channelInfos, setChannelInfos] = useState<ChannelInfos | undefined>(
     undefined
   );
-
   const [formDatas, setFormDatas] = useState<ChannelAdminFormDatas>({
     password: "",
     channelMode: ChannelMode.PUBLIC,
-    userToInvite: "",
-    userToKick: "",
-    userToAddAdmin: "",
-    userToRemoveAdmin: "",
   });
-
   const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage>({
     success: undefined,
     failure: undefined,
@@ -98,7 +83,6 @@ export default function AdministrateChannel({
         });
       }
     } catch (error) {
-      alert("lol");
       setFeedbackMessage({
         success: undefined,
         failure: "You can't delete this channel!",
@@ -156,7 +140,7 @@ export default function AdministrateChannel({
     }
   }
 
-  async function handleSubmit(evt: any): Promise<void> {
+  async function handleUpdateMode(evt: any): Promise<void> {
     evt.preventDefault();
     try {
       const res = await axios.patch(
@@ -164,7 +148,7 @@ export default function AdministrateChannel({
         {
           channelName: activeDiscussion,
           mode: formDatas.channelMode,
-          password: "",
+          password: formDatas.password,
         },
         {
           headers: {
@@ -173,11 +157,11 @@ export default function AdministrateChannel({
         }
       );
       if (res.status) {
-        setChannelInfos({
-          channelName: "",
-          password: "",
-          mode: ChannelMode.PUBLIC,
+        getChannelInfos().then((channelInfos) => {
+          setChannelInfos(channelInfos);
+          console.log("CHANNNEEEEL INFOS :      ", channelInfos);
         });
+        setFormDatas({ ...formDatas, password: "" });
         setFeedbackMessage({
           success: "Channel update success!",
           failure: undefined,
@@ -222,7 +206,7 @@ export default function AdministrateChannel({
         <b>{activeDiscussion}</b>
       </h2>
       <div className={styles.forms}>
-        <form onSubmit={(evt) => handleSubmit(evt)}>
+        <form onSubmit={(evt) => handleUpdateMode(evt)}>
           <div className={styles.subform}>
             <label htmlFor="channelMode">Change mode :</label>
             <select
@@ -231,6 +215,7 @@ export default function AdministrateChannel({
               value={formDatas.channelMode}
               onChange={(evt) => handleChangeForm(evt)}
             >
+              <option value=""></option>
               <option value="PUBLIC">Public</option>
               <option value="PRIVATE">Private</option>
               <option value="PROTECTED">Protected</option>
@@ -251,134 +236,41 @@ export default function AdministrateChannel({
           <input type="submit" value="Update" />
         </form>
 
-        <form
-          onSubmit={(evt) =>
-            handleUpdate(
-              evt,
-              formDatas.userToAddAdmin,
-              UpdateType.SET_PLAYER_ADMIN
-            )
-          }
-        >
-          <div className={styles.subform}>
-            <label htmlFor="userToAddAdmin">Set new admin:</label>
-            <select
-              name="userToAddAdmin"
-              id="userToAddAdmin"
-              value={formDatas.userToAddAdmin}
-              onChange={(evt) => handleChangeForm(evt)}
-            >
-              <option value=""></option>
-              {users
-                ? users.map((user) => (
-                    <option key={user.id} value={user.username}>
-                      {user.username}
-                    </option>
-                  ))
-                : undefined}
-            </select>
-          </div>
-          <input type="submit" value="Promote" />
-        </form>
-
-        <form
-          onSubmit={(evt) =>
-            handleUpdate(
-              evt,
-              formDatas.userToRemoveAdmin,
-              UpdateType.UNSET_PLAYER_ADMIN
-            )
-          }
-        >
-          <div className={styles.subform}>
-            <label htmlFor="userToRemoveAdmin">Remove admin:</label>
-            <select
-              name="userToRemoveAdmin"
-              id="userToRemoveAdmin"
-              value={formDatas.userToRemoveAdmin}
-              onChange={(evt) => handleChangeForm(evt)}
-            >
-              <option value=""></option>
-              {channelInfos?.invitedUsers
-                ? channelInfos.invitedUsers.map((invitedUser) => (
-                    <option key={invitedUser.id} value={invitedUser.username}>
-                      {invitedUser.username}
-                    </option>
-                  ))
-                : undefined}
-            </select>
-          </div>
-          <input type="submit" value="Remove" />
-        </form>
-
         <AdministrateChannelForm
+          formLabel={"Set new admin:"}
+          formOption={"userToAddAdmin"}
+          submitMessage={"Promote"}
+          updateType={UpdateType.SET_PLAYER_ADMIN}
+          optionUsers={users}
           handleUpdate={handleUpdate}
-          handleChangeForm={handleChangeForm}
+        />
+        <AdministrateChannelForm
+          formLabel={"Remove admin"}
           formOption={"userToRemoveAdmin"}
-          formDatas={formDatas}
-          optionUsers={channelInfos?.invitedUsers}
-          label={"Remove admin"}
+          submitMessage={"Demote"}
+          updateType={UpdateType.UNSET_PLAYER_ADMIN}
+          optionUsers={channelInfos?.adminUsers}
+          handleUpdate={handleUpdate}
         />
 
-        {formDatas.channelMode === ChannelMode.PRIVATE ? (
+        {channelInfos.mode === ChannelMode.PRIVATE ? (
           <>
-            <form
-              onSubmit={(evt) =>
-                handleUpdate(
-                  evt,
-                  formDatas.userToInvite,
-                  UpdateType.INVITE_PLAYER
-                )
-              }
-            >
-              <div className={styles.subform}>
-                <label htmlFor="userToInvite">Invite to channel:</label>
-                <select
-                  name="userToInvite"
-                  id="userToInvite"
-                  value={formDatas.userToInvite}
-                  onChange={(evt) => handleChangeForm(evt)}
-                >
-                  <option value=""></option>
-                  {users
-                    ? users.map((user) => (
-                        <option key={user.id} value={user.username}>
-                          {user.username}
-                        </option>
-                      ))
-                    : undefined}
-                </select>
-              </div>
-              <input type="submit" value="Invite" />
-            </form>
-            <form
-              onSubmit={(evt) =>
-                handleUpdate(evt, formDatas.userToKick, UpdateType.KICK_PLAYER)
-              }
-            >
-              <div className={styles.subform}>
-                <label htmlFor="userToKick">Kick from channel:</label>
-                <select
-                  name="userToKick"
-                  id="userToKick"
-                  value={formDatas.userToKick}
-                  onChange={(evt) => handleChangeForm(evt)}
-                >
-                  <option value=""></option>
-                  {channelInfos?.invitedUsers
-                    ? channelInfos.invitedUsers.map((invitedUser) => (
-                        <option
-                          key={invitedUser.id}
-                          value={invitedUser.username}
-                        >
-                          {invitedUser.username}
-                        </option>
-                      ))
-                    : undefined}
-                </select>
-              </div>
-              <input type="submit" value="Kick" />
-            </form>
+            <AdministrateChannelForm
+              formLabel={"Invite to channel:"}
+              formOption={"userToInvite"}
+              submitMessage={"Invite"}
+              updateType={UpdateType.INVITE_PLAYER}
+              optionUsers={users}
+              handleUpdate={handleUpdate}
+            />
+            <AdministrateChannelForm
+              formLabel={"Kick from channel:"}
+              formOption={"userToKick"}
+              submitMessage={"Kick"}
+              updateType={UpdateType.KICK_PLAYER}
+              optionUsers={channelInfos?.invitedUsers}
+              handleUpdate={handleUpdate}
+            />
           </>
         ) : undefined}
 

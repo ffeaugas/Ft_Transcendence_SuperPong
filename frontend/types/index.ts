@@ -36,6 +36,11 @@ type ChannelInfos = {
   banUsers?: User[];
 };
 
+type ChannelAdminFormDatas = {
+  password: string;
+  channelMode: ChannelMode;
+};
+
 type FeedbackMessage = {
   success: string | undefined;
   failure: string | undefined;
