@@ -101,7 +101,6 @@ export default function MsgList({
           },
         });
         const messages = res.data;
-        console.log("MESSAGES RECUUUUU : ", messages);
         return messages;
       } catch (error) {
         console.error("Error fetching channel messages", error);
@@ -139,7 +138,6 @@ export default function MsgList({
   }
 
   function messageListner(message: Message) {
-    // console.log(message);
     if (!messages) return;
     if (
       !message.isPrivMessage &&
@@ -167,12 +165,6 @@ export default function MsgList({
       setMessages(messages);
     });
   }, [activeDiscussion]);
-
-  // useEffect(() => {
-  //   getMessages().then((messages) => {
-  //     setMessages(messages);
-  //   });
-  // }, [activeDiscussionType]);
 
   useEffect(() => {
     if (msgListRef.current) {
