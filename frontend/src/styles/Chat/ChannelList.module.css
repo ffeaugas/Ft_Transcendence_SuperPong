@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  gap: 5px;
 }
 
 .channels {
@@ -52,4 +53,16 @@
 .channelList button:hover {
   background-color: var(--titleColor1);
   color: var(--textColor1);
+}
+
+.channelButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.warningMessage {
+  color: rgb(223, 136, 136);
+  font-size: var(--textSize2);
+  transform: translateY(-5px);
 }

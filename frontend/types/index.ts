@@ -30,6 +30,10 @@ type ChannelInfos = {
   channelName: string;
   password?: string;
   mode: ChannelMode;
+  owner?: User;
+  adminUsers?: User[];
+  invitedUsers?: User[];
+  banUsers?: User[];
 };
 
 type FeedbackMessage = {

@@ -17,6 +17,13 @@ enum MenuType {
   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
 }
 
+enum UpdateType {
+  KICK_PLAYER = "KICK_PLAYER",
+  INVITE_PLAYER = "INVITE_PLAYER",
+  SET_PLAYER_ADMIN = "SET_PLAYER_ADMIN",
+  UNSET_PLAYER_ADMIN = "UNSET_PLAYER_ADMIN",
+}
+
 enum ActiveDiscussionType {
   PRIV_MSG = "PRIV_MSG",
   CHANNEL = "CHANNEL",
@@ -50,10 +57,13 @@ export default function AdministrateChannel({
   const [userToInvite, setUserToInvite] = useState<string | undefined>(
     undefined
   );
-  const [userToKick, setUserToKick] = useState<string | undefined>(undefined);
-  const [invitedUsers, setInvitedUsers] = useState<User[] | undefined>(
+  const [userToAddAdmin, setUserToAddAdmin] = useState<string | undefined>(
     undefined
   );
+  const [userToKick, setUserToKick] = useState<string | undefined>(undefined);
+  const [userToRemoveAdmin, setUserToRemoveAdmin] = useState<
+    string | undefined
+  >(undefined);
 
   async function deleteChannel() {
     try {
@@ -104,51 +114,30 @@ export default function AdministrateChannel({
     setUserToKick(value);
   }
 
-  async function handleInvitation(evt: any): Promise<void> {
-    evt.preventDefault();
-    try {
-      const res = await axios.patch(
-        "http://10.5.0.3:3001/channels/invite",
-        {
-          channelName: activeDiscussion,
-          userToInvite: userToInvite,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      if (res.status) {
-        setFeedbackMessage({
-          success: "User successfully invited!",
-          failure: undefined,
-        });
-        getInvitedUsers().then((invitedUsers) => {
-          setInvitedUsers(invitedUsers);
-        });
-      } else {
-        setFeedbackMessage({
-          success: undefined,
-          failure: res.data.message,
-        });
-      }
-    } catch (error: any) {
-      setFeedbackMessage({
-        success: undefined,
-        failure: "Error occured when trying to invite user",
-      });
-    }
+  function handleChangeAddAdmin(evt: any): void {
+    const { name, value } = evt.target;
+    setUserToAddAdmin(value);
   }
 
-  async function handleKick(evt: any): Promise<void> {
+  function handleChangeRemoveAdmin(evt: any): void {
+    const { name, value } = evt.target;
+    setUserToRemoveAdmin(value);
+  }
+
+  async function handleUpdate(
+    evt: any,
+    targetUser: string | undefined,
+    updateType: UpdateType
+  ): Promise<void> {
     evt.preventDefault();
+    if (!targetUser) return;
     try {
       const res = await axios.patch(
-        "http://10.5.0.3:3001/channels/kick",
+        "http://10.5.0.3:3001/channels/update",
         {
           channelName: activeDiscussion,
-          userToKick: userToInvite,
+          targetUser: targetUser,
+          updateType: updateType,
         },
         {
           headers: {
@@ -158,11 +147,12 @@ export default function AdministrateChannel({
       );
       if (res.status) {
         setFeedbackMessage({
-          success: "User successfully kicked!",
+          success: "Update successful!",
           failure: undefined,
         });
-        getInvitedUsers().then((invitedUsers) => {
-          setInvitedUsers(invitedUsers);
+        getChannelInfos().then((channelInfos) => {
+          setChannelInfos(channelInfos);
+          console.log("CHANNNEEEEL INFOS :      ", channelInfos);
         });
       } else {
         setFeedbackMessage({
@@ -173,7 +163,7 @@ export default function AdministrateChannel({
     } catch (error: any) {
       setFeedbackMessage({
         success: undefined,
-        failure: "Error occured when trying to kick user",
+        failure: `Request ${updateType} failed`,
       });
     }
   }
@@ -218,28 +208,20 @@ export default function AdministrateChannel({
     }
   }
 
-  async function getInvitedUsers() {
-    try {
-      const res = await axios.get(
-        "http://10.5.0.3:3001/channels/invited-users",
-        {
-          params: { channelName: activeDiscussion },
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const invitedUsers = res.data;
-      return invitedUsers;
-    } catch (error) {
-      console.error("Error fetching user list", error);
-      return undefined;
-    }
+  async function getChannelInfos(): Promise<any> {
+    const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
+      params: { channelName: activeDiscussion },
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+    console.log(res.data);
+    return res.data;
   }
 
   useEffect(() => {
-    getInvitedUsers().then((invitedUsers) => {
-      setInvitedUsers(invitedUsers);
+    getChannelInfos().then((channelInfos) => {
+      setChannelInfos(channelInfos);
     });
   }, []);
 
@@ -279,9 +261,65 @@ export default function AdministrateChannel({
           <input type="submit" value="Update" />
         </form>
 
+        <form
+          onSubmit={(evt) =>
+            handleUpdate(evt, userToAddAdmin, UpdateType.SET_PLAYER_ADMIN)
+          }
+        >
+          <div className={styles.subform}>
+            <label htmlFor="add-admin">Set new admin:</label>
+            <select
+              name="add-admin"
+              id="add-admin"
+              value={userToAddAdmin}
+              onChange={(evt) => handleChangeAddAdmin(evt)}
+            >
+              <option value=""></option>
+              {users
+                ? users.map((user) => (
+                    <option key={user.id} value={user.username}>
+                      {user.username}
+                    </option>
+                  ))
+                : undefined}
+            </select>
+          </div>
+          <input type="submit" value="Promote" />
+        </form>
+
+        <form
+          onSubmit={(evt) =>
+            handleUpdate(evt, userToRemoveAdmin, UpdateType.UNSET_PLAYER_ADMIN)
+          }
+        >
+          <div className={styles.subform}>
+            <label htmlFor="remove-admin">Remove admin:</label>
+            <select
+              name="remove-admin"
+              id="remove-admin"
+              value={userToRemoveAdmin}
+              onChange={(evt) => handleChangeRemoveAdmin(evt)}
+            >
+              <option value=""></option>
+              {channelInfos?.invitedUsers
+                ? channelInfos.invitedUsers.map((invitedUser) => (
+                    <option key={invitedUser.id} value={invitedUser.username}>
+                      {invitedUser.username}
+                    </option>
+                  ))
+                : undefined}
+            </select>
+          </div>
+          <input type="submit" value="Remove" />
+        </form>
+
         {channelInfos.mode === ChannelMode.PRIVATE ? (
           <>
-            <form onSubmit={(evt) => handleInvitation(evt)}>
+            <form
+              onSubmit={(evt) =>
+                handleUpdate(evt, userToInvite, UpdateType.INVITE_PLAYER)
+              }
+            >
               <div className={styles.subform}>
                 <label htmlFor="invitation">Invite to channel:</label>
                 <select
@@ -302,7 +340,11 @@ export default function AdministrateChannel({
               </div>
               <input type="submit" value="Invite" />
             </form>
-            <form onSubmit={(evt) => handleKick(evt)}>
+            <form
+              onSubmit={(evt) =>
+                handleUpdate(evt, userToKick, UpdateType.KICK_PLAYER)
+              }
+            >
               <div className={styles.subform}>
                 <label htmlFor="kick">Kick from channel:</label>
                 <select
@@ -312,8 +354,8 @@ export default function AdministrateChannel({
                   onChange={(evt) => handleChangeKick(evt)}
                 >
                   <option value=""></option>
-                  {invitedUsers
-                    ? invitedUsers.map((invitedUser) => (
+                  {channelInfos?.invitedUsers
+                    ? channelInfos.invitedUsers.map((invitedUser) => (
                         <option
                           key={invitedUser.id}
                           value={invitedUser.username}
