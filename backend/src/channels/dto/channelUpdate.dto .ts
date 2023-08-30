@@ -13,11 +13,13 @@ export class ChannelUpdateDto {
   @IsNotEmpty()
   @ApiProperty({ description: 'Name of the channel' })
   channelName: string;
+
   @IsString({
     message: 'Target user must be a string',
   })
   @ApiProperty({ description: 'Target user' })
   targetUser?: string;
+
   @IsString()
   @IsNotEmpty()
   updateType: UpdateType;

@@ -15,7 +15,7 @@ import { ChannelDto } from './dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ChannelModifyDto } from './dto/channelModify.dto';
+import { ChannelUpdateModeDto } from './dto/channelUpdateMode.dto';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
 import { ChannelLeaveDto } from './dto/channelLeave.dto';
 import { ChannelUpdateDto } from './dto/channelUpdate.dto ';
@@ -58,38 +58,9 @@ export class ChannelsController {
     );
   }
 
-  // @Get('invited-users')
-  // async getInvitedUsers(
-  //   @Query('channelName') channelName: string,
-  //   @Req() req: Request,
-  // ) {
-  //   return await this.channelsService.getInvitedUsers(channelName, req);
-  // }
-
-  // @Get('banned-users')
-  // async getBannedUsers(
-  //   @Query('channelName') channelName: string,
-  //   @Req() req: Request,
-  // ) {
-  //   return await this.channelsService.getBannedUsers(channelName, req);
-  // }
-
-  // @Get('admin-users')
-  // async getAdminUsers(
-  //   @Query('channelName') channelName: string,
-  //   @Req() req: Request,
-  // ) {
-  //   return await this.channelsService.getAdminUsers(channelName, req);
-  // }
-
   @Post()
   async createChannel(@Req() req: Request, @Body() dto: ChannelDto) {
     return await this.channelsService.createChannel(req, dto);
-  }
-
-  @Patch()
-  async setChannelPassword(@Body() dto: ChannelModifyDto, @Req() req: Request) {
-    return await this.channelsService.setChannelPassword(dto, req);
   }
 
   @Patch('change-mode')
@@ -101,7 +72,10 @@ export class ChannelsController {
     status: 403,
     description: "User isn't owner channel Forbidden.",
   })
-  async changeChannelMode(@Req() req: Request, @Body() dto: ChannelModifyDto) {
+  async changeChannelMode(
+    @Req() req: Request,
+    @Body() dto: ChannelUpdateModeDto,
+  ) {
     return await this.channelsService.changeChannelMode(req, dto);
   }
 
@@ -109,16 +83,6 @@ export class ChannelsController {
   async updateChannel(@Req() req: Request, @Body() dto: ChannelUpdateDto) {
     return await this.channelsService.updateChannel(req, dto);
   }
-
-  // @Patch('add-admin')
-  // async addAdminToChannel(@Req() req: Request, @Body() dto: ChannelUpdateDto) {
-  //   return await this.channelsService.addAdminToChannel(req, dto);
-  // }
-
-  // @Patch('kick')
-  // async kickFromChannel(@Req() req: Request, @Body() dto: ChannelUpdateDto) {
-  //   return await this.channelsService.kickFromChannel(req, dto);
-  // }
 
   @Delete(':channelName')
   async deleteChannel(

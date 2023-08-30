@@ -7,7 +7,7 @@ import { ChannelDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelMode } from '@prisma/client';
 import { Request } from 'express';
-import { ChannelModifyDto } from './dto/channelModify.dto';
+import { ChannelUpdateModeDto } from './dto/channelUpdateMode.dto';
 import * as argon from 'argon2';
 import { SocketEvents } from 'src/socket/socketEvents';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
@@ -28,69 +28,36 @@ export class ChannelsService {
     private readonly socketEvents: SocketEvents,
   ) {}
 
-  private async createPublicChannel(owner: any, dto: ChannelDto) {
-    return await this.prisma.channel.create({
-      data: {
-        ownerId: owner.id,
-        channelName: dto.channelName,
-        password: '',
-        mode: ChannelMode.PUBLIC,
-      },
-    });
-  }
-
-  private async createPrivateChannel(owner: any, dto: ChannelDto) {
-    return await this.prisma.channel.create({
-      data: {
-        ownerId: owner.id,
-        channelName: dto.channelName,
-        password: '',
-        mode: ChannelMode.PRIVATE,
-      },
-    });
-  }
-
-  private async createProtectedChannel(owner: any, dto: ChannelDto) {
-    const hashPasswd = await argon.hash(dto.password);
-    return await this.prisma.channel.create({
-      data: {
-        ownerId: owner.id,
-        channelName: dto.channelName,
-        mode: ChannelMode.PROTECTED,
-        password: hashPasswd,
-      },
-    });
-  }
-
   async createChannel(req: Request, dto: ChannelDto) {
     try {
       const owner = await this.prisma.user.findUnique({
         where: { id: req['user'].sub },
       });
       if (!owner) throw new ForbiddenException('User not found.');
-      let newChannel = await this.prisma.channel.findUnique({
+      const newChannel = await this.prisma.channel.findUnique({
         where: { channelName: dto.channelName },
       });
       if (newChannel) throw new ForbiddenException('Channel already exists');
-      switch (dto.mode) {
-        case 'PUBLIC':
-          newChannel = await this.createPublicChannel(owner, dto);
-          break;
-        case 'PROTECTED':
-          newChannel = await this.createProtectedChannel(owner, dto);
-          break;
-        case 'PRIVATE':
-          newChannel = await this.createPrivateChannel(owner, dto);
-          break;
+      const channelDatas = {
+        ownerId: owner.id,
+        channelName: dto.channelName,
+        mode: dto.mode,
+      };
+      if (dto.mode === ChannelMode.PROTECTED) {
+        const hashPsswd = await argon.hash(dto.password);
+        channelDatas['password'] = hashPsswd;
       }
-      return newChannel;
+      const createdChannel = await this.prisma.channel.create({
+        data: channelDatas,
+      });
+      return createdChannel;
     } catch (error) {
       throw error;
     }
   }
 
-  async changeChannelMode(req: Request, dto: any) {
-    let updateChannel: any;
+  async changeChannelMode(req: Request, dto: ChannelUpdateModeDto) {
+    const channelPatch = { mode: dto.mode };
     const user = await this.prisma.user.findUnique({
       where: { id: req['user'].sub },
     });
@@ -103,25 +70,14 @@ export class ChannelsService {
       throw new ForbiddenException(
         'You must be the channel owner to do this operation',
       );
-    if (dto.mode === ChannelMode.PRIVATE) {
-      updateChannel = await this.prisma.channel.update({
-        where: { channelName: dto.channelName },
-        data: { mode: ChannelMode.PRIVATE },
-      });
-    } else if (dto.mode === ChannelMode.PUBLIC) {
-      updateChannel = await this.prisma.channel.update({
-        where: { channelName: dto.channelName },
-        data: { mode: ChannelMode.PUBLIC },
-      });
-    } else if (dto.mode === ChannelMode.PROTECTED) {
+    if (dto.mode === ChannelMode.PROTECTED) {
       const hashPsswd = await argon.hash(dto.password);
-      updateChannel = await this.prisma.channel.update({
-        where: { channelName: dto.channelName },
-        data: { mode: ChannelMode.PROTECTED, password: hashPsswd },
-      });
-    } else {
-      throw new ForbiddenException('mode not valid.');
+      channelPatch['password'] = hashPsswd;
     }
+    const updateChannel = await this.prisma.channel.update({
+      where: { channelName: dto.channelName },
+      data: channelPatch,
+    });
     return updateChannel;
   }
 
@@ -250,27 +206,6 @@ export class ChannelsService {
       data: { invitedUsers: { set: updatedInvitations } },
     });
     return updateChannelInvitations;
-  }
-
-  async setChannelPassword(dto: ChannelModifyDto, req: Request) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-    });
-    const channelToUpdate = await this.prisma.channel.findFirst({
-      where: {
-        channelName: dto.channelName,
-        ownerId: user.id,
-      },
-    });
-    if (!channelToUpdate)
-      throw new ForbiddenException("This user is not channel's owner");
-    const hashPasswd = await argon.hash(dto.password);
-    const updatedChannel = await this.prisma.channel.update({
-      where: { channelName: dto.channelName, mode: ChannelMode.PRIVATE },
-      data: { password: hashPasswd },
-    });
-    delete updatedChannel.password;
-    return updatedChannel;
   }
 
   async getChannelInfos(channelName: string) {

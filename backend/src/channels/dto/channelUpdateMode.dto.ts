@@ -8,7 +8,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 
-export class ChannelModifyDto {
+export class ChannelUpdateModeDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Name of the channel' })

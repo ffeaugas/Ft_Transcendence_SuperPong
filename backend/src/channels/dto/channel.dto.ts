@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ChannelMode } from '@prisma/client';
 import {
-  IsNotEmpty,
   IsString,
   Matches,
   MaxLength,
@@ -22,11 +21,12 @@ export class ChannelDto {
   })
   @ApiProperty({ description: 'Name of the channel' })
   channelName: string;
+
+  @ValidateIf((o) => o.mode === ChannelMode.PROTECTED)
   @IsString()
   @MaxLength(12, {
     message: 'Password should be max 12 characters. ',
   })
-  @ValidateIf((o) => o.mode === ChannelMode.PROTECTED)
   @MinLength(3, {
     message: 'Password should be at least 3 characters long. ',
   })
@@ -34,6 +34,7 @@ export class ChannelDto {
     message: 'Password should be alpha-numeric. ',
   })
   password?: string;
+
   @IsString()
   mode?: ChannelMode;
 }
