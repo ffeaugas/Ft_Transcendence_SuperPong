@@ -1,17 +1,13 @@
 import { useState } from "react";
 import styles from "../../styles/Chat/AdministrateChannel.module.css";
 
-enum ChannelMode {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  PROTECTED = "PROTECTED",
-}
-
 enum UpdateType {
   KICK_PLAYER = "KICK_PLAYER",
   INVITE_PLAYER = "INVITE_PLAYER",
   SET_PLAYER_ADMIN = "SET_PLAYER_ADMIN",
   UNSET_PLAYER_ADMIN = "UNSET_PLAYER_ADMIN",
+  BAN_PLAYER = "BAN_PLAYER",
+  DEBAN_PLAYER = "DEBAN_PLAYER",
 }
 
 type AdministrateChannelFormProps = {

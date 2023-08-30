@@ -23,6 +23,8 @@ enum UpdateType {
   INVITE_PLAYER = "INVITE_PLAYER",
   SET_PLAYER_ADMIN = "SET_PLAYER_ADMIN",
   UNSET_PLAYER_ADMIN = "UNSET_PLAYER_ADMIN",
+  BAN_PLAYER = "BAN_PLAYER",
+  DEBAN_PLAYER = "DEBAN_PLAYER",
 }
 
 enum ActiveDiscussionType {
@@ -104,38 +106,37 @@ export default function AdministrateChannel({
     evt.preventDefault();
     if (!targetUser) return;
     try {
-      const res = await axios.patch(
-        "http://10.5.0.3:3001/channels/update",
-        {
+      const res = await fetch("http://10.5.0.3:3001/channels/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
           channelName: activeDiscussion,
           targetUser: targetUser,
           updateType: updateType,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      if (res.status) {
+        }),
+      });
+      if (res.ok) {
         setFeedbackMessage({
           success: "Update successful!",
           failure: undefined,
         });
         getChannelInfos().then((channelInfos) => {
           setChannelInfos(channelInfos);
-          console.log("CHANNNEEEEL INFOS :      ", channelInfos);
         });
       } else {
+        const errorResponse = await res.json();
         setFeedbackMessage({
           success: undefined,
-          failure: res.data.message,
+          failure: errorResponse.message,
         });
       }
     } catch (error: any) {
       setFeedbackMessage({
         success: undefined,
-        failure: `Request ${updateType} failed`,
+        failure: "Error when trying to update channel",
       });
     }
   }
@@ -236,23 +237,6 @@ export default function AdministrateChannel({
           <input type="submit" value="Update" />
         </form>
 
-        <AdministrateChannelForm
-          formLabel={"Set new admin:"}
-          formOption={"userToAddAdmin"}
-          submitMessage={"Promote"}
-          updateType={UpdateType.SET_PLAYER_ADMIN}
-          optionUsers={users}
-          handleUpdate={handleUpdate}
-        />
-        <AdministrateChannelForm
-          formLabel={"Remove admin"}
-          formOption={"userToRemoveAdmin"}
-          submitMessage={"Demote"}
-          updateType={UpdateType.UNSET_PLAYER_ADMIN}
-          optionUsers={channelInfos?.adminUsers}
-          handleUpdate={handleUpdate}
-        />
-
         {channelInfos.mode === ChannelMode.PRIVATE ? (
           <>
             <AdministrateChannelForm
@@ -273,6 +257,40 @@ export default function AdministrateChannel({
             />
           </>
         ) : undefined}
+
+        <AdministrateChannelForm
+          formLabel={"Set new admin:"}
+          formOption={"userToAddAdmin"}
+          submitMessage={"Promote"}
+          updateType={UpdateType.SET_PLAYER_ADMIN}
+          optionUsers={users}
+          handleUpdate={handleUpdate}
+        />
+        <AdministrateChannelForm
+          formLabel={"Remove admin"}
+          formOption={"userToRemoveAdmin"}
+          submitMessage={"Demote"}
+          updateType={UpdateType.UNSET_PLAYER_ADMIN}
+          optionUsers={channelInfos?.adminUsers}
+          handleUpdate={handleUpdate}
+        />
+
+        <AdministrateChannelForm
+          formLabel={"Ban user:"}
+          formOption={"userToBan"}
+          submitMessage={"Ban"}
+          updateType={UpdateType.BAN_PLAYER}
+          optionUsers={users}
+          handleUpdate={handleUpdate}
+        />
+        <AdministrateChannelForm
+          formLabel={"Deban user"}
+          formOption={"userToDeban"}
+          submitMessage={"Deban"}
+          updateType={UpdateType.DEBAN_PLAYER}
+          optionUsers={channelInfos?.banUsers}
+          handleUpdate={handleUpdate}
+        />
 
         <button onClick={deleteChannel}>Delete</button>
       </div>
