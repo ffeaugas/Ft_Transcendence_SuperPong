@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ChannelDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelMode } from '@prisma/client';
@@ -7,8 +11,15 @@ import { ChannelModifyDto } from './dto/channelModify.dto';
 import * as argon from 'argon2';
 import { SocketEvents } from 'src/socket/socketEvents';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
-import { ChannelInvitationDto } from './dto/channelInvitation.dto';
-import { ChannelKickDto } from './dto/channelKick.dto ';
+import { ChannelUpdateDto } from './dto/channelUpdate.dto ';
+import { ChannelLeaveDto } from './dto/channelLeave.dto';
+
+enum UpdateType {
+  KICK_PLAYER = 'KICK_PLAYER',
+  INVITE_PLAYER = 'INVITE_PLAYER',
+  SET_PLAYER_ADMIN = 'SET_PLAYER_ADMIN',
+  UNSET_PLAYER_ADMIN = 'UNSET_PLAYER_ADMIN',
+}
 
 @Injectable()
 export class ChannelsService {
@@ -61,7 +72,6 @@ export class ChannelsService {
         where: { channelName: dto.channelName },
       });
       if (newChannel) throw new ForbiddenException('Channel already exists');
-      // let newChannel: any;
       switch (dto.mode) {
         case 'PUBLIC':
           newChannel = await this.createPublicChannel(owner, dto);
@@ -115,61 +125,128 @@ export class ChannelsService {
     return updateChannel;
   }
 
-  async inviteInChannel(req: Request, dto: ChannelInvitationDto) {
+  async leaveChannel(dto: ChannelLeaveDto, req: Request) {
     const user = await this.prisma.user.findUnique({
       where: { id: req['user'].sub },
     });
-    const channelToInviteIn = await this.prisma.channel.findUnique({
+    const channelToLeave = await this.prisma.channel.findUnique({
       where: { channelName: dto.channelName },
+      include: { invitedUsers: true, owner: true },
+    });
+    if (user.username === channelToLeave.owner.username) {
+      const deletedChannel = await this.prisma.channel.delete({
+        where: { channelName: dto.channelName },
+      });
+      this.socketEvents.deletedChannel(deletedChannel);
+      return deletedChannel;
+    } else {
+      const updatedInvitations = channelToLeave.invitedUsers.filter(
+        (invitedUser) => invitedUser.username !== user.username,
+      );
+      const updateChannelInvitations = await this.prisma.channel.update({
+        where: { channelName: dto.channelName },
+        data: { invitedUsers: { set: updatedInvitations } },
+      });
+      return updateChannelInvitations;
+    }
+  }
+
+  async updateChannel(req: Request, dto: ChannelUpdateDto) {
+    console.log('Update Channel Request :', dto);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: req['user'].sub },
+      });
+      if (!user) throw new NotFoundException('Invalid user');
+      const targetChannel = await this.prisma.channel.findUnique({
+        where: { channelName: dto.channelName },
+      });
+      if (!targetChannel) throw new NotFoundException('Invalid channel');
+      const targetUser = await this.prisma.user.findUnique({
+        where: { username: dto.targetUser },
+      });
+      if (!targetUser) throw new NotFoundException('Invalid target user');
+      if (targetChannel.ownerId !== user.id)
+        throw new ForbiddenException(
+          'You must be the channel owner to update channel',
+        );
+      switch (dto.updateType) {
+        case UpdateType.INVITE_PLAYER:
+          this.setPlayerInvitation(
+            targetUser,
+            dto.channelName,
+            UpdateType.INVITE_PLAYER,
+          );
+        case UpdateType.KICK_PLAYER:
+          this.setPlayerInvitation(
+            targetUser,
+            dto.channelName,
+            UpdateType.KICK_PLAYER,
+          );
+        case UpdateType.SET_PLAYER_ADMIN:
+          this.setPlayerAdmin(
+            targetUser,
+            dto.channelName,
+            UpdateType.SET_PLAYER_ADMIN,
+          );
+        case UpdateType.UNSET_PLAYER_ADMIN:
+          this.setPlayerAdmin(
+            targetUser,
+            dto.channelName,
+            UpdateType.UNSET_PLAYER_ADMIN,
+          );
+      }
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async setPlayerAdmin(targetUser: any, channelName: string, mode: UpdateType) {
+    let updatedAdmins: any[];
+
+    const targetChannel = await this.prisma.channel.findUnique({
+      where: { channelName: channelName },
+      include: { adminUsers: true },
+    });
+    if (mode === UpdateType.SET_PLAYER_ADMIN) {
+      updatedAdmins = [...targetChannel.adminUsers, targetUser];
+    } else {
+      updatedAdmins = targetChannel.adminUsers.filter(
+        (adminUser) => adminUser.username !== targetUser.username,
+      );
+    }
+    const updateChannelAdmins = await this.prisma.channel.update({
+      where: { channelName: channelName },
+      data: { adminUsers: { set: updatedAdmins } },
+    });
+    return updateChannelAdmins;
+  }
+
+  async setPlayerInvitation(
+    targetUser: any,
+    channelName: string,
+    mode: UpdateType,
+  ) {
+    let updatedInvitations: any[];
+
+    const targetChannel = await this.prisma.channel.findUnique({
+      where: { channelName: channelName },
       include: { invitedUsers: true },
     });
-    const userToInvite = await this.prisma.user.findUnique({
-      where: { username: dto.userToInvite },
-    });
-    if (channelToInviteIn.ownerId !== user.id)
-      throw new ForbiddenException(
-        'You must be the channel owner to invite anyone',
-      );
-    if (channelToInviteIn.mode !== ChannelMode.PRIVATE)
+    if (targetChannel?.mode !== ChannelMode.PRIVATE)
       throw new ForbiddenException(
         'Invitations only works with private channel',
       );
-    const updatedInvitations = [
-      ...channelToInviteIn.invitedUsers,
-      userToInvite,
-    ];
-    const updateChannelInvitations = await this.prisma.channel.update({
-      where: { channelName: dto.channelName },
-      data: { invitedUsers: { connect: updatedInvitations } },
-    });
-    return updateChannelInvitations;
-  }
-
-  async kickFromChannel(req: Request, dto: ChannelKickDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-    });
-    const channelToKickFrom = await this.prisma.channel.findUnique({
-      where: { channelName: dto.channelName },
-      include: { invitedUsers: true },
-    });
-    const userToKick = await this.prisma.user.findUnique({
-      where: { username: dto.userToKick },
-    });
-    if (!userToKick) throw new ForbiddenException("User doesn't exist");
-    if (channelToKickFrom.ownerId !== user.id)
-      throw new ForbiddenException(
-        'You must be the channel owner to kick someone',
+    if (mode === UpdateType.KICK_PLAYER) {
+      updatedInvitations = targetChannel.invitedUsers.filter(
+        (invitedUser) => invitedUser.username !== targetUser.username,
       );
-    if (channelToKickFrom.mode !== ChannelMode.PRIVATE)
-      throw new ForbiddenException('Kick only works with private channel');
-    console.log('BEFORE KICK : ', channelToKickFrom.invitedUsers);
-    const updatedInvitations = channelToKickFrom.invitedUsers.filter(
-      (invitedUser) => invitedUser.username !== dto.userToKick,
-    );
-    console.log('AFTER KICK : ', updatedInvitations);
+    } else {
+      updatedInvitations = [...targetChannel.invitedUsers, targetUser];
+    }
     const updateChannelInvitations = await this.prisma.channel.update({
-      where: { channelName: dto.channelName },
+      where: { channelName: channelName },
       data: { invitedUsers: { set: updatedInvitations } },
     });
     return updateChannelInvitations;
@@ -196,12 +273,18 @@ export class ChannelsService {
     return updatedChannel;
   }
 
-  async isOwner(channelName: string, userId: number) {
+  async getChannelInfos(channelName: string) {
     const channel = await this.prisma.channel.findUnique({
       where: { channelName: channelName },
+      include: {
+        owner: true,
+        invitedUsers: true,
+        adminUsers: true,
+        banUsers: true,
+      },
     });
     if (!channel) throw new ForbiddenException('Channel not found');
-    return userId == channel.ownerId;
+    return channel;
   }
 
   async getAllPublic() {
@@ -249,21 +332,6 @@ export class ChannelsService {
       return allMessages;
     }
     return undefined;
-  }
-
-  async getInvitedUsers(channelName: string, req: Request) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-    });
-    if (!user) throw new ForbiddenException('User not found.');
-    const channel = await this.prisma.channel.findUnique({
-      where: { channelName: channelName },
-      include: { invitedUsers: true },
-    });
-    if (!channel) throw new ForbiddenException('Channel not found.');
-    if (channel.ownerId !== user.id)
-      throw new ForbiddenException('User is not channel owner');
-    return channel.invitedUsers;
   }
 
   async getAuthorization(dto: ChannelJoinDto, req: any) {
