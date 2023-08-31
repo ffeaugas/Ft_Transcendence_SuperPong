@@ -25,6 +25,7 @@ enum UpdateType {
   UNSET_PLAYER_ADMIN = "UNSET_PLAYER_ADMIN",
   BAN_PLAYER = "BAN_PLAYER",
   DEBAN_PLAYER = "DEBAN_PLAYER",
+  MUTE_PLAYER = "MUTE_PLAYER",
 }
 
 enum ActiveDiscussionType {
@@ -216,6 +217,14 @@ export default function AdministrateChannel({
     return true;
   }
 
+  function isMutable(user: User, adminUsers: User[] | undefined) {
+    if (!adminUsers) return;
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return false;
+    }
+    return true;
+  }
+
   async function getChannelInfos(): Promise<any> {
     const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
       params: { channelName: activeDiscussion },
@@ -330,6 +339,17 @@ export default function AdministrateChannel({
           submitMessage={"Deban"}
           updateType={UpdateType.DEBAN_PLAYER}
           optionUsers={channelInfos?.banUsers}
+          handleUpdate={handleUpdate}
+        />
+
+        <AdministrateChannelForm
+          formLabel={"Mute user"}
+          formOption={"userToMute"}
+          submitMessage={"Mute"}
+          updateType={UpdateType.MUTE_PLAYER}
+          optionUsers={users?.filter((user) =>
+            isMutable(user, channelInfos.adminUsers)
+          )}
           handleUpdate={handleUpdate}
         />
 
