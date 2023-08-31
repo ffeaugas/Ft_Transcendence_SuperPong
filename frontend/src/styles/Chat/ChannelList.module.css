@@ -28,6 +28,7 @@
 
 .channelList h2 {
   font-size: var(--titleSize3);
+  margin: 0 auto;
 }
 
 .channelList h4 {

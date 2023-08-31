@@ -21,6 +21,7 @@ enum UpdateType {
   UNSET_PLAYER_ADMIN = 'UNSET_PLAYER_ADMIN',
   BAN_PLAYER = 'BAN_PLAYER',
   DEBAN_PLAYER = 'DEBAN_PLAYER',
+  MUTE_PLAYER = 'MUTE_PLAYER',
 }
 
 @Injectable()
@@ -168,18 +169,21 @@ export class ChannelsService {
           );
           break;
         case UpdateType.BAN_PLAYER:
-          this.setBannedUsers(
+          this.setBannedPlayer(
             targetUser,
             dto.channelName,
             UpdateType.BAN_PLAYER,
           );
           break;
         case UpdateType.DEBAN_PLAYER:
-          this.setBannedUsers(
+          this.setBannedPlayer(
             targetUser,
             dto.channelName,
             UpdateType.DEBAN_PLAYER,
           );
+          break;
+        case UpdateType.MUTE_PLAYER:
+          this.muteUser(targetUser, dto.channelName);
           break;
       }
     } catch (error) {
@@ -187,9 +191,32 @@ export class ChannelsService {
     }
   }
 
+  async muteUser(targetUser: any, channelName: string) {
+    const targetChannel = await this.prisma.channel.findUnique({
+      where: { channelName: channelName },
+      include: { adminUsers: true },
+    });
+    if (
+      this.isAdmin(targetChannel.adminUsers, targetUser) ||
+      targetChannel.ownerId === targetUser.id
+    )
+      return;
+    const createdMute = await this.prisma.mute.create({
+      data: {
+        mutedPlayerId: targetUser.id,
+        channelId: targetChannel.id,
+      },
+    });
+    return createdMute;
+  }
+
   //Ban or Deban user from channel
   //
-  async setBannedUsers(targetUser: any, channelName: string, mode: UpdateType) {
+  async setBannedPlayer(
+    targetUser: any,
+    channelName: string,
+    mode: UpdateType,
+  ) {
     try {
       let updatedBans: any[];
       const targetChannel = await this.prisma.channel.findUnique({
@@ -200,7 +227,7 @@ export class ChannelsService {
         this.isAdmin(targetChannel.adminUsers, targetUser) ||
         targetChannel.ownerId === targetUser.id
       )
-        throw new ForbiddenException('You cannot ban an admin');
+        return;
       if (mode === UpdateType.BAN_PLAYER) {
         updatedBans = [...targetChannel.banUsers, targetUser];
       } else {
@@ -336,9 +363,16 @@ export class ChannelsService {
       if (!user) throw new ForbiddenException('User not found.');
       const channel = await this.prisma.channel.findUnique({
         where: { channelName: dto.channelName },
-        include: { invitedUsers: true },
+        include: { invitedUsers: true, banUsers: true },
       });
       if (!channel) throw new ForbiddenException('Channel not found.');
+      if (
+        channel.banUsers.find((banUser) => banUser.username === user.username)
+      )
+        return {
+          authorization: false,
+          reason: 'You are banned from this channel',
+        };
       switch (channel.mode) {
         case 'PUBLIC':
           return { authorization: true };

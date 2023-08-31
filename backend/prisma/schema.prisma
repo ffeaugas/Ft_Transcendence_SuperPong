@@ -54,6 +54,7 @@ model User {
     friends          User[]    @relation(name: "friends")
     friendsAddedMe   User[]    @relation(name: "friends")
     channelId        Int?
+    muted            Mute[]    @relation("userMuted")
 
     @@map("users")
 }
@@ -91,6 +92,16 @@ model Message {
     @@map("messages")
 }
 
+model Mute {
+    id            Int      @id @default(autoincrement())
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt()
+    mutedPlayer   User     @relation("userMuted", fields: [mutedPlayerId], references: [id])
+    mutedPlayerId Int
+    channel       Channel  @relation("channelMute", fields: [channelId], references: [id])
+    channelId     Int
+}
+
 model Channel {
     id           Int      @id @default(autoincrement())
     createdAt    DateTime @default(now())
@@ -105,6 +116,7 @@ model Channel {
     password String?
     messages Message[]   @relation(name: "Channel")
     mode     ChannelMode @default(PUBLIC)
+    muted    Mute[]      @relation("channelMute")
 
     @@map("channels")
 }

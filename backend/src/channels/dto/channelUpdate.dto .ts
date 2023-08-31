@@ -8,6 +8,7 @@ enum UpdateType {
   UNSET_PLAYER_ADMIN = 'UNSET_PLAYER_ADMIN',
   BAN_PLAYER = 'BAN_PLAYER',
   DEBAN_PLAYER = 'DEBAN_PLAYER',
+  MUTE_PLAYER = 'MUTE_PLAYER',
 }
 
 export class ChannelUpdateDto {
