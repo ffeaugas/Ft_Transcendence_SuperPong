@@ -104,6 +104,7 @@ export default function AdministrateChannel({
     updateType: UpdateType
   ): Promise<void> {
     evt.preventDefault();
+    console.log("UPDATE : ", updateType, " on : ", targetUser);
     if (!targetUser) return;
     try {
       const res = await fetch("http://10.5.0.3:3001/channels/update", {
@@ -123,9 +124,11 @@ export default function AdministrateChannel({
           success: "Update successful!",
           failure: undefined,
         });
-        getChannelInfos().then((channelInfos) => {
-          setChannelInfos(channelInfos);
-        });
+        setTimeout(() => {
+          getChannelInfos().then((channelInfos) => {
+            setChannelInfos(channelInfos);
+          });
+        }, 300);
       } else {
         const errorResponse = await res.json();
         setFeedbackMessage({
@@ -158,10 +161,11 @@ export default function AdministrateChannel({
         }
       );
       if (res.status) {
-        getChannelInfos().then((channelInfos) => {
-          setChannelInfos(channelInfos);
-          console.log("CHANNNEEEEL INFOS :      ", channelInfos);
-        });
+        setTimeout(() => {
+          getChannelInfos().then((channelInfos) => {
+            setChannelInfos(channelInfos);
+          });
+        }, 300);
         setFormDatas({ ...formDatas, password: "" });
         setFeedbackMessage({
           success: "Channel update success!",
@@ -181,6 +185,37 @@ export default function AdministrateChannel({
     }
   }
 
+  function isInvited(user: User, invitedUsers: User[] | undefined) {
+    if (!invitedUsers) return;
+    for (let i = 0; i < invitedUsers.length; i++) {
+      if (user.username === invitedUsers[i].username) return true;
+    }
+    return false;
+  }
+
+  function isAdmin(user: User, adminUsers: User[] | undefined) {
+    if (!adminUsers) return;
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return true;
+    }
+    return false;
+  }
+
+  function isBannable(
+    user: User,
+    banUsers: User[] | undefined,
+    adminUsers: User[] | undefined
+  ) {
+    if (!banUsers || !adminUsers) return;
+    for (let i = 0; i < banUsers.length; i++) {
+      if (user.username === banUsers[i].username) return false;
+    }
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return false;
+    }
+    return true;
+  }
+
   async function getChannelInfos(): Promise<any> {
     const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
       params: { channelName: activeDiscussion },
@@ -188,7 +223,7 @@ export default function AdministrateChannel({
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
-    console.log(res.data);
+    console.log("Updated infos : ", res.data);
     return res.data;
   }
 
@@ -244,7 +279,9 @@ export default function AdministrateChannel({
               formOption={"userToInvite"}
               submitMessage={"Invite"}
               updateType={UpdateType.INVITE_PLAYER}
-              optionUsers={users}
+              optionUsers={users?.filter(
+                (user) => !isInvited(user, channelInfos.invitedUsers)
+              )}
               handleUpdate={handleUpdate}
             />
             <AdministrateChannelForm
@@ -263,7 +300,9 @@ export default function AdministrateChannel({
           formOption={"userToAddAdmin"}
           submitMessage={"Promote"}
           updateType={UpdateType.SET_PLAYER_ADMIN}
-          optionUsers={users}
+          optionUsers={users?.filter(
+            (user) => !isAdmin(user, channelInfos.adminUsers)
+          )}
           handleUpdate={handleUpdate}
         />
         <AdministrateChannelForm
@@ -280,7 +319,9 @@ export default function AdministrateChannel({
           formOption={"userToBan"}
           submitMessage={"Ban"}
           updateType={UpdateType.BAN_PLAYER}
-          optionUsers={users}
+          optionUsers={users?.filter((user) =>
+            isBannable(user, channelInfos.banUsers, channelInfos.adminUsers)
+          )}
           handleUpdate={handleUpdate}
         />
         <AdministrateChannelForm
