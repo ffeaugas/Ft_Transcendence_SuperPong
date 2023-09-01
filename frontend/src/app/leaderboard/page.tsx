@@ -26,7 +26,6 @@ export default async function Leaderboard() {
     profiles.sort(function compareElo(a: Profile, b: Profile) {
       return a.eloMatchMaking - b.eloMatchMaking;
     });
-    console.log(profiles);
     return profiles;
   }
 

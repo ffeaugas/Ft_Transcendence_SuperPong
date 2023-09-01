@@ -53,6 +53,8 @@ model User {
     gameAsPlayer2    Game[]    @relation(name: "Player2")
     friends          User[]    @relation(name: "friends")
     friendsAddedMe   User[]    @relation(name: "friends")
+    blockedUsers     User[]    @relation(name: "blocked")
+    blockedByUsers   User[]    @relation(name: "blocked")
     channelId        Int?
     muted            Mute[]    @relation("userMuted")
 
