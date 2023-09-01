@@ -78,7 +78,7 @@ export default function AdministrateChannel({
           failure: undefined,
         });
         switchChannel("General", ActiveDiscussionType.CHANNEL);
-        setTimeout(() => changeMenu(MenuType.CHANNEL_SELECTOR), 1000);
+        setTimeout(() => changeMenu(MenuType.CHANNEL_SELECTOR), 700);
       } else {
         setFeedbackMessage({
           success: undefined,
