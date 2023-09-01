@@ -225,8 +225,8 @@ export class MyRoom extends Room<MyRoomState> {
           } else this.direction = 2.5;
         }
         if (this.state.score[1] != 5 || this.state.score[0] != 5) {
-          this.state.balls.y = data.w / 2;
-          this.state.balls.x = data.h / 2;
+          this.state.balls.x = data.w / 2;
+          this.state.balls.y = data.h / 2;
           this.state.balls.angle = 0;
         }
       } else {
