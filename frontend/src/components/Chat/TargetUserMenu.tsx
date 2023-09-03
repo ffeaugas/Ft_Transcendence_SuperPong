@@ -8,6 +8,16 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/GlobalRedux/store";
 
+enum RelationType {
+  FRIEND = "FRIEND",
+  BLOCK = "BLOCK",
+}
+
+type Relation = {
+  isFriend: boolean;
+  isBlocked: boolean;
+};
+
 type TargetUserMenuProps = {
   targetUser: string;
   closeUserInfos: () => void;
@@ -20,34 +30,25 @@ export default function TargetUserMenu({
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
-  const [friendship, setFrienship] = useState<boolean>(false);
+  const [relationToTarget, setRelationToTarget] = useState<
+    Relation | undefined
+  >(undefined);
   const route = useRouter();
   const username = useSelector((state: RootState) => state.user.username);
 
-  async function getFriendship() {
-    const userRes = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await userRes.json();
-    const friends = await axios.get("http://10.5.0.3:3001/users/friends", {
-      params: { user: user.username },
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const isFriend = friends.data.find(
-      (friend: any) => friend.username === targetUser
-    );
-    if (isFriend) {
-      console.log("FRIENDS : OUI");
-      return true;
+  async function getRelationToTarget(): Promise<Relation | undefined> {
+    try {
+      const res = await axios.get("http://10.5.0.3:3001/users/relation", {
+        params: { username: targetUser },
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching relations with target", error);
+      return undefined;
     }
-
-    console.log("FRIENDS : ", " NON");
-    return false;
   }
 
   async function getProfileDatas(): Promise<ProfileDatas | undefined> {
@@ -66,12 +67,13 @@ export default function TargetUserMenu({
     }
   }
 
-  const handleInvitFriend = async () => {
+  const handleRelationChange = async (relationType: RelationType) => {
     try {
-      const res = await axios.post(
-        "http://10.5.0.3:3001/users/addOrRemoveFriend",
+      const res = await axios.patch(
+        "http://10.5.0.3:3001/users/changeRelation",
         {
-          username: targetUser,
+          targetUsername: targetUser,
+          relationType: relationType,
         },
         {
           headers: {
@@ -79,9 +81,12 @@ export default function TargetUserMenu({
           },
         }
       );
-      console.log(res.data);
       const profileDatas = res.data;
-      setFrienship(!friendship);
+      setTimeout(() => {
+        getRelationToTarget().then((relation) => {
+          if (relation) setRelationToTarget(relation);
+        });
+      }, 300);
       return profileDatas;
     } catch (error) {
       console.error("Error fetching profile datas", error);
@@ -97,11 +102,13 @@ export default function TargetUserMenu({
     if (targetUser) {
       getProfileDatas().then((datas) => setProfileDatas(datas));
     }
-    getFriendship().then((friendship) => setFrienship(friendship));
+    getRelationToTarget().then((relation) => {
+      if (relation) setRelationToTarget(relation);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUser]);
 
-  if (!profileDatas) {
+  if (!profileDatas || !relationToTarget) {
     return <>...</>;
   }
 
@@ -118,12 +125,14 @@ export default function TargetUserMenu({
       </div>
       <h1>{targetUser}</h1>
       <button onClick={goToProfile}>Profile</button>
-      {profileDatas.isKickable ? <button>kick</button> : undefined}
       {username === targetUser ? undefined : (
         <>
           <button>Invite in game</button>
-          <button onClick={handleInvitFriend}>
-            {friendship ? "Remove friend" : "Add friend"}
+          <button onClick={() => handleRelationChange(RelationType.FRIEND)}>
+            {relationToTarget.isFriend ? "Remove friend" : "Add friend"}
+          </button>
+          <button onClick={() => handleRelationChange(RelationType.BLOCK)}>
+            {relationToTarget.isBlocked ? "Deblock" : "Block"}
           </button>
         </>
       )}

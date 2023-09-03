@@ -7,10 +7,18 @@ enum UserStatus {
   OFFLINE = "OFFLINE",
 }
 
+enum ActiveDiscussionType {
+  PRIV_MSG = "PRIV_MSG",
+  CHANNEL = "CHANNEL",
+}
+
 type UserItemProps = {
   user: User;
   isActive: boolean;
-  switchChannel: (discussionName: string) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
 };
 
 export default function UserItem({
@@ -21,7 +29,9 @@ export default function UserItem({
   return (
     <div
       className={isActive ? styles.activeUserItem : styles.userItem}
-      onClick={() => switchChannel(user.username)}
+      onClick={() =>
+        switchChannel(user.username, ActiveDiscussionType.PRIV_MSG)
+      }
     >
       <p>
         {user.username}

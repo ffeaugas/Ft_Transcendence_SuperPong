@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import styles from "@/styles/Chat/ChannelList.module.css";
 import ChannelItem from "./ChannelItem";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/GlobalRedux/store";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -27,7 +29,10 @@ type ChannelListProps = {
   channels: Channels | undefined;
   activeDiscussionType: ActiveDiscussionType;
   activeDiscussion: string | undefined;
-  switchChannel: (discussionName: string) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
@@ -43,7 +48,9 @@ export default function ChannelList({
     privateChannels: false,
     protectedChannels: false,
   });
-  const [isChannelOwner, setIsChannelOwner] = useState<boolean>(false);
+  const [channelInfos, setChannelInfos] = useState<any>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const username = useSelector((state: RootState) => state.user.username);
 
   function toggleChannelDisplay(channelMode: keyof ChannelDisplay): void {
     setChannelDisplay((prevState) => ({
@@ -57,27 +64,50 @@ export default function ChannelList({
     return false;
   }
 
-  async function isOwner(): Promise<boolean> {
-    const userRes = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
-    const user = await userRes.json();
-    const userId = user.id;
-    const res = await axios.get("http://10.5.0.3:3001/channels/is-owner", {
-      params: { channelName: activeDiscussion, userId: userId },
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+  function checkIfAdmin(adminUsers: User[]): boolean {
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (adminUsers[i].username === username) return true;
+    }
+    return false;
+  }
+
+  async function leaveChannel() {
+    const res = await axios.patch(
+      "http://10.5.0.3:3001/channels/leave-channel",
+      { channelName: activeDiscussion },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    switchChannel("General", ActiveDiscussionType.CHANNEL);
+    console.log(res.data);
     return res.data;
+  }
+
+  async function getChannelInfos(): Promise<any> {
+    try {
+      const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
+        params: { channelName: activeDiscussion },
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      return res.data;
+    } catch (error) {
+      switchChannel("General", ActiveDiscussionType.CHANNEL);
+    }
+    return undefined;
+    // console.log(res.data);
   }
 
   useEffect(() => {
     if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
-      isOwner().then((isChannelOwner) => setIsChannelOwner(isChannelOwner));
+      getChannelInfos().then((channelInfos) => {
+        setChannelInfos(channelInfos);
+        setIsAdmin(checkIfAdmin(channelInfos.adminUsers));
+      });
     }
   }, [activeDiscussion]);
 
@@ -165,11 +195,22 @@ export default function ChannelList({
           </ul>
         ) : undefined}
       </div>
-      {isChannelOwner ? (
-        <button onClick={() => changeMenu(MenuType.CHANNEL_ADMINISTRATION)}>
-          Manage Channel
-        </button>
-      ) : undefined}
+      <div className={styles.channelButtons}>
+        {channelInfos.mode === ChannelType.PRIVATE ? (
+          <button onClick={leaveChannel}>Leave Channel</button>
+        ) : undefined}
+        {channelInfos.mode === ChannelType.PRIVATE &&
+        channelInfos?.owner?.username === username ? (
+          <p className={styles.warningMessage}>
+            Be careful : leaving channel as owner will destroy it
+          </p>
+        ) : undefined}
+        {channelInfos?.owner?.username === username || isAdmin ? (
+          <button onClick={() => changeMenu(MenuType.CHANNEL_ADMINISTRATION)}>
+            Manage Channel
+          </button>
+        ) : undefined}
+      </div>
     </div>
   );
 }

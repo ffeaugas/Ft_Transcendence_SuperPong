@@ -14,18 +14,11 @@ import { ChannelsService } from './channels.service';
 import { ChannelDto } from './dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
-import {
-  ApiBearerAuth,
-  ApiProperty,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { ChannelModifyDto } from './dto/channelModify.dto';
-import { ChannelMode } from '@prisma/client';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ChannelUpdateModeDto } from './dto/channelUpdateMode.dto';
 import { ChannelJoinDto } from './dto/channelJoin.dto';
-import { ChannelInvitationDto } from './dto/channelInvitation.dto';
-import { ChannelKickDto } from './dto/channelKick.dto ';
+import { ChannelLeaveDto } from './dto/channelLeave.dto';
+import { ChannelUpdateDto } from './dto/channelUpdate.dto ';
 
 @Controller('channels')
 @ApiBearerAuth()
@@ -34,18 +27,15 @@ import { ChannelKickDto } from './dto/channelKick.dto ';
 export class ChannelsController {
   constructor(private readonly channelsService: ChannelsService) {}
 
-  @Get('is-owner')
-  async isOwner(
-    @Query('channelName') channelName: string,
-    @Query('userId') userId: number,
-  ) {
-    return await this.channelsService.isOwner(channelName, userId);
+  @Get('infos')
+  async getChannelInfos(@Query('channelName') channelName: string) {
+    return await this.channelsService.getChannelInfos(channelName);
   }
 
-  // @Get('publics') //NOT USED
-  // async getAllPublic() {
-  //   return await this.channelsService.getAllPublic();
-  // }
+  @Patch('leave-channel')
+  async leaveChannel(@Body() dto: ChannelLeaveDto, @Req() req: Request) {
+    return await this.channelsService.leaveChannel(dto, req);
+  }
 
   @Get('all')
   async getAllChannels() {
@@ -68,22 +58,9 @@ export class ChannelsController {
     );
   }
 
-  @Get('invited-users')
-  async getInvitedUsers(
-    @Query('channelName') channelName: string,
-    @Req() req: Request,
-  ) {
-    return await this.channelsService.getInvitedUsers(channelName, req);
-  }
-
   @Post()
   async createChannel(@Req() req: Request, @Body() dto: ChannelDto) {
     return await this.channelsService.createChannel(req, dto);
-  }
-
-  @Patch()
-  async setChannelPassword(@Body() dto: ChannelModifyDto, @Req() req: Request) {
-    return await this.channelsService.setChannelPassword(dto, req);
   }
 
   @Patch('change-mode')
@@ -95,21 +72,16 @@ export class ChannelsController {
     status: 403,
     description: "User isn't owner channel Forbidden.",
   })
-  async changeChannelMode(@Req() req: Request, @Body() dto: ChannelModifyDto) {
+  async changeChannelMode(
+    @Req() req: Request,
+    @Body() dto: ChannelUpdateModeDto,
+  ) {
     return await this.channelsService.changeChannelMode(req, dto);
   }
 
-  @Patch('invite')
-  async inviteInChannel(
-    @Req() req: Request,
-    @Body() dto: ChannelInvitationDto,
-  ) {
-    return await this.channelsService.inviteInChannel(req, dto);
-  }
-
-  @Patch('kick')
-  async kickFromChannel(@Req() req: Request, @Body() dto: ChannelKickDto) {
-    return await this.channelsService.kickFromChannel(req, dto);
+  @Patch('update')
+  async updateChannel(@Req() req: Request, @Body() dto: ChannelUpdateDto) {
+    return await this.channelsService.updateChannel(req, dto);
   }
 
   @Delete(':channelName')

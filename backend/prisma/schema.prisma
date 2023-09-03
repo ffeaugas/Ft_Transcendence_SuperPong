@@ -45,12 +45,18 @@ model User {
     profile          Profile?
     channelsOwned    Channel[] @relation(name: "OwnedChannel")
     channelsInvited  Channel[] @relation(name: "Whitelist")
+    channelsAdmin    Channel[] @relation(name: "Administrators")
+    channelsBan      Channel[] @relation(name: "Bans")
     messagesSent     Message[] @relation("sender")
     messagesReceived Message[] @relation("receiver")
     gameAsPlayer1    Game[]    @relation(name: "Player1")
     gameAsPlayer2    Game[]    @relation(name: "Player2")
     friends          User[]    @relation(name: "friends")
     friendsAddedMe   User[]    @relation(name: "friends")
+    blockedUsers     User[]    @relation(name: "blocked")
+    blockedByUsers   User[]    @relation(name: "blocked")
+    channelId        Int?
+    muted            Mute[]    @relation("userMuted")
 
     @@map("users")
 }
@@ -88,17 +94,31 @@ model Message {
     @@map("messages")
 }
 
+model Mute {
+    id            Int      @id @default(autoincrement())
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt()
+    mutedPlayer   User     @relation("userMuted", fields: [mutedPlayerId], references: [id])
+    mutedPlayerId Int
+    channel       Channel  @relation("channelMute", fields: [channelId], references: [id])
+    channelId     Int
+}
+
 model Channel {
-    id           Int         @id @default(autoincrement())
-    createdAt    DateTime    @default(now())
-    updatedAt    DateTime    @updatedAt()
-    channelName  String      @unique
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt()
+    channelName  String   @unique
     ownerId      Int?
-    owner        User?       @relation(name: "OwnedChannel", fields: [ownerId], references: [id])
-    invitedUsers User[]      @relation(name: "Whitelist")
-    password     String?
-    messages     Message[]   @relation(name: "Channel")
-    mode         ChannelMode @default(PUBLIC)
+    owner        User?    @relation(name: "OwnedChannel", fields: [ownerId], references: [id])
+    invitedUsers User[]   @relation(name: "Whitelist")
+    adminUsers   User[]   @relation(name: "Administrators")
+    banUsers     User[]   @relation(name: "Bans")
+
+    password String?
+    messages Message[]   @relation(name: "Channel")
+    mode     ChannelMode @default(PUBLIC)
+    muted    Mute[]      @relation("channelMute")
 
     @@map("channels")
 }

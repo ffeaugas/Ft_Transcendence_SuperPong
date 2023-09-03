@@ -24,3 +24,22 @@
 .feedbackMessage {
   color: rgb(223, 136, 136);
 }
+
+.channelItem label,
+.activeChannelItem label {
+  font-size: var(--textSize2);
+  color: var(--titleColor1);
+  font-weight: 300;
+  margin: 0 auto;
+}
+
+.channelItem input[type="text"],
+.activeChannelItem input[type="text"] {
+  background-color: var(--backgroundColor1);
+  color: white;
+  border-style: none;
+  border: solid 1px rgb(82, 80, 80);
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 3px;
+}

@@ -27,7 +27,10 @@ type MenuProps = {
   selectedMenu: MenuType;
   activeDiscussion: string | undefined;
   activeDiscussionType: ActiveDiscussionType;
-  switchChannel: (discussionName: string) => void;
+  switchChannel: (
+    discussionName: string,
+    discussionType: ActiveDiscussionType
+  ) => void;
   changeMenu: (menu: MenuType) => void;
 };
 
@@ -126,6 +129,8 @@ export default function Menu({
             <AdministrateChannel
               activeDiscussion={activeDiscussion}
               users={users}
+              changeMenu={changeMenu}
+              switchChannel={switchChannel}
             />
           }
         </div>

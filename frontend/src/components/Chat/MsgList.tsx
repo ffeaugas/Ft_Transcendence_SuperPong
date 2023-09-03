@@ -50,44 +50,33 @@ export default function MsgList({
   }, [setSocket]);
 
   async function addMessage(content: string) {
-    if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
-      try {
-        const data = {
+    let data;
+    try {
+      if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
+        data = {
           isPrivMessage: false,
           channelName: activeDiscussion,
           content: textInput,
           receiver: "",
         };
-        const res = await fetch("http://10.5.0.3:3001/message", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify(data),
-        });
-      } catch (error) {
-        console.error("Error adding a new message", error);
-      }
-    } else {
-      try {
-        const data = {
+      } else {
+        data = {
           isPrivMessage: true,
           channelName: "",
           content: textInput,
           receiver: activeDiscussion,
         };
-        const res = await fetch("http://10.5.0.3:3001/message", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify(data),
-        });
-      } catch (error) {
-        console.error("Error adding a new message", error);
       }
+      const res = await fetch("http://10.5.0.3:3001/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify(data),
+      });
+    } catch (error) {
+      console.error("Error adding a new message", error);
     }
   }
 
@@ -101,7 +90,6 @@ export default function MsgList({
           },
         });
         const messages = res.data;
-        console.log("MESSAGES RECUUUUU : ", messages);
         return messages;
       } catch (error) {
         console.error("Error fetching channel messages", error);
@@ -139,7 +127,6 @@ export default function MsgList({
   }
 
   function messageListner(message: Message) {
-    // console.log(message);
     if (!messages) return;
     if (
       !message.isPrivMessage &&
@@ -167,12 +154,6 @@ export default function MsgList({
       setMessages(messages);
     });
   }, [activeDiscussion]);
-
-  // useEffect(() => {
-  //   getMessages().then((messages) => {
-  //     setMessages(messages);
-  //   });
-  // }, [activeDiscussionType]);
 
   useEffect(() => {
     if (msgListRef.current) {
