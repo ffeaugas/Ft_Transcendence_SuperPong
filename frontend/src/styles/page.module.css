@@ -185,3 +185,10 @@ img.rounded {
 .rankTitle {
   flex: 3;
 }
+
+/*================ HOME PAGE ================*/
+
+.centered-element {
+  margin-left: auto;
+  margin-right: auto;
+}
