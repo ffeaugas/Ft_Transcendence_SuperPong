@@ -57,6 +57,8 @@ model User {
     blockedByUsers   User[]    @relation(name: "blocked")
     channelId        Int?
     muted            Mute[]    @relation("userMuted")
+    isTwoFaEnabled   Boolean   @default(false)
+    TwoFaSecret      String?
 
     @@map("users")
 }
