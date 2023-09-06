@@ -203,7 +203,9 @@ export class MyRoom extends Room<MyRoomState> {
         this.direction *= -1.05;
         this.refresh = 5;
         this.state.balls.angle = (this.state.balls.y - player.y) / 30;
-        client.send('boom', client);
+        this.clients.forEach((client) => {
+          client.send('boom', client);
+        });
       } else if (this.state.balls.x < 0 || this.state.balls.x > data.w) {
         if (this.state.balls.x < 0) {
           this.state.score[1] += 1;
