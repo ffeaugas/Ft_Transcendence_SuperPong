@@ -22,6 +22,7 @@ export default class GameScene extends Phaser.Scene {
     finish = 0;
     counter = 0;
     score: number = 0;
+    KeyF;
 
     constructor() {
         super("Game");
@@ -30,6 +31,7 @@ export default class GameScene extends Phaser.Scene {
     preload() {
         // preload scene
         this.cursorKeys = this.input.keyboard.createCursorKeys();
+        this.KeyF = this.input.keyboard.addKey("F");
     }
 
     async create() {
@@ -285,6 +287,13 @@ export default class GameScene extends Phaser.Scene {
             if (this.room && this.cursorKeys.space.isDown) {
                 this.room.send("launch");
             }
+            if (this.room && this.KeyF.isDown) {
+                try {
+                    this.scale.startFullscreen();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
             // if (this.ballEntity) this.ballEntity.serverX += 1;
             for (let sessionId in this.playerEntities) {
                 // interpolate all player entities
@@ -333,30 +342,30 @@ export default class GameScene extends Phaser.Scene {
                         }
                     });
                 }
+                if (this.room) {
+                    this.room.onMessage("win", (score) => {
+                        this.finish = 1;
+                        this.scoreEntities[0].setText("You Win");
+                        setTimeout(() => {
+                            this.room.leave();
+                        }, 5000);
+                    });
+                }
+                if (this.room) {
+                    this.room.onMessage("loose", (score) => {
+                        this.finish = 1;
+                        this.scoreEntities[0].setText("You Loose");
+                        setTimeout(() => {
+                            this.room.leave();
+                        }, 5000);
+                    });
+                }
+
+                this.events.on("destroy", () => {
+                    console.log("tarplu");
+                    this.room.leave();
+                });
             }
         }
-        if (this.room) {
-            this.room.onMessage("win", (score) => {
-                this.finish = 1;
-                this.scoreEntities[0].setText("You Win");
-                setTimeout(() => {
-                    this.room.leave();
-                }, 5000);
-            });
-        }
-        if (this.room) {
-            this.room.onMessage("loose", (score) => {
-                this.finish = 1;
-                this.scoreEntities[0].setText("You Loose");
-                setTimeout(() => {
-                    this.room.leave();
-                }, 5000);
-            });
-        }
-
-        this.events.on("destroy", () => {
-            console.log("tarplu");
-            this.room.leave();
-        });
     }
 }
