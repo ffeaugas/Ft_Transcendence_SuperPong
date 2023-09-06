@@ -174,18 +174,9 @@ export class MyRoom extends Room<MyRoomState> {
 
   onCreate(options: any) {
     this.setState(new MyRoomState());
-    this.onMessage('type', (client, message) => {
-      //
-      // handle "type" message
-      //
-    });
-
     this.onMessage('move', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       player.y = data;
-      // this.state.players.forEach(() => {
-      //   player.y += data;
-      // });
     });
     this.onMessage('updateStatus', (client, data) => {
       const player = this.state.players.get(client.sessionId);
@@ -197,10 +188,6 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
       if (player.get_ball != 0) this.direction = 2.5;
-      // if (client.sessionId==this.player[0] && player.status == 2)
-      //   console.log("coucou");
-      // else if (client.sessionId==this.player[1] && player.status == 3)
-      //   console.log("coucou");
     });
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
@@ -216,6 +203,7 @@ export class MyRoom extends Room<MyRoomState> {
         this.direction *= -1.05;
         this.refresh = 5;
         this.state.balls.angle = (this.state.balls.y - player.y) / 30;
+        client.send('boom', client);
       } else if (this.state.balls.x < 0 || this.state.balls.x > data.w) {
         if (this.state.balls.x < 0) {
           this.state.score[1] += 1;
@@ -256,7 +244,6 @@ export class MyRoom extends Room<MyRoomState> {
     const mapWidth = options[0];
     const mapHeight = options[1];
 
-    // create Player instance
     const player = new Player();
     if (!this.player[0]) {
       player.x = mapWidth * 0.01;
@@ -281,8 +268,6 @@ export class MyRoom extends Room<MyRoomState> {
     } else {
       player.status = 0;
     }
-    // place player in the map of players by its sessionId
-    // (client.sessionId is unique per connection!)
     this.state.players.set(client.sessionId, player);
   }
 

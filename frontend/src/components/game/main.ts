@@ -275,7 +275,7 @@
 // }
 import Phaser from "phaser";
 import { Client, Room } from "colyseus.js";
-import { matchMaker } from "colyseus";
+import { matchMaker } from "colyseus.js";
 
 // custom scene class
 export default class GameScene extends Phaser.Scene {
@@ -286,6 +286,7 @@ export default class GameScene extends Phaser.Scene {
   playerEntities: { [sessionId: string]: any } = {};
   playersLight: { [sessionId: string]: any } = {};
   ballEntity: any = undefined;
+  ballLight: any = undefined;
   scoreEntities: { [index: number]: any } = {};
   loadingEntities: { [index: number]: any } = {};
   backgroundEntities: { [index: number]: any } = {};
@@ -312,7 +313,7 @@ export default class GameScene extends Phaser.Scene {
       this.scale.refresh();
 
       this.client = new Client("ws://10.11.250.74:3001");
-      this.room = await this.client.joinOrCreate("MyRoom", dim);
+      this.room = await this.client.joinOrCreate("MyRoom", dim); // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
       this.game.canvas.style.cursor = "none";
       this.loadingEntities[11] = this.add.rectangle(
         dim[0] / 2,
@@ -440,12 +441,14 @@ export default class GameScene extends Phaser.Scene {
       if (sessionId === this.room.sessionId) {
         var entity = this.add.rectangle(player.x, player.y, 10, 100, 0x00ff00);
         this.playerEntities[sessionId] = entity;
-        var pointLight = this.add.pointlight(player.x, player.y, 0x000a10, 275);
+        var pointLight = this.add.pointlight(player.x, player.y, 0x001a10, 275);
+        pointLight.intensity = 0.5;
         this.playersLight[sessionId] = pointLight;
       } else {
         var entity = this.add.rectangle(player.x, player.y, 10, 100, 0xff0000);
         this.playerEntities[sessionId] = entity;
-        var pointLight = this.add.pointlight(player.x, player.y, 0x000a10, 275);
+        var pointLight = this.add.pointlight(player.x, player.y, 0x1a0a10, 275);
+        pointLight.intensity = 0.5;
         this.playersLight[sessionId] = pointLight;
       }
       // keep a reference of it on `playerEntities`
@@ -485,6 +488,8 @@ export default class GameScene extends Phaser.Scene {
             15,
             0x006600
           );
+          this.ballLight = this.add.pointlight(dim[0], dim[1], 0x000a10, 275);
+          this.ballLight.intensity = 0.25;
         }
         if (player.get_ball == 1) {
           entity.setData("serverYB", player.y);
@@ -522,7 +527,7 @@ export default class GameScene extends Phaser.Scene {
       if (this.room && this.cursorKeys.space.isDown) {
         this.room.send("launch");
       }
-      if (this.ballEntity) this.ballEntity.serverX += 1;
+      // if (this.ballEntity) this.ballEntity.serverX += 1;
       for (let sessionId in this.playerEntities) {
         // interpolate all player entities
         const entity = this.playerEntities[sessionId];
@@ -539,12 +544,31 @@ export default class GameScene extends Phaser.Scene {
         this.room.onMessage("ballPos", (ball) => {
           this.ballEntity.x = ball.x;
           this.ballEntity.y = ball.y;
+          this.ballLight.x = ball.x;
+          this.ballLight.y = ball.y;
         });
-        if (this.finish != 1) {
+        if (this.finish !== 1) {
           this.room.onMessage("score", (score) => {
             this.scoreEntities[0].setText(
               score[0].toString() + "     " + score[1].toString()
             );
+          });
+        }
+        if (this.room && this.ballEntity) {
+          this.room.onMessage("boom", (client) => {
+            if (
+              (this.ballEntity.x < window.outerWidth / 2 &&
+                this.playerEntities[client.sessionId].x < window.outerWidth) ||
+              (this.ballEntity.x > window.outerWidth / 2 &&
+                this.playerEntities[client.sessionId].x > window.outerWidth)
+            ) {
+              this.ballLight.intensity = 1;
+              this.playersLight[client.sessionId].intensity = 1;
+              setTimeout(() => {
+                this.playersLight[client.sessionId].intensity = 0.5;
+                this.ballLight.intensity = 0.5;
+              }, 50);
+            }
           });
         }
       }
@@ -553,12 +577,18 @@ export default class GameScene extends Phaser.Scene {
       this.room.onMessage("win", (score) => {
         this.finish = 1;
         this.scoreEntities[0].setText("You Win");
+        setTimeout(() => {
+          this.room.leave();
+        }, 5000);
       });
     }
     if (this.room) {
       this.room.onMessage("loose", (score) => {
         this.finish = 1;
         this.scoreEntities[0].setText("You Loose");
+        setTimeout(() => {
+          this.room.leave();
+        }, 5000);
       });
     }
   }
