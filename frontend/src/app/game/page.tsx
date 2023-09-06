@@ -29,12 +29,13 @@ const Game = () => {
         setLoading(true);
     }, []);
 
+    //   const auth = localStorage.getItem("Authenticate") === "true";
     return (
         <section className={`${styles.page}`}>
             <Header />
             <h1>GAME</h1>
             <div key={Math.random()} id="game"></div>
-            {loading ? <DynamicComponentWithNoSSR /> : null}
+            {loading /*&& auth*/ ? <DynamicComponentWithNoSSR /> : null}
         </section>
     );
 };
