@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import MainMenuScene from "./scenes/menu";
 import GameScene from "./scenes/main";
+=======
+import Main from "./main";
+>>>>>>> impl_game
 import { useEffect } from "react";
 import "phaser";
 
@@ -12,6 +16,7 @@ export default function Index() {
         if (typeof window !== "object") {
             return;
         }
+<<<<<<< HEAD
     };
     const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
@@ -39,4 +44,39 @@ export default function Index() {
 
     // instantiate the game
     const game = new Phaser.Game(config);
+=======
+
+        const config: Phaser.Types.Core.GameConfig = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.RESIZE,
+                // mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+            },
+            backgroundColor: "#000000",
+            parent: "phaser-example",
+            physics: {
+                default: "arcade",
+                arcade: {
+                    debug: true,
+                },
+            },
+            fps: {
+                target: 60,
+                min: 60,
+                forceSetTimeOut: true,
+            },
+            pixelArt: true,
+            scene: [Main],
+        };
+
+        // instantiate the game
+        const game = new Phaser.Game(config);
+
+        // game.scene.add("main", Main);
+        // game.scene.start("main");
+    };
+
+    return null;
+>>>>>>> impl_game
 }

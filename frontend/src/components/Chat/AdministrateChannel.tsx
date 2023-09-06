@@ -25,6 +25,10 @@ enum UpdateType {
   UNSET_PLAYER_ADMIN = "UNSET_PLAYER_ADMIN",
   BAN_PLAYER = "BAN_PLAYER",
   DEBAN_PLAYER = "DEBAN_PLAYER",
+<<<<<<< HEAD
+=======
+  MUTE_PLAYER = "MUTE_PLAYER",
+>>>>>>> impl_game
 }
 
 enum ActiveDiscussionType {
@@ -77,7 +81,7 @@ export default function AdministrateChannel({
           failure: undefined,
         });
         switchChannel("General", ActiveDiscussionType.CHANNEL);
-        setTimeout(() => changeMenu(MenuType.CHANNEL_SELECTOR), 1000);
+        setTimeout(() => changeMenu(MenuType.CHANNEL_SELECTOR), 700);
       } else {
         setFeedbackMessage({
           success: undefined,
@@ -104,6 +108,10 @@ export default function AdministrateChannel({
     updateType: UpdateType
   ): Promise<void> {
     evt.preventDefault();
+<<<<<<< HEAD
+=======
+    console.log("UPDATE : ", updateType, " on : ", targetUser);
+>>>>>>> impl_game
     if (!targetUser) return;
     try {
       const res = await fetch("http://10.5.0.3:3001/channels/update", {
@@ -123,9 +131,17 @@ export default function AdministrateChannel({
           success: "Update successful!",
           failure: undefined,
         });
+<<<<<<< HEAD
         getChannelInfos().then((channelInfos) => {
           setChannelInfos(channelInfos);
         });
+=======
+        setTimeout(() => {
+          getChannelInfos().then((channelInfos) => {
+            setChannelInfos(channelInfos);
+          });
+        }, 300);
+>>>>>>> impl_game
       } else {
         const errorResponse = await res.json();
         setFeedbackMessage({
@@ -158,10 +174,18 @@ export default function AdministrateChannel({
         }
       );
       if (res.status) {
+<<<<<<< HEAD
         getChannelInfos().then((channelInfos) => {
           setChannelInfos(channelInfos);
           console.log("CHANNNEEEEL INFOS :      ", channelInfos);
         });
+=======
+        setTimeout(() => {
+          getChannelInfos().then((channelInfos) => {
+            setChannelInfos(channelInfos);
+          });
+        }, 300);
+>>>>>>> impl_game
         setFormDatas({ ...formDatas, password: "" });
         setFeedbackMessage({
           success: "Channel update success!",
@@ -181,6 +205,48 @@ export default function AdministrateChannel({
     }
   }
 
+<<<<<<< HEAD
+=======
+  function isInvited(user: User, invitedUsers: User[] | undefined) {
+    if (!invitedUsers) return;
+    for (let i = 0; i < invitedUsers.length; i++) {
+      if (user.username === invitedUsers[i].username) return true;
+    }
+    return false;
+  }
+
+  function isAdmin(user: User, adminUsers: User[] | undefined) {
+    if (!adminUsers) return;
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return true;
+    }
+    return false;
+  }
+
+  function isBannable(
+    user: User,
+    banUsers: User[] | undefined,
+    adminUsers: User[] | undefined
+  ) {
+    if (!banUsers || !adminUsers) return;
+    for (let i = 0; i < banUsers.length; i++) {
+      if (user.username === banUsers[i].username) return false;
+    }
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return false;
+    }
+    return true;
+  }
+
+  function isMutable(user: User, adminUsers: User[] | undefined) {
+    if (!adminUsers) return;
+    for (let i = 0; i < adminUsers.length; i++) {
+      if (user.username === adminUsers[i].username) return false;
+    }
+    return true;
+  }
+
+>>>>>>> impl_game
   async function getChannelInfos(): Promise<any> {
     const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
       params: { channelName: activeDiscussion },
@@ -188,7 +254,11 @@ export default function AdministrateChannel({
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
+<<<<<<< HEAD
     console.log(res.data);
+=======
+    console.log("Updated infos : ", res.data);
+>>>>>>> impl_game
     return res.data;
   }
 
@@ -244,7 +314,13 @@ export default function AdministrateChannel({
               formOption={"userToInvite"}
               submitMessage={"Invite"}
               updateType={UpdateType.INVITE_PLAYER}
+<<<<<<< HEAD
               optionUsers={users}
+=======
+              optionUsers={users?.filter(
+                (user) => !isInvited(user, channelInfos.invitedUsers)
+              )}
+>>>>>>> impl_game
               handleUpdate={handleUpdate}
             />
             <AdministrateChannelForm
@@ -263,7 +339,13 @@ export default function AdministrateChannel({
           formOption={"userToAddAdmin"}
           submitMessage={"Promote"}
           updateType={UpdateType.SET_PLAYER_ADMIN}
+<<<<<<< HEAD
           optionUsers={users}
+=======
+          optionUsers={users?.filter(
+            (user) => !isAdmin(user, channelInfos.adminUsers)
+          )}
+>>>>>>> impl_game
           handleUpdate={handleUpdate}
         />
         <AdministrateChannelForm
@@ -280,7 +362,13 @@ export default function AdministrateChannel({
           formOption={"userToBan"}
           submitMessage={"Ban"}
           updateType={UpdateType.BAN_PLAYER}
+<<<<<<< HEAD
           optionUsers={users}
+=======
+          optionUsers={users?.filter((user) =>
+            isBannable(user, channelInfos.banUsers, channelInfos.adminUsers)
+          )}
+>>>>>>> impl_game
           handleUpdate={handleUpdate}
         />
         <AdministrateChannelForm
@@ -292,6 +380,20 @@ export default function AdministrateChannel({
           handleUpdate={handleUpdate}
         />
 
+<<<<<<< HEAD
+=======
+        <AdministrateChannelForm
+          formLabel={"Mute user"}
+          formOption={"userToMute"}
+          submitMessage={"Mute"}
+          updateType={UpdateType.MUTE_PLAYER}
+          optionUsers={users?.filter((user) =>
+            isMutable(user, channelInfos.adminUsers)
+          )}
+          handleUpdate={handleUpdate}
+        />
+
+>>>>>>> impl_game
         <button onClick={deleteChannel}>Delete</button>
       </div>
       {feedbackMessage.success ? (

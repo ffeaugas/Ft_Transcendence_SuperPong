@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { MessageDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SocketEvents } from 'src/socket/socketEvents';
+import { Channel, User } from '@prisma/client';
 
 @Injectable()
 export class MessageService {
@@ -9,6 +10,26 @@ export class MessageService {
     private prisma: PrismaService,
     private readonly socketGateway: SocketEvents,
   ) {}
+
+  async isMuted(sender: User, channelToSend: Channel): Promise<boolean> {
+    const userMutedOnChannel = await this.prisma.mute.findMany({
+      where: { channelId: channelToSend.id, mutedPlayerId: sender.id },
+    });
+    if (userMutedOnChannel.length === 0) return false;
+    const date = new Date();
+    if (
+      (date.getTime() -
+        userMutedOnChannel[userMutedOnChannel.length - 1].updatedAt.getTime()) /
+        60000 >
+      1
+    ) {
+      const deleteMuted = await this.prisma.mute.deleteMany({
+        where: { channelId: channelToSend.id, mutedPlayerId: sender.id },
+      });
+      return false;
+    }
+    return true;
+  }
 
   async postMessage(dto: MessageDto, req: any) {
     const sender = await this.prisma.user.findUnique({
@@ -23,9 +44,13 @@ export class MessageService {
       const channelToSend = await this.prisma.channel.findUnique({
         where: { channelName: dto.channelName },
       });
-      if (!channelToSend) throw new ForbiddenException('Channel not found.');
+      if (!channelToSend) {
+        throw new ForbiddenException('Channel not found.');
+      }
       (newMessageDatas['isPrivMessage'] = false),
         (newMessageDatas['channelId'] = channelToSend.id);
+      const muted = await this.isMuted(sender, channelToSend);
+      if (muted) throw new ForbiddenException(`You are muted on this channel`);
     } else {
       const userToSend = await this.prisma.user.findUnique({
         where: { username: dto.receiver },

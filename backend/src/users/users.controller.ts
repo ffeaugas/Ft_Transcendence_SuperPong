@@ -5,7 +5,6 @@ import {
   Query,
   Delete,
   Req,
-  Post,
   Body,
   Patch,
 } from '@nestjs/common';
@@ -13,7 +12,8 @@ import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserDto, UsernameUpdateDto } from './dto';
+import { UserUpdateDto } from './dto/userUpdate.dto';
+import { UserRelationChangeDto } from './dto/userRelationChange.dto';
 
 @Controller('users')
 @ApiBearerAuth()
@@ -23,13 +23,29 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('friends')
-  async getFriends(@Req() req: Request, @Query('user') user: string) {
-    return this.usersService.getFriends(req, user);
+  async getFriends(@Req() req: Request) {
+    return this.usersService.getFriends(req);
   }
 
-  @Post('addOrRemoveFriend')
-  async addOrRemoveFriend(@Req() req: Request, @Body() dto: UserDto) {
-    return await this.usersService.addOrRemoveFriend(req, dto);
+  @Get('blockeds')
+  async getBlockeds(@Req() req: Request) {
+    return this.usersService.getFriends(req);
+  }
+
+  @Get('relation')
+  async getRelationToUser(
+    @Req() req: Request,
+    @Query('username') username: string,
+  ) {
+    return this.usersService.getRelationToUser(req, username);
+  }
+
+  @Patch('changeRelation')
+  async updateUserRelation(
+    @Req() req: Request,
+    @Body() dto: UserRelationChangeDto,
+  ) {
+    return await this.usersService.updateUserRelation(req, dto);
   }
 
   @Get('channels')
@@ -58,7 +74,7 @@ export class UsersController {
   }
 
   @Patch('update-username')
-  async updateUsername(@Body() dto: UsernameUpdateDto) {
+  async updateUsername(@Body() dto: UserUpdateDto) {
     return await this.usersService.updateUsername(dto);
   }
 
