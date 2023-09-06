@@ -41,7 +41,7 @@ export default class GameScene extends Phaser.Scene {
             let dim = [this.game.canvas.width, this.game.canvas.height];
             this.scale.refresh();
 
-            this.client = new Client("ws://10.5.0.3:3001");
+            this.client = new Client("ws://10.11.250.83:3001");
             this.room = await this.client.joinOrCreate("MyRoom", dim); // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
             this.game.canvas.style.cursor = "none";
             this.loadingEntities[11] = this.add.rectangle(
@@ -353,5 +353,10 @@ export default class GameScene extends Phaser.Scene {
                 }, 5000);
             });
         }
+
+        this.events.on("destroy", () => {
+            console.log("tarplu");
+            this.room.leave();
+        });
     }
 }

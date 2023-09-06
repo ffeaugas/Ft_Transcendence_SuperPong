@@ -2,16 +2,6 @@
 
 import Header from "@/components/Header";
 import styles from "../../styles/page.module.css";
-
-// export default function Game() {
-//   return (
-//     <section className={`${styles.page}`}>
-//       <Header />
-//       <h1>GAME</h1>
-//     </section>
-//   );
-// }
-
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 

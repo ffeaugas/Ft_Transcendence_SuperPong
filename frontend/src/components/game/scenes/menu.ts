@@ -12,10 +12,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.cursorPos = this.input.mousePointer.position;
     }
 
-    preload() {
-        this.load.image("glass-panel", "assets/glassPanel.png");
-        this.load.image("cursor-hand", "assets/cursor_hand.png");
-    }
+    preload() {}
 
     create() {
         console.log("MENU SCENE");
@@ -26,8 +23,11 @@ export default class MainMenuScene extends Phaser.Scene {
             .rectangle(width * 0.5, height * 0.5, 150, 100, 0xffffff)
             .setDisplaySize(150, 50);
         playButton.setName("PlayButton");
-        this.add.text(playButton.x, playButton.y, "Normal").setOrigin(0.5);
-
+        const textPlay = this.add
+            .text(playButton.x, playButton.y, "Play Normal")
+            .setOrigin(0.5)
+            .setScale(1.2);
+        textPlay.setTint(0x00000);
         // Settings button
         const customButton = this.add
             .rectangle(

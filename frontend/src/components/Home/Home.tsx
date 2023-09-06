@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import "phaser";
 
 // custom scene class
-export class GameScene extends Phaser.Scene {
+export class Home extends Phaser.Scene {
     playerEntities: { [index: number]: any } = {};
     ballEntity: { [index: number]: any } = {};
     roger: any;
@@ -110,21 +110,23 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: "phaser-example",
     physics: { default: "arcade" },
     pixelArt: true,
-    scene: [GameScene],
+    scene: [Home],
     scale: { autoCenter: Phaser.Scale.CENTER_HORIZONTALLY },
 };
 
 export default function Index() {
     useEffect(() => {
+        const loadGame = async () => {
+            if (typeof window !== "object") {
+                return;
+            }
+        };
         loadGame();
+
+        // instantiate the game
+        const game = new Phaser.Game(config);
+        return () => {
+            game.destroy(true);
+        };
     }, []);
 }
-
-const loadGame = async () => {
-    if (typeof window !== "object") {
-        return;
-    }
-};
-
-// instantiate the game
-const game = new Phaser.Game(config);
