@@ -32,7 +32,6 @@ const Game = () => {
     return (
         <section className={`${styles.page}`}>
             <Header />
-            <h1>GAME</h1>
             <div key={Math.random()} id="game"></div>
             {loading ? <DynamicComponentWithNoSSR /> : null}
         </section>
