@@ -36,4 +36,7 @@ export default function Index() {
         pixelArt: true,
         scene: [MainMenuScene, GameScene],
     };
+
+    // instantiate the game
+    const game = new Phaser.Game(config);
 }

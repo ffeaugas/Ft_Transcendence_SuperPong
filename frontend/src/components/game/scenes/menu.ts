@@ -18,6 +18,7 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     create() {
+        console.log("MENU SCENE");
         const { width, height } = this.scale;
 
         // Play button

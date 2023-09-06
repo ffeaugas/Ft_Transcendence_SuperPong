@@ -21,10 +21,7 @@ enum UpdateType {
   UNSET_PLAYER_ADMIN = 'UNSET_PLAYER_ADMIN',
   BAN_PLAYER = 'BAN_PLAYER',
   DEBAN_PLAYER = 'DEBAN_PLAYER',
-<<<<<<< HEAD
-=======
   MUTE_PLAYER = 'MUTE_PLAYER',
->>>>>>> impl_game
 }
 
 @Injectable()
@@ -172,44 +169,28 @@ export class ChannelsService {
           );
           break;
         case UpdateType.BAN_PLAYER:
-<<<<<<< HEAD
-          this.setBannedUsers(
-=======
           this.setBannedPlayer(
->>>>>>> impl_game
             targetUser,
             dto.channelName,
             UpdateType.BAN_PLAYER,
           );
           break;
         case UpdateType.DEBAN_PLAYER:
-<<<<<<< HEAD
-          this.setBannedUsers(
-=======
           this.setBannedPlayer(
->>>>>>> impl_game
             targetUser,
             dto.channelName,
             UpdateType.DEBAN_PLAYER,
           );
           break;
-<<<<<<< HEAD
-=======
         case UpdateType.MUTE_PLAYER:
           this.muteUser(targetUser, dto.channelName);
           break;
->>>>>>> impl_game
       }
     } catch (error) {
       throw error;
     }
   }
 
-<<<<<<< HEAD
-  //Ban or Deban user from channel
-  //
-  async setBannedUsers(targetUser: any, channelName: string, mode: UpdateType) {
-=======
   async muteUser(targetUser: any, channelName: string) {
     const targetChannel = await this.prisma.channel.findUnique({
       where: { channelName: channelName },
@@ -236,7 +217,6 @@ export class ChannelsService {
     channelName: string,
     mode: UpdateType,
   ) {
->>>>>>> impl_game
     try {
       let updatedBans: any[];
       const targetChannel = await this.prisma.channel.findUnique({
@@ -247,11 +227,7 @@ export class ChannelsService {
         this.isAdmin(targetChannel.adminUsers, targetUser) ||
         targetChannel.ownerId === targetUser.id
       )
-<<<<<<< HEAD
-        throw new ForbiddenException('You cannot ban an admin');
-=======
         return;
->>>>>>> impl_game
       if (mode === UpdateType.BAN_PLAYER) {
         updatedBans = [...targetChannel.banUsers, targetUser];
       } else {

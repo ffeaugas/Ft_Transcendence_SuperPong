@@ -53,14 +53,10 @@ model User {
     gameAsPlayer2    Game[]    @relation(name: "Player2")
     friends          User[]    @relation(name: "friends")
     friendsAddedMe   User[]    @relation(name: "friends")
-<<<<<<< HEAD
-    channelId        Int?
-=======
     blockedUsers     User[]    @relation(name: "blocked")
     blockedByUsers   User[]    @relation(name: "blocked")
     channelId        Int?
     muted            Mute[]    @relation("userMuted")
->>>>>>> impl_game
 
     @@map("users")
 }
@@ -122,10 +118,7 @@ model Channel {
     password String?
     messages Message[]   @relation(name: "Channel")
     mode     ChannelMode @default(PUBLIC)
-<<<<<<< HEAD
-=======
     muted    Mute[]      @relation("channelMute")
->>>>>>> impl_game
 
     @@map("channels")
 }
