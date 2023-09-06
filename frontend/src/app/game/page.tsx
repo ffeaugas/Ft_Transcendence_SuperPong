@@ -16,27 +16,28 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const DynamicComponentWithNoSSR = dynamic(
-    () => import("@/components/game/index"),
-    {
-        ssr: false,
-    }
+  () => import("@/components/game/index"),
+  {
+    ssr: false,
+  }
 );
 
 const Game = () => {
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setLoading(true);
-    }, []);
+  useEffect(() => {
+    setLoading(true);
+  }, []);
 
-    return (
-        <section className={`${styles.page}`}>
-            <Header />
-            <h1>GAME</h1>
-            <div key={Math.random()} id="game"></div>
-            {loading ? <DynamicComponentWithNoSSR /> : null}
-        </section>
-    );
+  //   const auth = localStorage.getItem("Authenticate") === "true";
+  return (
+    <section className={`${styles.page}`}>
+      <Header />
+      <h1>GAME</h1>
+      <div key={Math.random()} id="game"></div>
+      {loading /*&& auth*/ ? <DynamicComponentWithNoSSR /> : null}
+    </section>
+  );
 };
 
 export default Game;

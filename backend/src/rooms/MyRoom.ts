@@ -167,8 +167,11 @@ import { Schema } from '@colyseus/schema';
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 2;
   player = ['', ''];
-  direction = 2.5;
+  direction = 0;
   refresh = 0;
+  i = 0;
+  host: Client;
+
   onCreate(options: any) {
     this.setState(new MyRoomState());
     this.onMessage('type', (client, message) => {
@@ -193,6 +196,7 @@ export class MyRoom extends Room<MyRoomState> {
     });
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
+      if (player.get_ball != 0) this.direction = 2.5;
       // if (client.sessionId==this.player[0] && player.status == 2)
       //   console.log("coucou");
       // else if (client.sessionId==this.player[1] && player.status == 3)
@@ -216,17 +220,30 @@ export class MyRoom extends Room<MyRoomState> {
         if (this.state.balls.x < 0) {
           this.state.score[1] += 1;
           if (this.state.score[1] == 5) {
-            client.send('end', this.state.score);
-          } else this.direction = 2.5;
+            this.clients.forEach((client) => {
+              if (this.host != client) client.send('win');
+              else client.send('loose');
+              this.i++;
+            });
+          } else this.direction = -2.5;
         } else {
           this.state.score[0] += 1;
           if (this.state.score[0] == 5) {
-            client.send('end', this.state.score);
+            this.clients.forEach((client) => {
+              if (this.host != client) client.send('loose');
+              else client.send('win');
+              this.i++;
+            });
           } else this.direction = 2.5;
         }
         if (this.state.score[1] != 5 || this.state.score[0] != 5) {
+<<<<<<< HEAD
           this.state.balls.x = data.w / 2;
           this.state.balls.y = data.h / 2;
+=======
+          this.state.balls.y = data.h / 2;
+          this.state.balls.x = data.w / 2;
+>>>>>>> bb60ea7 (score set end game set)
           this.state.balls.angle = 0;
         }
       } else {
@@ -234,7 +251,7 @@ export class MyRoom extends Room<MyRoomState> {
         this.state.balls.x += this.direction;
         this.state.balls.y += this.state.balls.angle;
       }
-      client.send('score', this.state.score);
+      if (this.i == 0) client.send('score', this.state.score);
       client.send('ballPos', this.state.balls);
     });
   }
@@ -250,6 +267,7 @@ export class MyRoom extends Room<MyRoomState> {
       player.x = mapWidth * 0.01;
       player.y = mapHeight / 2;
       this.player[0] = client.sessionId;
+      this.host = client;
       player.get_ball = 1;
     } else {
       const ball = this.state.balls;

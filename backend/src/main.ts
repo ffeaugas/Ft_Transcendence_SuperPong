@@ -69,7 +69,7 @@ async function bootstrap() {
         },
         {
           title: 'Serial Winner',
-          description: 'Perdre 5 fois de suite',
+          description: 'Gagner 5 fois de suite',
           picture: 'default.png',
         },
         {

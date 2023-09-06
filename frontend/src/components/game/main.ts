@@ -284,6 +284,7 @@ export default class GameScene extends Phaser.Scene {
   private room: Room;
   nb_client: number = 0;
   playerEntities: { [sessionId: string]: any } = {};
+  playersLight: { [sessionId: string]: any } = {};
   ballEntity: any = undefined;
   scoreEntities: { [index: number]: any } = {};
   loadingEntities: { [index: number]: any } = {};
@@ -292,6 +293,9 @@ export default class GameScene extends Phaser.Scene {
   colorr = 0x00bb80;
   cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   nbPlayer: number = 0;
+  finish = 0;
+  counter = 0;
+  score: number = 0;
 
   preload() {
     // preload scene
@@ -436,9 +440,13 @@ export default class GameScene extends Phaser.Scene {
       if (sessionId === this.room.sessionId) {
         var entity = this.add.rectangle(player.x, player.y, 10, 100, 0x00ff00);
         this.playerEntities[sessionId] = entity;
+        var pointLight = this.add.pointlight(player.x, player.y, 0x000a10, 275);
+        this.playersLight[sessionId] = pointLight;
       } else {
         var entity = this.add.rectangle(player.x, player.y, 10, 100, 0xff0000);
         this.playerEntities[sessionId] = entity;
+        var pointLight = this.add.pointlight(player.x, player.y, 0x000a10, 275);
+        this.playersLight[sessionId] = pointLight;
       }
       // keep a reference of it on `playerEntities`
       player.onChange(() => {
@@ -488,11 +496,14 @@ export default class GameScene extends Phaser.Scene {
 
     this.room.state.players.onRemove((player, sessionId) => {
       const entity = this.playerEntities[sessionId];
+      const light = this.playersLight[sessionId];
       if (entity) {
         // destroy entity
         entity.destroy();
+        light.destroy();
 
         // clear local reference
+        delete this.playersLight[sessionId];
         delete this.playerEntities[sessionId];
       }
     });
@@ -500,36 +511,55 @@ export default class GameScene extends Phaser.Scene {
 
   // Add your update() function if needed
   update(time: number, delta: number): void {
-    let dim = [this.game.canvas.width, this.game.canvas.height];
-    if (this.room && this.input.mousePointer.y) {
-      if (this.input.mousePointer.y < 50) this.room.send("move", 50);
-      else if (this.input.mousePointer.y > dim[1] - 50)
-        this.room.send("move", dim[1] - 50);
-      else this.room.send("move", this.input.mousePointer.y);
-    }
-    // if (this.room && this.cursorKeys.space.isDown) {
-    //   this.room.send("launch");
-    // }
-    if (this.ballEntity) this.ballEntity.serverX += 1;
-    for (let sessionId in this.playerEntities) {
-      // interpolate all player entities
-      const entity = this.playerEntities[sessionId];
-      const { serverX, serverY } = entity.data.values;
-      entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-      entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
-      if (this.ballEntity) {
-        this.room.send("ball", { h: dim[1], w: dim[0] });
+    if (this.finish == 0) {
+      let dim = [this.game.canvas.width, this.game.canvas.height];
+      if (this.room && this.input.mousePointer.y) {
+        if (this.input.mousePointer.y < 50) this.room.send("move", 50);
+        else if (this.input.mousePointer.y > dim[1] - 50)
+          this.room.send("move", dim[1] - 50);
+        else this.room.send("move", this.input.mousePointer.y);
       }
-      this.room.onMessage("ballPos", (ball) => {
-        this.ballEntity.x = ball.x;
-        this.ballEntity.y = ball.y;
+      if (this.room && this.cursorKeys.space.isDown) {
+        this.room.send("launch");
+      }
+      if (this.ballEntity) this.ballEntity.serverX += 1;
+      for (let sessionId in this.playerEntities) {
+        // interpolate all player entities
+        const entity = this.playerEntities[sessionId];
+        const light = this.playersLight[sessionId];
+
+        const { serverX, serverY } = entity.data.values;
+        entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
+        entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+        light.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
+        light.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+        if (this.ballEntity) {
+          this.room.send("ball", { h: dim[1], w: dim[0] });
+        }
+        this.room.onMessage("ballPos", (ball) => {
+          this.ballEntity.x = ball.x;
+          this.ballEntity.y = ball.y;
+        });
+        if (this.finish != 1) {
+          this.room.onMessage("score", (score) => {
+            this.scoreEntities[0].setText(
+              score[0].toString() + "     " + score[1].toString()
+            );
+          });
+        }
+      }
+    }
+    if (this.room) {
+      this.room.onMessage("win", (score) => {
+        this.finish = 1;
+        this.scoreEntities[0].setText("You Win");
       });
-      this.room.onMessage("score", (score) => {
-        this.scoreEntities[0].setText(
-          score[0].toString() + "     " + score[1].toString()
-        );
+    }
+    if (this.room) {
+      this.room.onMessage("loose", (score) => {
+        this.finish = 1;
+        this.scoreEntities[0].setText("You Loose");
       });
-      this.room.onMessage("end", (score) => {});
     }
   }
 }
