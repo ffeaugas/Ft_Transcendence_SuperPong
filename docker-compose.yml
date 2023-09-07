@@ -32,7 +32,7 @@ services:
     volumes:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start
+    command: npm run dev
     depends_on:
       - backend
     ports:
