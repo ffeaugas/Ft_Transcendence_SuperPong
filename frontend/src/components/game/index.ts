@@ -1,5 +1,6 @@
 import MainMenuScene from "./scenes/menu";
 import GameScene from "./scenes/main";
+import LoadingScene from "./scenes/loading";
 import { useEffect } from "react";
 import "phaser";
 
@@ -33,7 +34,7 @@ export default function Index() {
                     forceSetTimeOut: true,
                 },
                 pixelArt: true,
-                scene: [MainMenuScene, GameScene],
+                scene: [MainMenuScene, GameScene, LoadingScene],
             };
             gameInstance = new Phaser.Game(config);
         };

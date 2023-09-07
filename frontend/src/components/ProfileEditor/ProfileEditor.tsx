@@ -48,12 +48,16 @@ export default function ProfileEditor() {
         username: string
     ): Promise<ProfileDatas | undefined> {
         try {
-            const res = await axios.get("http://10.5.0.3:3001/profiles", {
-                params: { username: username },
-                headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                },
-            });
+            const res = await axios.get(
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+                {
+                    params: { username: username },
+                    headers: {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("token"),
+                    },
+                }
+            );
             const profileDatas = res.data;
             return profileDatas;
         } catch (error) {
@@ -82,7 +86,7 @@ export default function ProfileEditor() {
                 newUsername: editedDatas.username,
             };
             const res = await fetch(
-                "http://10.5.0.3:3001/users/update-username",
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/update-username`,
                 {
                     method: "PATCH",
                     headers: {
@@ -108,7 +112,7 @@ export default function ProfileEditor() {
                 bio: editedDatas.bio,
             };
             const res = await fetch(
-                "http://10.5.0.3:3001/profiles/update-bio",
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles/update-bio`,
                 {
                     method: "PATCH",
                     headers: {
@@ -216,7 +220,7 @@ export default function ProfileEditor() {
                         ) : (
                             <img
                                 className={styles.rounded}
-                                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
+                                src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
                             />
                         )}
                         <input
@@ -237,7 +241,7 @@ export default function ProfileEditor() {
                 ) : (
                     <img
                         className={styles.rounded}
-                        src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
+                        src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
                     />
                 )}
                 <button

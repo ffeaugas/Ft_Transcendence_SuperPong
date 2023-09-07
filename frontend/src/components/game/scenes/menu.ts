@@ -59,7 +59,7 @@ export default class MainMenuScene extends Phaser.Scene {
                     this.input.mousePointer.leftButtonDown()
                 ) {
                     console.log(button.name);
-                    this.scene.start("Game");
+                    this.scene.start("Loading");
                 }
             } else {
                 button.setScale(1);

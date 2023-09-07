@@ -64,7 +64,7 @@ export default function AdministrateChannel({
     async function deleteChannel() {
         try {
             const response = await fetch(
-                `http://10.5.0.3:3001/channels/${activeDiscussion}`,
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/${activeDiscussion}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -109,18 +109,22 @@ export default function AdministrateChannel({
         console.log("UPDATE : ", updateType, " on : ", targetUser);
         if (!targetUser) return;
         try {
-            const res = await fetch("http://10.5.0.3:3001/channels/update", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                },
-                body: JSON.stringify({
-                    channelName: activeDiscussion,
-                    targetUser: targetUser,
-                    updateType: updateType,
-                }),
-            });
+            const res = await fetch(
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/update`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization:
+                            "Bearer " + localStorage.getItem("token"),
+                    },
+                    body: JSON.stringify({
+                        channelName: activeDiscussion,
+                        targetUser: targetUser,
+                        updateType: updateType,
+                    }),
+                }
+            );
             if (res.ok) {
                 setFeedbackMessage({
                     success: "Update successful!",
@@ -150,7 +154,7 @@ export default function AdministrateChannel({
         evt.preventDefault();
         try {
             const res = await axios.patch(
-                "http://10.5.0.3:3001/channels/change-mode",
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/change-mode`,
                 {
                     channelName: activeDiscussion,
                     mode: formDatas.channelMode,
@@ -228,12 +232,15 @@ export default function AdministrateChannel({
     }
 
     async function getChannelInfos(): Promise<any> {
-        const res = await axios.get("http://10.5.0.3:3001/channels/infos", {
-            params: { channelName: activeDiscussion },
-            headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-        });
+        const res = await axios.get(
+            `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/infos`,
+            {
+                params: { channelName: activeDiscussion },
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
+            }
+        );
         console.log("Updated infos : ", res.data);
         return res.data;
     }

@@ -49,8 +49,8 @@ model User {
     channelsBan      Channel[] @relation(name: "Bans")
     messagesSent     Message[] @relation("sender")
     messagesReceived Message[] @relation("receiver")
-    gameAsPlayer1    Game[]    @relation(name: "Player1")
-    gameAsPlayer2    Game[]    @relation(name: "Player2")
+    // gameAsPlayer1    Game[]    @relation(name: "Player1")
+    // gameAsPlayer2    Game[]    @relation(name: "Player2")
     friends          User[]    @relation(name: "friends")
     friendsAddedMe   User[]    @relation(name: "friends")
     blockedUsers     User[]    @relation(name: "blocked")
@@ -129,10 +129,10 @@ model Game {
     updatedAt DateTime @updatedAt()
     winner    String?
     looser    String?
-    player1   User     @relation(name: "Player1", fields: [player1Id], references: [id])
-    player1Id Int
-    player2   User     @relation(name: "Player2", fields: [player2Id], references: [id])
-    player2Id Int
+    // player1   User     @relation(name: "Player1", fields: [player1Id], references: [id])
+    // player1Id Int
+    // player2   User     @relation(name: "Player2", fields: [player2Id], references: [id])
+    // player2Id Int
 
     @@map("games")
 }

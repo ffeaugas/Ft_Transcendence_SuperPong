@@ -27,7 +27,7 @@ export default function LeaderboardItem({
             <div className={styles.player}>
                 <img
                     className={`${styles.rounded}`}
-                    src={`http://10.5.0.3:3001/uploads/avatar/${profile.profilePicture}`}
+                    src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profile.profilePicture}`}
                 />
                 <Link href={`/profile/${profile.username}`}>
                     {profile.username}

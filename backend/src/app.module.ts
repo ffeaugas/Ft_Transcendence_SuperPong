@@ -19,6 +19,7 @@ import { AchievementService } from './achievement/achievement.service';
 import { AchievementModule } from './achievement/achievement.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { GameService } from './game.service';
+import { GameController } from './game.controller';
 
 @Module({
   imports: [
@@ -33,7 +34,12 @@ import { GameService } from './game.service';
     AchievementModule,
     LeaderboardModule,
   ],
-  controllers: [AppController, ExchangeCodeController, AchievementController],
+  controllers: [
+    AppController,
+    ExchangeCodeController,
+    AchievementController,
+    GameController,
+  ],
   providers: [
     AppService,
     AuthService,

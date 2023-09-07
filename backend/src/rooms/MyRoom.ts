@@ -162,7 +162,11 @@
 // }
 import { Room, Client, ISendOptions } from '@colyseus/core';
 import { MyRoomState, Player, Ball } from './schema/MyRoomState';
-import { Schema } from '@colyseus/schema';
+import { GameDto } from 'src/game.dto';
+import { GameService } from 'src/game.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+const prisma = new PrismaService();
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 2;
@@ -171,8 +175,10 @@ export class MyRoom extends Room<MyRoomState> {
   refresh = 0;
   i = 0;
   host: Client;
+  game: GameService;
 
   onCreate(options: any) {
+    this.game = new GameService(prisma);
     this.setState(new MyRoomState());
     this.onMessage('move', (client, data) => {
       const player = this.state.players.get(client.sessionId);
@@ -210,20 +216,48 @@ export class MyRoom extends Room<MyRoomState> {
         if (this.state.balls.x < 0) {
           this.state.score[1] += 1;
           if (this.state.score[1] == 5) {
-            this.clients.forEach((client) => {
-              if (this.host != client) client.send('win');
-              else client.send('loose');
+            const dto = new GameDto();
+            this.clients.forEach((cli) => {
+              const player_ = this.state.players.get(cli.sessionId);
+              if (this.host != cli) {
+                dto.winner = player_.username;
+                cli.send('win', player_.username);
+              } else {
+                dto.looser = this.state.players.get(
+                  this.host.sessionId,
+                ).username;
+                cli.send(
+                  'loose',
+                  this.state.players.get(this.host.sessionId).username,
+                );
+              }
               this.i++;
             });
+            // CREE la ligne dans la db
+            this.game.createGameHistory(dto);
           } else this.direction = -2.5;
         } else {
           this.state.score[0] += 1;
           if (this.state.score[0] == 5) {
-            this.clients.forEach((client) => {
-              if (this.host != client) client.send('loose');
-              else client.send('win');
+            const dto = new GameDto();
+            this.clients.forEach((cli) => {
+              const player_ = this.state.players.get(cli.sessionId);
+              if (this.host != cli) {
+                dto.looser = player_.username;
+                cli.send('loose', player_.username);
+              } else {
+                dto.winner = this.state.players.get(
+                  this.host.sessionId,
+                ).username;
+                cli.send(
+                  'win',
+                  this.state.players.get(this.host.sessionId).username,
+                );
+              }
               this.i++;
             });
+            // CREE la ligne dans la dbs
+            this.game.createGameHistory(dto);
           } else this.direction = 2.5;
         }
         if (this.state.score[1] != 5 || this.state.score[0] != 5) {
@@ -243,10 +277,13 @@ export class MyRoom extends Room<MyRoomState> {
 
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, 'joined!');
-    const mapWidth = options[0];
-    const mapHeight = options[1];
+    const mapWidth = options.dim[0];
+    const mapHeight = options.dim[1];
 
     const player = new Player();
+    player.username = options.name;
+    // console.log(player.username);
+
     if (!this.player[0]) {
       player.x = mapWidth * 0.01;
       player.y = mapHeight / 2;

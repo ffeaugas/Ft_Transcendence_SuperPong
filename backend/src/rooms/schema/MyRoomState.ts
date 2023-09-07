@@ -5,6 +5,7 @@ export class Player extends Schema {
   @type('number') y: number;
   @type('number') status: number;
   @type('number') get_ball: number;
+  @type('string') username: string;
 }
 
 export class Ball extends Schema {
