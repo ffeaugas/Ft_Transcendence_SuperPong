@@ -14,9 +14,9 @@ export default function Callback() {
         //   return;
         // }
         console.log("JE SUIS LE CALLBACK DU FRONT");
-        const redirectUri = "http://10.11.250.83:3000/auth/callback";
+        const redirectUri = `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/auth/callback`;
         axios
-            .post("http://10.11.250.83:3001/api/exchange-code", {
+            .post(`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/api/exchange-code`, {
                 code,
                 redirectUri,
             })
