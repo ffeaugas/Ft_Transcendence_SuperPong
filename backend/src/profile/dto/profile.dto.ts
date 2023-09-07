@@ -26,3 +26,10 @@ export class ProfileBioUpdateDto {
   @ApiProperty({ description: 'bio' })
   bio: string;
 }
+
+export class ProfilePictureUpdateDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'image url' })
+  image: string;
+}

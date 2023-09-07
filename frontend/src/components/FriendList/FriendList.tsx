@@ -25,7 +25,6 @@ export default function FriendList({ username }: FriendListProps) {
         },
       });
       const friends = res.data;
-      console.log(friends);
       return friends;
     } catch (error) {
       console.error("Error fetching user friends", error);

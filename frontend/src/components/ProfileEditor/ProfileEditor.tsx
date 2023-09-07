@@ -27,7 +27,8 @@ type EditedDatas = {
 export default function ProfileEditor() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [createObjectURL, setCreateObjectURL] = useState(undefined);
+  const [objectURL, setObjectURL] = useState<any | undefined>(undefined);
+  const [objectFile, setObjectFile] = useState<any | undefined>(undefined);
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
@@ -111,7 +112,7 @@ export default function ProfileEditor() {
         },
         body: JSON.stringify(dataBody),
       });
-      if (res.ok) {
+      if (res.ok && profileDatas) {
         setProfileDatas({ ...profileDatas, bio: editedDatas.bio });
       }
     } catch (error) {}
@@ -119,20 +120,41 @@ export default function ProfileEditor() {
 
   const uploadToClient = (evt: any) => {
     if (evt.target.files && evt.target.files[0]) {
+      if (objectURL) {
+        URL.revokeObjectURL(objectURL);
+      }
       const localImage = evt.target.files[0];
+      setObjectFile(localImage);
+      console.log("localImage : ", localImage);
 
-      setEditedDatas({ ...editedDatas, profilePicture: localImage });
-      setCreateObjectURL(URL.createObjectURL(localImage));
+      setEditedDatas({ ...editedDatas, profilePicture: localImage.name });
+      const image = URL.createObjectURL(localImage);
+      // console.log("image : ", image);
+      setObjectURL(image);
     }
   };
 
-  const uploadToServer = async (event) => {
-    const body = new FormData();
-    body.append("file", image);
-    const response = await fetch("/api/file", {
-      method: "POST",
-      body,
-    });
+  // const uploadToClient = (evt: any) => {
+  //   console.log("image : ", evt.target.files[0]);
+  //   setObjectURL(evt.target.files[0]);
+  // };
+
+  const uploadToServer = async (evt: any) => {
+    evt.preventDefault();
+
+    const formData = new FormData();
+    formData.append("image", objectFile);
+    const response = await fetch(
+      "http://10.5.0.3:3001/profiles/update-profile-picture",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -198,28 +220,30 @@ export default function ProfileEditor() {
       <div className={styles.editProfile}>
         {datasEditor.profilePicture ? (
           <div className={styles.imageUploader}>
-            {createObjectURL ? (
-              <img className={styles.rounded} src={createObjectURL} />
+            {objectURL ? (
+              <img className={styles.rounded} src={objectURL} />
             ) : (
               <img
                 className={styles.rounded}
                 src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
               />
             )}
-            <input
-              type="file"
-              id="uploadImg"
-              name="uploadImg"
-              className={styles.imageUploaderInput}
-              onChange={uploadToClient}
-            />
-            <button
-              type="submit"
-              onClick={uploadToServer}
-              className={styles.customButton}
-            >
-              update
-            </button>
+            <form>
+              <input
+                type="file"
+                id="uploadImg"
+                name="uploadImg"
+                className={styles.imageUploaderInput}
+                onChange={uploadToClient}
+              />
+              <button
+                type="submit"
+                onClick={uploadToServer}
+                className={styles.customButton}
+              >
+                update
+              </button>
+            </form>
           </div>
         ) : (
           <img
