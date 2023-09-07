@@ -6,7 +6,7 @@ import { useLogin } from "./hook/useLogin";
 import styles from "@/styles/Login.module.css";
 
 const clientId = process.env.NEXT_PUBLIC_OAUTH42_UID as string;
-const redirectUri = "http://10.11.250.83:3000/auth/callback";
+const redirectUri = `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/auth/callback`;
 const scope = "public";
 
 export default function Login() {
