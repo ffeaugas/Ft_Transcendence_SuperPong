@@ -45,6 +45,7 @@ export default function ProfileEditor() {
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
   const username = useSelector((state: RootState) => state.user.username);
 
+  //franci le bg
   async function getProfileDatas(
     username: string
   ): Promise<ProfileDatas | undefined> {
