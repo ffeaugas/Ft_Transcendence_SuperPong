@@ -38,14 +38,14 @@ export class ProfileController {
     }
   }
 
-  @Post('update-profile-picture')
-  @UseInterceptors(FileInterceptor('image'))
-  async updateProfilePicture(
-    @Req() req: Request,
-    @Body() dto: ProfilePictureUpdateDto,
-  ) {
-    return await this.profileService.updateProfilePicture(req, dto);
-  }
+  // @Post('update-profile-picture')
+  // @UseInterceptors(FileInterceptor('image'))
+  // async updateProfilePicture(
+  //   @Req() req: Request,
+  //   @Body() dto: ProfilePictureUpdateDto,
+  // ) {
+  //   return await this.profileService.updateProfilePicture(req, dto);
+  // }
 
   @Patch('update-bio')
   async updateProfileBio(@Body() dto: ProfileBioUpdateDto) {

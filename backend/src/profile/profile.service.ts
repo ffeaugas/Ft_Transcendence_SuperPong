@@ -70,16 +70,16 @@ export class ProfileService {
   //   });
   // }
 
-  async updateProfilePicture(req: Request, dto: ProfilePictureUpdateDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-    });
-    if (!user) throw new ForbiddenException('User not found.');
-    const newImgUrl = await this.saveImage(dto.image);
-    await this.updateUserProfilePicture(user.id, newImgUrl);
+  // async updateProfilePicture(req: Request, dto: ProfilePictureUpdateDto) {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: req['user'].sub },
+  //   });
+  //   if (!user) throw new ForbiddenException('User not found.');
+  //   const newImgUrl = await this.saveImage(dto.image);
+  //   await this.updateUserProfilePicture(user.id, newImgUrl);
 
-    return { message: 'Profile picture updated successfully' };
-  }
+  //   return { message: 'Profile picture updated successfully' };
+  // }
 
   async updateProfileBio(dto: ProfileBioUpdateDto) {
     const userFounded = await this.prisma.user.findUnique({
