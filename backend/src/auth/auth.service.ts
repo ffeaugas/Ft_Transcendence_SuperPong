@@ -119,22 +119,22 @@ export class AuthService {
     });
   }
 
-  @Post('2fa/turn-on')
-  @UseGuards(JwtAuthGuard)
-  async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
-    const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-      body.twoFactorAuthenticationCode,
-      request.user,
-    );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
-    await this.usersService.setTwoFactorAuth(request, true);
-  }
+  // @Post('2fa/turn-on')
+  // @UseGuards(JwtAuthGuard)
+  // async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+  //   const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+  //     body.twoFactorAuthenticationCode,
+  //     request.user,
+  //   );
+  //   if (!isCodeValid) {
+  //     throw new UnauthorizedException('Wrong authentication code');
+  //   }
+  //   await this.usersService.setTwoFactorAuth(request, true);
+  // }
 
-  async generateQrCodeDataURL(otpAuthUrl: string) {
-    return toDataURL(otpAuthUrl);
-  }
+  // async generateQrCodeDataURL(otpAuthUrl: string) {
+  //   return toDataURL(otpAuthUrl);
+  // }
 
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);

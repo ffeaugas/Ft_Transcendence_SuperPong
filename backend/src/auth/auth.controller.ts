@@ -24,21 +24,21 @@ export class AuthController {
     private userService: UsersService,
   ) {}
 
-  @Post('2fa/turn-on')
-  @UseGuards(AuthGuard)
-  async turnOnTwoFactorAuthentication(
-    @Req() request: any,
-    @Body() dto: User2Fa,
-  ) {
-    const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-      dto.twoFactorAuthenticationCode,
-      request.user,
-    );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
-    await this.userService.setTwoFactorAuth(request, true);
-  }
+  // @Post('2fa/turn-on')
+  // @UseGuards(AuthGuard)
+  // async turnOnTwoFactorAuthentication(
+  //   @Req() request: any,
+  //   @Body() dto: User2Fa,
+  // ) {
+  //   const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+  //     dto.twoFactorAuthenticationCode,
+  //     request.user,
+  //   );
+  //   if (!isCodeValid) {
+  //     throw new UnauthorizedException('Wrong authentication code');
+  //   }
+  //   await this.userService.setTwoFactorAuth(request, true);
+  // }
 
   @ApiOperation({ summary: 'login' })
   @Post('login')
