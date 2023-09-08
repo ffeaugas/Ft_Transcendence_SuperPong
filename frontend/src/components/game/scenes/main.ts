@@ -130,10 +130,6 @@ export default class GameScene extends Phaser.Scene {
                 entity.setData("serverX", player.x);
                 //entity.y=player.y;
                 if (player.status == 1) {
-                    this.room.onMessage("connected", (players) => {
-                        // this.player = players.username;
-                        console.log(this.player);
-                    });
                     this.room.send("updateStatus", 2);
                     entity.setData("serverY", player.y);
                 }
