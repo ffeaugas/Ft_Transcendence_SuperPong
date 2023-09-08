@@ -19,12 +19,16 @@ export default function FriendList({ username }: FriendListProps) {
 
   async function getFriends(): Promise<FriendItem[] | undefined> {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/users/friends", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+      const res = await axios.get(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/friends`,
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       const friends = res.data;
+      console.log(friends);
       return friends;
     } catch (error) {
       console.error("Error fetching user friends", error);

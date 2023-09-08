@@ -1,13 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
+import { GameService } from './game.service';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
 import { PrismaService } from './prisma/prisma.service';
-import { create } from 'domain';
+import { MyRoom } from './rooms/MyRoom';
 
 const prisma = new PrismaService();
+
+const ROOMS = [MyRoom];
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -66,7 +69,7 @@ async function bootstrap() {
         },
         {
           title: 'Serial Winner',
-          description: 'Perdre 5 fois de suite',
+          description: 'Gagner 5 fois de suite',
           picture: 'default.png',
         },
         {
@@ -97,6 +100,18 @@ async function bootstrap() {
   } catch (error) {
     console.error('Error creating :', error.message);
   }
+
+  app.enableShutdownHooks();
+
+  const gameSvc = app.get(GameService);
+
+  gameSvc.createServer(app.getHttpServer());
+
+  ROOMS.forEach((r) => {
+    console.info(`Registering room: ${r.name}`);
+    gameSvc.defineRoom(r.name, r);
+  });
+
   await app.listen(3001);
 }
 bootstrap();

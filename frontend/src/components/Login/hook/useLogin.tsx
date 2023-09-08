@@ -11,13 +11,16 @@ export const useLogin = () => {
     };
     const handleLogin = async (values: any, { resetForm }: any) => {
         const loggedUser = { ...values };
-        const res = await fetch(`http://10.5.0.3:3001/auth/login`, {
-            method: "POST",
-            body: JSON.stringify(loggedUser),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/login`,
+            {
+                method: "POST",
+                body: JSON.stringify(loggedUser),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
         if (res.ok) {
             const json = await res.json();
             localStorage.setItem("Authenticate", "true");

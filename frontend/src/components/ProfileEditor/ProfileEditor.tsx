@@ -49,12 +49,15 @@ export default function ProfileEditor() {
     username: string
   ): Promise<ProfileDatas | undefined> {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/profiles", {
-        params: { username: username },
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+      const res = await axios.get(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+        {
+          params: { username: username },
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {
@@ -82,14 +85,17 @@ export default function ProfileEditor() {
         oldUsername: username,
         newUsername: editedDatas.username,
       };
-      const res = await fetch("http://10.5.0.3:3001/users/update-username", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(dataBody),
-      });
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/update-username`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(dataBody),
+        }
+      );
       if (res.ok) {
         dispatch(setUsername(editedDatas.username));
         router.push(`/profile/${editedDatas.username}`);
@@ -104,15 +110,18 @@ export default function ProfileEditor() {
         username: username,
         bio: editedDatas.bio,
       };
-      const res = await fetch("http://10.5.0.3:3001/profiles/update-bio", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(dataBody),
-      });
-      if (res.ok && profileDatas) {
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles/update-bio`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(dataBody),
+        }
+      );
+      if (res.ok) {
         setProfileDatas({ ...profileDatas, bio: editedDatas.bio });
       }
     } catch (error) {}
@@ -120,52 +129,33 @@ export default function ProfileEditor() {
 
   const uploadToClient = (evt: any) => {
     if (evt.target.files && evt.target.files[0]) {
-      if (objectURL) {
-        URL.revokeObjectURL(objectURL);
-      }
       const localImage = evt.target.files[0];
-      setObjectFile(localImage);
-      console.log("localImage : ", localImage);
 
-      setEditedDatas({ ...editedDatas, profilePicture: localImage.name });
-      const image = URL.createObjectURL(localImage);
-      // console.log("image : ", image);
-      setObjectURL(image);
+      setEditedDatas({ ...editedDatas, profilePicture: localImage });
+      setObjectURL(URL.createObjectURL(localImage));
     }
   };
 
-  // const uploadToClient = (evt: any) => {
-  //   console.log("image : ", evt.target.files[0]);
-  //   setObjectURL(evt.target.files[0]);
-  // };
-
-  const uploadToServer = async (evt: any) => {
-    evt.preventDefault();
-
-    const formData = new FormData();
-    formData.append("image", objectFile);
-    const response = await fetch(
-      "http://10.5.0.3:3001/profiles/update-profile-picture",
-      {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }
-    );
+  const uploadToServer = async () => {
+    const body = new FormData();
+    body.append("file", image);
+    const response = await fetch("/api/file", {
+      method: "POST",
+      body,
+    });
   };
 
   useEffect(() => {
     if (username) {
       getProfileDatas(username).then((datas) => {
+        console.log(datas);
         setProfileDatas(datas);
       });
     }
   }, []);
 
   useEffect(() => {
+    // console.log(username, profileDatas);
     if (username && profileDatas) {
       setEditedDatas({
         username: username,
@@ -228,22 +218,20 @@ export default function ProfileEditor() {
                 src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
               />
             )}
-            <form>
-              <input
-                type="file"
-                id="uploadImg"
-                name="uploadImg"
-                className={styles.imageUploaderInput}
-                onChange={uploadToClient}
-              />
-              <button
-                type="submit"
-                onClick={uploadToServer}
-                className={styles.customButton}
-              >
-                update
-              </button>
-            </form>
+            <input
+              type="file"
+              id="uploadImg"
+              name="uploadImg"
+              className={styles.imageUploaderInput}
+              onChange={uploadToClient}
+            />
+            <button
+              type="submit"
+              onClick={uploadToServer}
+              className={styles.customButton}
+            >
+              update
+            </button>
           </div>
         ) : (
           <img
