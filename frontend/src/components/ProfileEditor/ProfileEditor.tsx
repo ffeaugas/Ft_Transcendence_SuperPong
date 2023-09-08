@@ -8,21 +8,10 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/app/GlobalRedux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
+import BlockedList from "../BlockedList/BlockedList";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
-
-type EditorModes = {
-    username: boolean;
-    profilePicture: boolean;
-    bio: boolean;
-};
-
-type EditedDatas = {
-    username: string;
-    profilePicture?: string;
-    bio: string;
-};
 
 export default function ProfileEditor() {
     const dispatch = useDispatch();
@@ -49,17 +38,16 @@ export default function ProfileEditor() {
         username: string
     ): Promise<ProfileDatas | undefined> {
         try {
-            const res = await axios.get(
-                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+            const res = await fetch(
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles?username=${username}`,
                 {
-                    params: { username: username },
                     headers: {
                         Authorization:
                             "Bearer " + localStorage.getItem("token"),
                     },
                 }
             );
-            const profileDatas = res.data;
+            const profileDatas = await res.json();
             return profileDatas;
         } catch (error) {
             console.error("Error fetching profile datas", error);
@@ -132,41 +120,20 @@ export default function ProfileEditor() {
 
     const uploadToClient = (evt: any) => {
         if (evt.target.files && evt.target.files[0]) {
-            if (objectURL) {
-                URL.revokeObjectURL(objectURL);
-            }
             const localImage = evt.target.files[0];
-            setObjectFile(localImage);
-            console.log("localImage : ", localImage);
 
-            setEditedDatas({ ...editedDatas, profilePicture: localImage.name });
-            const image = URL.createObjectURL(localImage);
-            // console.log("image : ", image);
-            setObjectURL(image);
+            setEditedDatas({ ...editedDatas, profilePicture: localImage });
+            setObjectURL(URL.createObjectURL(localImage));
         }
     };
 
-    // const uploadToClient = (evt: any) => {
-    //   console.log("image : ", evt.target.files[0]);
-    //   setObjectURL(evt.target.files[0]);
-    // };
-
-    const uploadToServer = async (evt: any) => {
-        evt.preventDefault();
-
-        const formData = new FormData();
-        formData.append("image", objectFile);
-        const response = await fetch(
-            "http://10.5.0.3:3001/profiles/update-profile-picture",
-            {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                },
-            }
-        );
+    const uploadToServer = async () => {
+        const body = new FormData();
+        body.append("file", image);
+        const response = await fetch("/api/file", {
+            method: "POST",
+            body,
+        });
     };
 
     useEffect(() => {
@@ -179,7 +146,6 @@ export default function ProfileEditor() {
     }, []);
 
     useEffect(() => {
-        // console.log(username, profileDatas);
         if (username && profileDatas) {
             setEditedDatas({
                 username: username,
@@ -234,30 +200,31 @@ export default function ProfileEditor() {
             <div className={styles.editProfile}>
                 {datasEditor.profilePicture ? (
                     <div className={styles.imageUploader}>
-                        {objectURL ? (
-                            <img className={styles.rounded} src={objectURL} />
+                        {createObjectURL ? (
+                            <img
+                                className={styles.rounded}
+                                src={createObjectURL}
+                            />
                         ) : (
                             <img
                                 className={styles.rounded}
                                 src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
                             />
                         )}
-                        <form>
-                            <input
-                                type="file"
-                                id="uploadImg"
-                                name="uploadImg"
-                                className={styles.imageUploaderInput}
-                                onChange={uploadToClient}
-                            />
-                            <button
-                                type="submit"
-                                onClick={uploadToServer}
-                                className={styles.customButton}
-                            >
-                                update
-                            </button>
-                        </form>
+                        <input
+                            type="file"
+                            id="uploadImg"
+                            name="uploadImg"
+                            className={styles.imageUploaderInput}
+                            onChange={uploadToClient}
+                        />
+                        <button
+                            type="submit"
+                            onClick={uploadToServer}
+                            className={styles.customButton}
+                        >
+                            update
+                        </button>
                     </div>
                 ) : (
                     <img
@@ -306,6 +273,7 @@ export default function ProfileEditor() {
                     &#9998;
                 </button>
             </div>
+            <BlockedList />
             <p>{feedbackMessage}</p>
         </div>
     );
