@@ -1,5 +1,5 @@
 # Ft_Transcendence_Super
-42 School Project : Last mandatory project to validate the cursus - An multiplayer pong game full stack app, with OAuth and Credentials auth, 2Fa, profile customization, socials (friends and real time chat), matchmaking, leaderboard, achievements...
+42 School Project : Last project to validate the cursus - A multiplayer pong game full stack app, with OAuth and Credentials auth, 2Fa, profile customization, socials (friends and real time chat), matchmaking, leaderboard, achievements...
 
 <h2>Frontend</h2>
 
