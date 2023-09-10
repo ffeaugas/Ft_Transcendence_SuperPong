@@ -1,7 +1,7 @@
 # Ft_Transcendence_Super
 42 School Project : Last project to validate the cursus - A multiplayer pong game full stack app, with OAuth and Credentials auth, 2Fa, profile customization, socials (friends and real time chat), matchmaking, leaderboard, achievements...
 
-<h2>Frontend</h2>
+<h2 style="color:red">Frontend</h2>
 
 <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=HTML5&logoColor=white"/></a>
 <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=CSS3&logoColor=white"/>
