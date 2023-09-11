@@ -44,10 +44,15 @@
 }
 
 body {
-  background-color: var(--backgroundColor1);
-  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-light.png"); */
   background-image: url("https://www.transparenttextures.com/patterns/otis-redding.png");
-  /* background-image: url(https://grainy-gradients.vercel.app/noise.svg); */
+  background: #1a1919;
+  background-color: var(--backgroundColor1);
+  background-image: linear-gradient(
+      rgba(105, 110, 105, 0.119) 0.02em,
+      transparent 0.1em
+    ),
+    linear-gradient(90deg, rgba(105, 110, 105, 0.119) 0.02em, transparent 0.1em);
+  background-size: 1.5em 1.5em;
 }
 
 h1 {

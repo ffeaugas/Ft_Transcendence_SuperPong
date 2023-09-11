@@ -8,21 +8,10 @@ import { useRouter } from "next/navigation";
 import { RootState } from "@/app/GlobalRedux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
+import BlockedList from "../BlockedList/BlockedList";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
-
-type EditorModes = {
-  username: boolean;
-  profilePicture: boolean;
-  bio: boolean;
-};
-
-type EditedDatas = {
-  username: string;
-  profilePicture?: string;
-  bio: string;
-};
 
 export default function ProfileEditor() {
   const dispatch = useDispatch();
@@ -45,21 +34,19 @@ export default function ProfileEditor() {
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
   const username = useSelector((state: RootState) => state.user.username);
 
-  //franci le bg
   async function getProfileDatas(
     username: string
   ): Promise<ProfileDatas | undefined> {
     try {
-      const res = await axios.get(
-        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles?username=${username}`,
         {
-          params: { username: username },
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         }
       );
-      const profileDatas = res.data;
+      const profileDatas = await res.json();
       return profileDatas;
     } catch (error) {
       console.error("Error fetching profile datas", error);
@@ -156,7 +143,6 @@ export default function ProfileEditor() {
   }, []);
 
   useEffect(() => {
-    // console.log(username, profileDatas);
     if (username && profileDatas) {
       setEditedDatas({
         username: username,
@@ -281,6 +267,7 @@ export default function ProfileEditor() {
           &#9998;
         </button>
       </div>
+      <BlockedList />
       <p>{feedbackMessage}</p>
     </div>
   );
