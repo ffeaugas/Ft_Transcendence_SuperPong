@@ -29,7 +29,7 @@ export class UsersController {
 
   @Get('blockeds')
   async getBlockeds(@Req() req: Request) {
-    return this.usersService.getFriends(req);
+    return this.usersService.getBlockeds(req);
   }
 
   @Get('relation')

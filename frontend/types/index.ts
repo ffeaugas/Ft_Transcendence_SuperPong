@@ -98,3 +98,15 @@ type ProfileDatas = {
 //   PRIV_MSG = "PRIV_MSG",
 //   CHANNEL = "CHANNEL",
 // }
+
+type EditorModes = {
+  username: boolean;
+  profilePicture: boolean;
+  bio: boolean;
+};
+
+type EditedDatas = {
+  username: string;
+  profilePicture?: string;
+  bio: string;
+};

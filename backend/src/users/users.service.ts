@@ -73,7 +73,7 @@ export class UsersService {
       updatedFriends = [...user.friends, targetUser];
     } else {
       updatedFriends = user.friends.filter(
-        (friend) => friend.username != dto.targetUsername,
+        (friend: User) => friend.username != dto.targetUsername,
       );
     }
     const updatedFriendUsers = await this.prismaService.user.update({
@@ -97,7 +97,7 @@ export class UsersService {
       updatedBlockeds = [...user.blockedUsers, targetUser];
     } else {
       updatedBlockeds = user.blockedUsers.filter(
-        (blockedUser) => blockedUser.username != dto.targetUsername,
+        (blockedUser: User) => blockedUser.username != dto.targetUsername,
       );
     }
     const updatedBlockedUsers = await this.prismaService.user.update({
