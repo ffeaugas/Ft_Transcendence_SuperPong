@@ -1,4 +1,5 @@
 import "phaser";
+import axios from "axios";
 import { Client, Room } from "colyseus.js";
 import { matchMaker } from "colyseus.js";
 
@@ -12,10 +13,12 @@ export default class LoadingScene extends Phaser.Scene {
     backgroundEntities: { [index: number]: any } = {};
     nameEntities: { [index: number]: any } = {};
     name: { [index: number]: any } = {};
+    playerSessionID: { [index: number]: any } = {};
     colorb = 0x0d0721;
     colorr = 0x00bce1;
     nbPlayer: number = 0;
     finish = 0;
+    timer = 0;
     counter = 0;
     score: number = 0;
 
@@ -36,19 +39,25 @@ export default class LoadingScene extends Phaser.Scene {
         const user = await res.json();
         return user["username"];
     }
-    /* async getPP(): Promise<string> {
-        const res = await fetch(
-            `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/me`,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                },
-            }
-        );
-        const user = await res.json();
-        return user["profile/profilePicture"];
-    }*/
+    async getProfileDatas(player: string): Promise<ProfileDatas | undefined> {
+        try {
+            const res = await axios.get(
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+                {
+                    params: { username: player },
+                    headers: {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("token"),
+                    },
+                }
+            );
+            const profileDatas = res.data;
+            return profileDatas;
+        } catch (error) {
+            console.error("Error fetching profile datas", error);
+            return undefined;
+        }
+    }
 
     async create() {
         console.log("Joining room...");
@@ -121,18 +130,21 @@ export default class LoadingScene extends Phaser.Scene {
             this.room.onMessage("Joined", (player) => {
                 // this.player = players.username;
                 console.log(player);
-                if (!this.name[0]) {
+                if (!this.playerSessionID[0] && this.name[1] != player) {
+                    this.playerSessionID[0] = sessionId;
                     this.name[0] = player;
                     this.nameEntities[0].setText(player);
-                } else if (!this.name[1] && this.name[0] != player) {
+                    this.load.image("p1", this.getProfileDatas(player));
+                    this.add.image(100, 10, "p1");
+                } else if (!this.playerSessionID[1] && this.name[0] != player) {
+                    this.playerSessionID[1] = sessionId;
                     this.name[1] = player;
                     this.nameEntities[1].setText(player);
+                    this.load.image("p2", this.getProfileDatas(player));
+                    this.add.image(500, 10, "p2");
                 }
-                this.client.name = player;
             });
-            if (this.nb_client === 2) {
-                setTimeout(() => this.scene.start("Game", this.room), 20000);
-            } else if (this.nb_client == 1) {
+            if (this.nb_client == 1) {
                 if (sessionId === this.room.sessionId) {
                     this.backgroundEntities[1] = this.add.pointlight(
                         (dim[0] / 4) * 3,
@@ -205,18 +217,28 @@ export default class LoadingScene extends Phaser.Scene {
         this.room.state.players.onRemove((player, sessionId) => {
             this.nb_client--;
             console.log(this.client.name);
-            /*let dim = [this.game.canvas.width, this.game.canvas.height];
-            if (this.client.name != this.name[0]) {
+            let dim = [this.game.canvas.width, this.game.canvas.height];
+            if (this.playerSessionID[0] == sessionId) {
+                this.playerSessionID[0] = 0;
                 this.name[0] = "";
                 this.nameEntities[0].setText("");
-            } else if (this.name[1]) {
+            } else if (this.playerSessionID[1]) {
+                this.playerSessionID[1] = 0;
                 this.name[1] = "";
                 this.nameEntities[1].setText("");
-            }*/
+            }
             // marche pas de ouf refonte avec sessionId a prevoir
         });
         this.events.on("destroy", () => {
             this.room.leave();
         });
+    }
+    update(time: number, delta: number): void {
+        //console.log(time);
+        if (this.nb_client === 2) {
+            if (this.timer == 0) this.timer = time;
+            else if (time - this.timer > 10000)
+                this.scene.start("Game", this.room);
+        } else this.timer = 0;
     }
 }
