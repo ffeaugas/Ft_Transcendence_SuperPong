@@ -14,6 +14,7 @@ export default class LoadingScene extends Phaser.Scene {
     nameEntities: { [index: number]: any } = {};
     name: { [index: number]: any } = {};
     playerSessionID: { [index: number]: any } = {};
+    turningRoger: { [index: number]: any } = {};
     colorb = 0x0d0721;
     colorr = 0x00bce1;
     nbPlayer: number = 0;
@@ -59,6 +60,10 @@ export default class LoadingScene extends Phaser.Scene {
         }
     }
 
+    preload() {
+        this.load.image("roger", "/sadnessAchievement.png");
+    }
+
     async create() {
         console.log("Joining room...");
         try {
@@ -67,15 +72,25 @@ export default class LoadingScene extends Phaser.Scene {
             // );
             let dim = [this.game.canvas.width, this.game.canvas.height];
             this.scale.refresh();
+            /*this.turningRoger[0] = this.add
+                .image(dim[0] / 4, dim[1] / 3, "roger")
+                .setDepth(7);
+            this.turningRoger[1] = this.add
+                .image((dim[0] / 4) * 3, dim[1] / 3, "roger")
+                .setDepth(7);
+            this.turningRoger[0].setOrigin(0.5);
+            this.turningRoger[1].setOrigin(0.5);
+            this.turningRoger[0].visible = false;
+            this.turningRoger[1].visible = false;*/
             this.backgroundEntities[0] = this.add
                 .rectangle(dim[0] / 2, dim[1] / 2, 20, 5000, 0x111111)
                 .setDepth(5);
             this.backgroundEntities[3] = this.add
                 .circle((dim[0] / 4) * 3, dim[1] / 3, 100, 0x111111)
-                .setDepth(5);
+                .setDepth(6);
             this.backgroundEntities[4] = this.add
                 .circle(dim[0] / 4, dim[1] / 3, 100, 0x111111)
-                .setDepth(5);
+                .setDepth(6);
             this.backgroundEntities[5] = this.add
                 .rectangle(
                     (dim[0] / 4) * 3,
@@ -85,6 +100,14 @@ export default class LoadingScene extends Phaser.Scene {
                     0x111111
                 )
                 .setDepth(5);
+            /*this.backgroundEntities[29] = this.add
+                .circle((dim[0] / 4) * 3, dim[1] / 3, 150)
+                .setDepth(8);
+            this.backgroundEntities[30] = this.add
+                .circle(dim[0] / 4, dim[1] / 3, 150)
+                .setDepth(8);
+            this.backgroundEntities[29].setStrokeStyle(100);
+            this.backgroundEntities[30].setStrokeStyle(100);*/
             //this.backgroundEntities[5].setCrop(0.5);
             this.backgroundEntities[6] = this.add
                 .rectangle(dim[0] / 4, (dim[1] / 3) * 2, 400, 50, 0x111111)
@@ -146,20 +169,18 @@ export default class LoadingScene extends Phaser.Scene {
             });
             if (this.nb_client == 1) {
                 if (sessionId === this.room.sessionId) {
-                    this.backgroundEntities[1] = this.add.pointlight(
-                        (dim[0] / 4) * 3,
-                        dim[1] / 3,
-                        0xff0000,
-                        200,
-                        0.5
-                    );
-                    this.backgroundEntities[2] = this.add.pointlight(
-                        dim[0] / 4,
-                        dim[1] / 3,
-                        0x00ff00,
-                        200,
-                        0.5
-                    );
+                    this.backgroundEntities[1] = this.add
+                        .pointlight(
+                            (dim[0] / 4) * 3,
+                            dim[1] / 3,
+                            0xff0000,
+                            200,
+                            0.5
+                        )
+                        .setDepth(2);
+                    this.backgroundEntities[2] = this.add
+                        .pointlight(dim[0] / 4, dim[1] / 3, 0x00ff00, 200, 0.5)
+                        .setDepth(2);
                     for (let i = 7; i < 18; i++) {
                         this.backgroundEntities[i] = this.add.pointlight(
                             (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
@@ -178,21 +199,20 @@ export default class LoadingScene extends Phaser.Scene {
                             0.2
                         );
                     }
+                    this.turningRoger[0].visible = true;
                 } else {
-                    this.backgroundEntities[1] = this.add.pointlight(
-                        (dim[0] / 4) * 3,
-                        dim[1] / 3,
-                        0x00ff00,
-                        200,
-                        0.5
-                    );
-                    this.backgroundEntities[2] = this.add.pointlight(
-                        dim[0] / 4,
-                        dim[1] / 3,
-                        0xff0000,
-                        200,
-                        0.5
-                    );
+                    this.backgroundEntities[1] = this.add
+                        .pointlight(
+                            (dim[0] / 4) * 3,
+                            dim[1] / 3,
+                            0x00ff00,
+                            200,
+                            0.5
+                        )
+                        .setDepth(2);
+                    this.backgroundEntities[2] = this.add
+                        .pointlight(dim[0] / 4, dim[1] / 3, 0xff0000, 200, 0.5)
+                        .setDepth(2);
                     for (let i = 7; i < 18; i++) {
                         this.backgroundEntities[i] = this.add.pointlight(
                             (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
@@ -211,6 +231,7 @@ export default class LoadingScene extends Phaser.Scene {
                             0.2
                         );
                     }
+                    this.turningRoger[1].visible = true;
                 }
             }
         });
@@ -222,10 +243,12 @@ export default class LoadingScene extends Phaser.Scene {
                 this.playerSessionID[0] = 0;
                 this.name[0] = "";
                 this.nameEntities[0].setText("");
+                //this.turningRoger[1].visible = false;
             } else if (this.playerSessionID[1]) {
                 this.playerSessionID[1] = 0;
                 this.name[1] = "";
                 this.nameEntities[1].setText("");
+                //this.turningRoger[1].visible = false;
             }
             // marche pas de ouf refonte avec sessionId a prevoir
         });

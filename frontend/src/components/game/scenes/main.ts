@@ -22,6 +22,7 @@ export default class GameScene extends Phaser.Scene {
     score: number = 0;
     KeyF;
     player: any;
+    ball_satus = 0;
 
     constructor() {
         super("Game");
@@ -166,8 +167,13 @@ export default class GameScene extends Phaser.Scene {
                     this.room.send("move", dim[1] - 50);
                 else this.room.send("move", this.input.mousePointer.y);
             }
-            if (this.room && this.cursorKeys.space.isDown) {
+            if (
+                this.room &&
+                this.cursorKeys.space.isDown &&
+                this.ball_satus == 0
+            ) {
                 this.room.send("launch");
+                this.ball_satus = 1;
             }
             if (this.room && this.KeyF.isDown) {
                 try {
@@ -204,6 +210,7 @@ export default class GameScene extends Phaser.Scene {
                                         score[1].toString()
                                 );
                             });
+                            this.ball_satus = 0;
                         }
                         if (this.room && this.ballEntity) {
                             this.room.onMessage("boom", (client) => {

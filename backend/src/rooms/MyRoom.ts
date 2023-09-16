@@ -12,6 +12,7 @@ export class MyRoom extends Room<MyRoomState> {
   direction = 0;
   refresh = 0;
   i = 0;
+  mooving_ball = 0;
   host: Client;
   game: GameService;
 
@@ -31,10 +32,16 @@ export class MyRoom extends Room<MyRoomState> {
     });
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
-      if (player.get_ball != 0) this.direction = 2.5;
+      if (player.get_ball != 0 && this.mooving_ball == 0) {
+        this.direction = 2.5;
+        this.mooving_ball = 1;
+      }
     });
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
+      if (this.mooving_ball == 0 && player.get_ball != 0) {
+        this.state.balls.y = player.y;
+      }
       if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
       if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
       if (
@@ -100,8 +107,18 @@ export class MyRoom extends Room<MyRoomState> {
         }
         if (this.state.score[1] != 5 || this.state.score[0] != 5) {
           this.state.balls.y = data.h / 2;
-          this.state.balls.x = data.w / 2;
           this.state.balls.angle = 0;
+          this.mooving_ball = 0;
+          this.direction = 0;
+          this.state.players.forEach((Fplayer) => {
+            if (Fplayer.get_ball == 0) {
+              Fplayer.get_ball = 1;
+              if (Fplayer.x < data.w / 2) this.state.balls.x = Fplayer.x + 20;
+              else this.state.balls.x = Fplayer.x - 20;
+            } else if (Fplayer.get_ball == 1) {
+              Fplayer.get_ball = 0;
+            }
+          });
         }
       } else {
         if (this.refresh != 0) this.refresh--;
