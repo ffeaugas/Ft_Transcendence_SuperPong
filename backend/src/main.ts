@@ -7,10 +7,11 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
 import { PrismaService } from './prisma/prisma.service';
 import { MyRoom } from './rooms/MyRoom';
+import { MyRoomGameBonus } from './rooms/MyRoomGameBonus';
 
 const prisma = new PrismaService();
 
-const ROOMS = [MyRoom];
+const ROOMS = [MyRoom, MyRoomGameBonus];
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

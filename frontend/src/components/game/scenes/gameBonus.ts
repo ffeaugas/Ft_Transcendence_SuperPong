@@ -1,9 +1,10 @@
 import "phaser";
 import { Client, Room } from "colyseus.js";
 import { matchMaker } from "colyseus.js";
+import LoadingSceneBonus from "./loadingBonusGame";
 
 // custom scene class
-export default class GameScene extends Phaser.Scene {
+export default class GameSceneBonus extends Phaser.Scene {
   // Initialize the client and room variables
   private room: Room;
   nb_client: number = 0;
@@ -21,10 +22,12 @@ export default class GameScene extends Phaser.Scene {
   counter = 0;
   score: number = 0;
   KeyF;
+  bonusPos = [0, 0];
+  bonusEntity;
   player: any;
 
   constructor() {
-    super("Game");
+    super("GameBonus");
   }
 
   // async postGame(data): Promise<string> {
@@ -47,6 +50,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.scene.stop("LoadingBonus");
     // preload scene
     let dim = [this.game.canvas.width, this.game.canvas.height];
     this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -69,6 +73,7 @@ export default class GameScene extends Phaser.Scene {
     this.ballEntity = this.add.rectangle(dim[0], dim[1], 15, 15, 0x006600);
     this.ballLight = this.add.pointlight(dim[0], dim[1], 0x000a10, 275);
     this.ballLight.intensity = 0.25;
+    this.bonusEntity = this.add.rectangle(-500, -500, 20, 20, 0xff0000);
   }
 
   async create() {
@@ -159,6 +164,40 @@ export default class GameScene extends Phaser.Scene {
         }
       }
       if (this.room) {
+        this.room.onMessage("spawnBonus", (data) => {
+          this.bonusEntity.x = data.x;
+          this.bonusEntity.y = data.y;
+          this.bonusPos[0] = data.x;
+          this.bonusPos[1] = data.y;
+        });
+        this.room.onMessage("touchBonus", (struct) => {
+          this.bonusEntity.x = -500;
+          this.bonusEntity.y = -500;
+          var entity = this.playerEntities[struct.cli.sessionId];
+          if (struct.wrong == 0) entity.setScale(1.5);
+          if (struct.wrong == 1) entity.setScale(0.5);
+        });
+        this.room.onMessage("otherTouch", (struct) => {
+          for (let sessionId in this.playerEntities) {
+            if (sessionId != struct.cli.sessionId) {
+              this.bonusEntity.x = -500;
+              this.bonusEntity.y = -500;
+              if (struct.wrong == 0)
+                this.playerEntities[sessionId].setScale(1.5);
+              if (struct.wrong == 1)
+                this.playerEntities[sessionId].setScale(0.5);
+            }
+          }
+        });
+        // this.room.onMessage("otherWrongTouch", (cli) => {
+        //   for (let sessionId in this.playerEntities) {
+        //     if (sessionId != cli.sessionId) {
+        //       this.playerEntities[sessionId].setScale(0.75);
+        //       this.bonusEntity.x = -500;
+        //       this.bonusEntity.y = -500;
+        //     }
+        //   }
+        // });
         for (let sessionId in this.playerEntities) {
           const entity = this.playerEntities[sessionId];
           const light = this.playersLight[sessionId];
@@ -170,7 +209,12 @@ export default class GameScene extends Phaser.Scene {
             light.x = Phaser.Math.Linear(entity.x, serverX, 0.7);
             light.y = Phaser.Math.Linear(entity.y, serverY, 0.7);
             if (this.ballEntity) {
-              this.room.send("ball", { h: dim[1], w: dim[0] });
+              this.room.send("ball", {
+                h: dim[1],
+                w: dim[0],
+                bonusPos: this.bonusPos,
+                playerHeight: (entity.height * entity.scale) / 2,
+              });
             }
             this.room.onMessage("ballPos", (ball) => {
               this.ballEntity.x = ball.x;
@@ -222,7 +266,7 @@ export default class GameScene extends Phaser.Scene {
                 this.scoreEntities[0].setText("You are a Winner " + username);
                 setTimeout(() => {
                   this.room.leave();
-                }, 5000);
+                }, 3000);
               });
             }
             if (this.room) {
@@ -231,7 +275,7 @@ export default class GameScene extends Phaser.Scene {
                 this.scoreEntities[0].setText("You are a Looser " + username);
                 setTimeout(() => {
                   this.room.leave();
-                }, 5000);
+                }, 3000);
               });
             }
 

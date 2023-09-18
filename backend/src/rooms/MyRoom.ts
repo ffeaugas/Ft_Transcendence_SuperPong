@@ -198,7 +198,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
-      if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
+      else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
       if (
         player.x < this.state.balls.x + 14 &&
         player.x > this.state.balls.x - 14 &&
