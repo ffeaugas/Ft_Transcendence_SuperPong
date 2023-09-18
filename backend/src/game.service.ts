@@ -41,15 +41,18 @@ export class GameService implements OnApplicationShutdown {
     });
     const game = await this.prisma.game.create({
       data: {
-        winner: winner.username,
-        looser: looser.username,
+        player1Id: winner.id,
+        player2Id: looser.id,
       },
+      include: { playerWinner: true, playerLooser: true },
     });
     return game;
   }
 
   async getGames() {
-    return await this.prisma.game.findMany();
+    return await this.prisma.game.findMany({
+      include: { playerWinner: true, playerLooser: true },
+    });
   }
 
   onApplicationShutdown(sig) {

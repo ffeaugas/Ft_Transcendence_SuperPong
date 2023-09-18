@@ -14,6 +14,7 @@ const ROOMS = [MyRoom];
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors({ origin: '*' });
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     index: false,
     prefix: '/uploads',
@@ -31,7 +32,6 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  app.enableCors({ origin: '*' });
   const name = 'General';
   try {
     const general = await prisma.channel.create({
