@@ -73,7 +73,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     async create() {
-        console.log("Joining room...");
+        console.log("Joining game normal room...");
 
         try {
             // this.scale.displaySize.setAspectRatio(
@@ -269,24 +269,44 @@ export default class GameScene extends Phaser.Scene {
                         }
                         if (this.room) {
                             this.room.onMessage("win", (username) => {
-                                this.finish = 1;
                                 this.scoreEntities[0].setText(
                                     "You are a Winner " + username
                                 );
-                                setTimeout(() => {
-                                    this.room.leave();
-                                }, 5000);
+
+                                this.room.leave();
+                                console.log("SDFSDFSDFSDF");
+                                if (this.finish == 0) {
+                                    this.finish = 1;
+                                    setTimeout(() => {
+                                        if (this.game.isRunning) {
+                                            this.registry.destroy(); // destroy registry
+                                            this.scene.stop();
+                                            this.game.destroy(false, true);
+                                            console.log("SDFSDFSDFSDF");
+                                            window.location.reload();
+                                            return;
+                                        }
+                                    }, 3000);
+                                }
                             });
-                        }
-                        if (this.room) {
                             this.room.onMessage("loose", (username) => {
-                                this.finish = 1;
                                 this.scoreEntities[0].setText(
                                     "You are a Looser " + username
                                 );
-                                setTimeout(() => {
-                                    this.room.leave();
-                                }, 5000);
+                                this.room.leave();
+                                if (this.finish == 0) {
+                                    this.finish = 1;
+                                    setTimeout(() => {
+                                        if (this.game.isRunning) {
+                                            this.registry.destroy(); // destroy registry
+                                            this.scene.stop();
+                                            this.game.destroy(false, true);
+                                            console.log("SDFSDFSDFSDF");
+                                            window.location.reload();
+                                            return;
+                                        }
+                                    }, 3000);
+                                }
                             });
                         }
 

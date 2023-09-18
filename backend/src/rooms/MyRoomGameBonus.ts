@@ -14,6 +14,7 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
   refresh = 0;
   bonus = 0;
   i = 0;
+  mooving_ball = 0;
   host: Client;
   game: GameService;
   random = 0;
@@ -34,10 +35,18 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
     });
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
-      if (player.get_ball != 0) this.direction = 2.5;
+      if (player.get_ball != 0 && this.mooving_ball == 0) {
+        this.direction = 2.5;
+        this.mooving_ball = 1;
+      }
     });
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
+      if (this.mooving_ball == 0 && player.get_ball != 0) {
+        this.state.balls.y = player.y;
+      }
+      if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
+      else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
       if (this.bonus == 0) {
         const xBonus = Math.random() * data.w;
         const yBonus = Math.random() * data.h;
@@ -50,8 +59,6 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
         });
         this.bonus = 1;
       }
-      if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
-      else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
       if (
         data.bonusPos[0] - 10 < this.state.balls.x + 14 &&
         data.bonusPos[0] + 10 > this.state.balls.x - 14 &&
@@ -98,11 +105,14 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               const player_ = this.state.players.get(cli.sessionId);
               if (this.host != cli) {
                 dto.winner = player_.username;
+                dto.winnerScore = this.state.score[1];
+
                 cli.send('win', player_.username);
               } else {
                 dto.looser = this.state.players.get(
                   this.host.sessionId,
                 ).username;
+                dto.looserScore = this.state.score[0];
                 cli.send(
                   'loose',
                   this.state.players.get(this.host.sessionId).username,
@@ -110,6 +120,7 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               }
               this.i++;
             });
+            // CREE la ligne dans la db
             this.game.createGameHistory(dto);
           } else this.direction = -2.5;
         } else {
@@ -120,11 +131,13 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               const player_ = this.state.players.get(cli.sessionId);
               if (this.host != cli) {
                 dto.looser = player_.username;
+                dto.looserScore = this.state.score[1];
                 cli.send('loose', player_.username);
               } else {
                 dto.winner = this.state.players.get(
                   this.host.sessionId,
                 ).username;
+                dto.winnerScore = this.state.score[0];
                 cli.send(
                   'win',
                   this.state.players.get(this.host.sessionId).username,
@@ -132,13 +145,24 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               }
               this.i++;
             });
+            // CREE la ligne dans la dbs
             this.game.createGameHistory(dto);
           } else this.direction = 2.5;
         }
         if (this.state.score[1] != 5 || this.state.score[0] != 5) {
           this.state.balls.y = data.h / 2;
-          this.state.balls.x = data.w / 2;
           this.state.balls.angle = 0;
+          this.mooving_ball = 0;
+          this.direction = 0;
+          this.state.players.forEach((Fplayer) => {
+            if (Fplayer.get_ball == 0) {
+              Fplayer.get_ball = 1;
+              if (Fplayer.x < data.w / 2) this.state.balls.x = Fplayer.x + 20;
+              else this.state.balls.x = Fplayer.x - 20;
+            } else if (Fplayer.get_ball == 1) {
+              Fplayer.get_ball = 0;
+            }
+          });
         }
       } else {
         if (this.refresh != 0) this.refresh--;
@@ -183,16 +207,17 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       player.status = 0;
     }
     this.state.players.set(client.sessionId, player);
+    this.clients.forEach((client) => {
+      this.state.players.forEach((player) => {
+        client.send('Joined', player.username);
+      });
+    });
   }
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, 'left!');
+    client.leave();
     this.state.players.delete(client.sessionId);
-    if (this.player[0] == client.sessionId) {
-      this.player[0] = '';
-    } else {
-      this.player[1] = '';
-    }
   }
 
   onDispose() {

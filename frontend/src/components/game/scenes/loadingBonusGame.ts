@@ -60,12 +60,17 @@ export default class LoadingSceneBonus extends Phaser.Scene {
         }
     }
 
+    init() {
+        this.nb_client = 0;
+        // this.client = null;
+    }
+
     preload() {
         this.load.image("roger", "/sadnessAchievement.png");
     }
 
     async create() {
-        console.log("Joining room...");
+        console.log("Joining custom room...");
         try {
             // this.scale.displaySize.setAspectRatio(
             //   window.outerWidth / window.outerHeight
@@ -135,7 +140,7 @@ export default class LoadingSceneBonus extends Phaser.Scene {
             this.client = new Client(
                 `ws://${process.env.NEXT_PUBLIC_DOMAIN}:3001`
             );
-            this.room = await this.client.joinOrCreate("MyRoom", {
+            this.room = await this.client.joinOrCreate("MyRoomGameBonus", {
                 dim,
                 name: await this.getUsername(),
                 //PpUrl: await this.getPP(),
@@ -253,6 +258,8 @@ export default class LoadingSceneBonus extends Phaser.Scene {
             // marche pas de ouf refonte avec sessionId a prevoir
         });
         this.events.on("destroy", () => {
+            console.log(this.playerSessionID, "disconnected");
+            this.game.destroy(true);
             this.room.leave();
         });
     }
@@ -260,8 +267,10 @@ export default class LoadingSceneBonus extends Phaser.Scene {
         //console.log(time);
         if (this.nb_client === 2) {
             if (this.timer == 0) this.timer = time;
-            else if (time - this.timer > 10000)
+            else if (time - this.timer > 3000) {
+                this.scene.stop();
                 this.scene.start("GameBonus", this.room);
+            }
         } else this.timer = 0;
     }
 }

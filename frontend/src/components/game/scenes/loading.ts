@@ -65,7 +65,7 @@ export default class LoadingScene extends Phaser.Scene {
     }
 
     async create() {
-        console.log("Joining room...");
+        console.log("Joining normal room...");
         try {
             // this.scale.displaySize.setAspectRatio(
             //   window.outerWidth / window.outerHeight
@@ -260,7 +260,7 @@ export default class LoadingScene extends Phaser.Scene {
         //console.log(time);
         if (this.nb_client === 2) {
             if (this.timer == 0) this.timer = time;
-            else if (time - this.timer > 10000)
+            else if (time - this.timer > 3000)
                 this.scene.start("Game", this.room);
         } else this.timer = 0;
     }

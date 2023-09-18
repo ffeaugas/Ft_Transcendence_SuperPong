@@ -70,12 +70,14 @@ export default class MainMenuScene extends Phaser.Scene {
                     this.input.mousePointer.leftButtonDown()
                 ) {
                     console.log(button.name);
+                    this.scene.stop();
                     this.scene.start("Loading");
                 } else if (
                     button.name == "CustomButton" &&
                     this.input.mousePointer.leftButtonDown()
                 ) {
                     console.log(button.name);
+                    this.scene.stop();
                     this.scene.start("LoadingSceneBonus");
                 }
             } else {
