@@ -6,6 +6,7 @@ export class Player extends Schema {
   @type('number') status: number;
   @type('number') get_ball: number;
   @type('string') username: string;
+  @type('string') PpUrl: string;
 }
 
 export class Ball extends Schema {

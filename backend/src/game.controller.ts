@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { GameDto } from './game.dto';
+import { Request } from 'express';
+import { AuthGuard } from './auth/auth.guard';
 
 @Controller('games')
+@UseGuards(AuthGuard)
 export class GameController {
   constructor(private readonly game: GameService) {}
 
@@ -12,7 +15,7 @@ export class GameController {
   }
 
   @Get()
-  async getGames() {
-    return await this.game.getGames();
+  async getGames(@Req() req: Request) {
+    return await this.game.getGames(req);
   }
 }

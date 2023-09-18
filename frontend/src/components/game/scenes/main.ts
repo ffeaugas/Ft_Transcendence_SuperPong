@@ -4,24 +4,25 @@ import { matchMaker } from "colyseus.js";
 
 // custom scene class
 export default class GameScene extends Phaser.Scene {
-  // Initialize the client and room variables
-  private room: Room;
-  nb_client: number = 0;
-  playerEntities: { [sessionId: string]: any } = {};
-  playersLight: { [sessionId: string]: any } = {};
-  ballEntity: any = undefined;
-  ballLight: any = undefined;
-  scoreEntities: { [index: number]: any } = {};
-  backgroundEntities: { [index: number]: any } = {};
-  colorb = 0x002b1d;
-  colorr = 0x00bb80;
-  cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
-  nbPlayer: number = 0;
-  finish = 0;
-  counter = 0;
-  score: number = 0;
-  KeyF;
-  player: any;
+    // Initialize the client and room variables
+    private room: Room;
+    nb_client: number = 0;
+    playerEntities: { [sessionId: string]: any } = {};
+    playersLight: { [sessionId: string]: any } = {};
+    ballEntity: any = undefined;
+    ballLight: any = undefined;
+    scoreEntities: { [index: number]: any } = {};
+    backgroundEntities: { [index: number]: any } = {};
+    colorb = 0x002b1d;
+    colorr = 0x00bb80;
+    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+    nbPlayer: number = 0;
+    finish = 0;
+    counter = 0;
+    score: number = 0;
+    KeyF;
+    player: any;
+    ball_satus = 0;
 
   constructor() {
     super("Game");
@@ -172,11 +173,20 @@ export default class GameScene extends Phaser.Scene {
             if (this.ballEntity) {
               this.room.send("ball", { h: dim[1], w: dim[0] });
             }
-            this.room.onMessage("ballPos", (ball) => {
-              this.ballEntity.x = ball.x;
-              this.ballEntity.y = ball.y;
-              this.ballLight.x = ball.x;
-              this.ballLight.y = ball.y;
+            // keep a reference of it on `playerEntities`
+            player.onChange(() => {
+                // update local position immediately
+                entity.setData("serverY", player.y);
+                entity.setData("serverX", player.x);
+                //entity.y=player.y;
+                if (player.status == 1) {
+                    this.room.send("updateStatus", 2);
+                    entity.setData("serverY", player.y);
+                }
+                if (player.get_ball == 1) {
+                    entity.setData("serverYB", player.y);
+                    entity.setData("serverXB", player.x);
+                }
             });
             if (this.finish !== 1) {
               this.room.onMessage("score", (score) => {
@@ -207,23 +217,145 @@ export default class GameScene extends Phaser.Scene {
                       this.playersLight[sessionId].intensity = 1;
                       this.ballLight.intensity = 1;
 
-                      setTimeout(() => {
-                        this.playersLight[client.sessionId].intensity = 0.5;
-                        this.ballLight.intensity = 0.5;
-                      }, 50);
-                    }
-                  }
+    // Add your update() function if needed
+    update(time: number, delta: number): void {
+        if (this.finish == 0) {
+            let dim = [this.game.canvas.width, this.game.canvas.height];
+            if (this.room && this.input.mousePointer.y) {
+                if (this.input.mousePointer.y < 50) this.room.send("move", 50);
+                else if (this.input.mousePointer.y > dim[1] - 50)
+                    this.room.send("move", dim[1] - 50);
+                else this.room.send("move", this.input.mousePointer.y);
+            }
+            if (
+                this.room &&
+                this.cursorKeys.space.isDown &&
+                this.ball_satus == 0
+            ) {
+                this.room.send("launch");
+                this.ball_satus = 1;
+            }
+            if (this.room && this.KeyF.isDown) {
+                try {
+                    this.scale.startFullscreen();
+                } catch (error) {
+                    console.log(error);
                 }
               });
             }
             if (this.room) {
-              this.room.onMessage("win", (username) => {
-                this.finish = 1;
-                this.scoreEntities[0].setText("You are a Winner " + username);
-                setTimeout(() => {
-                  this.room.leave();
-                }, 5000);
-              });
+                for (let sessionId in this.playerEntities) {
+                    const entity = this.playerEntities[sessionId];
+                    const light = this.playersLight[sessionId];
+
+                    if (entity.data) {
+                        const { serverX, serverY } = entity.data.values;
+                        entity.x = Phaser.Math.Interpolation.Linear(
+                            [entity.x, serverX],
+                            0.8
+                        );
+                        entity.y = Phaser.Math.Interpolation.Linear(
+                            [entity.y, serverY],
+                            0.8
+                        );
+                        light.x = Phaser.Math.Interpolation.Linear(
+                            [entity.x, serverX],
+                            0.8
+                        );
+                        light.y = Phaser.Math.Interpolation.Linear(
+                            [entity.y, serverY],
+                            0.8
+                        );
+                        if (this.ballEntity) {
+                            this.room.send("ball", { h: dim[1], w: dim[0] });
+                        }
+                        this.room.onMessage("ballPos", (ball) => {
+                            this.ballEntity.x = ball.x;
+                            this.ballEntity.y = ball.y;
+                            this.ballLight.x = ball.x;
+                            this.ballLight.y = ball.y;
+                        });
+                        if (this.finish !== 1) {
+                            this.room.onMessage("score", (score) => {
+                                this.scoreEntities[0].setText(
+                                    score[0].toString() +
+                                        "     " +
+                                        score[1].toString()
+                                );
+                            });
+                            this.ball_satus = 0;
+                        }
+                        if (this.room && this.ballEntity) {
+                            this.room.onMessage("boom", (client) => {
+                                if (
+                                    (this.ballEntity.x <
+                                        window.outerWidth / 2 &&
+                                        this.playerEntities[client.sessionId]
+                                            .x <
+                                            window.outerWidth / 2) ||
+                                    (this.ballEntity.x >
+                                        window.outerWidth / 2 &&
+                                        this.playerEntities[client.sessionId]
+                                            .x >
+                                            window.outerWidth / 2)
+                                ) {
+                                    this.ballLight.intensity = 1;
+                                    this.playersLight[
+                                        client.sessionId
+                                    ].intensity = 1;
+                                    setTimeout(() => {
+                                        this.playersLight[
+                                            client.sessionId
+                                        ].intensity = 0.5;
+                                        this.ballLight.intensity = 0.5;
+                                    }, 50);
+                                } else {
+                                    for (let sessionId in this.playerEntities) {
+                                        if (client.sessionId != sessionId) {
+                                            this.playersLight[
+                                                sessionId
+                                            ].intensity = 1;
+                                            this.ballLight.intensity = 1;
+
+                                            setTimeout(() => {
+                                                this.playersLight[
+                                                    client.sessionId
+                                                ].intensity = 0.5;
+                                                this.ballLight.intensity = 0.5;
+                                            }, 50);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        if (this.room) {
+                            this.room.onMessage("win", (username) => {
+                                this.finish = 1;
+                                this.scoreEntities[0].setText(
+                                    "You are a Winner " + username
+                                );
+                                setTimeout(() => {
+                                    this.room.leave();
+                                }, 5000);
+                            });
+                        }
+                        if (this.room) {
+                            this.room.onMessage("loose", (username) => {
+                                this.finish = 1;
+                                this.scoreEntities[0].setText(
+                                    "You are a Looser " + username
+                                );
+                                setTimeout(() => {
+                                    this.room.leave();
+                                }, 5000);
+                            });
+                        }
+
+                        this.events.on("destroy", () => {
+                            this.room.leave();
+                        });
+                    }
+                }
             }
             if (this.room) {
               this.room.onMessage("loose", (username) => {
