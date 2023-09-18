@@ -199,7 +199,7 @@ export default class LoadingScene extends Phaser.Scene {
                             0.2
                         );
                     }
-                    this.turningRoger[0].visible = true;
+                    //this.turningRoger[0].visible = true;
                 } else {
                     this.backgroundEntities[1] = this.add
                         .pointlight(
@@ -231,7 +231,7 @@ export default class LoadingScene extends Phaser.Scene {
                             0.2
                         );
                     }
-                    this.turningRoger[1].visible = true;
+                    //this.turningRoger[1].visible = true;
                 }
             }
         });

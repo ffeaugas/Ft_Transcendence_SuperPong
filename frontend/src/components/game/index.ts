@@ -33,7 +33,7 @@ export default function Index() {
                     min: 60,
                     forceSetTimeOut: true,
                 },
-                pixelArt: true,
+                pixelArt: false,
                 scene: [MainMenuScene, GameScene, LoadingScene],
             };
             gameInstance = new Phaser.Game(config);
