@@ -48,7 +48,7 @@ export class GameService implements OnApplicationShutdown {
         looser: { connect: looser },
         looserScore: dto.looserScore,
       },
-      include: { playerWinner: true, playerLooser: true },
+      include: { winner: true, looser: true },
     });
     return game;
   }
