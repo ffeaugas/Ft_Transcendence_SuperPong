@@ -1,10 +1,10 @@
 import styles from "@/styles/GamesHistoric/GameHistoricItem.module.css";
 
 type GameHistoricItem = {
-    winner: string;
-    looser: string;
-    // leftScore: number;
-    // rightScore: number;
+    winner: { username: string };
+    looser: { username: string };
+    winnerScore: number;
+    looserScore: number;
 };
 
 type GameHistoricItemProps = {
@@ -26,19 +26,21 @@ export default function GameHistoricItem({
     // }
     return (
         <div className={styles.gameHistoricItem}>
-            {username === game.winner && <h2 className={styles.win}>Win</h2>}
-            {username === game.looser && (
+            {username === game.winner.username && (
+                <h2 className={styles.win}>Win</h2>
+            )}
+            {username === game.looser.username && (
                 <h2 className={styles.loose}>Loose</h2>
             )}
             <div className={styles.infos}>
-                <p>{game.winner}</p>
-                {/* <p>
-          <b>{game.leftScore}</b>
-        </p>
-        <p>
-          <b>{game.rightScore}</b>
-        </p> */}
-                <p>{game.looser}</p>
+                <p>{game.winner.username}</p>
+                <p>
+                    <b>{game.winnerScore}</b>
+                </p>
+                <p>
+                    <b>{game.looserScore}</b>
+                </p>
+                <p>{game.looser.username}</p>
             </div>
         </div>
     );

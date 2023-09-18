@@ -189,10 +189,22 @@ export default class GameScene extends Phaser.Scene {
 
                     if (entity.data) {
                         const { serverX, serverY } = entity.data.values;
-                        entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-                        entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
-                        light.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-                        light.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+                        entity.x = Phaser.Math.Interpolation.Linear(
+                            [entity.x, serverX],
+                            0.8
+                        );
+                        entity.y = Phaser.Math.Interpolation.Linear(
+                            [entity.y, serverY],
+                            0.8
+                        );
+                        light.x = Phaser.Math.Interpolation.Linear(
+                            [entity.x, serverX],
+                            0.8
+                        );
+                        light.y = Phaser.Math.Interpolation.Linear(
+                            [entity.y, serverY],
+                            0.8
+                        );
                         if (this.ballEntity) {
                             this.room.send("ball", { h: dim[1], w: dim[0] });
                         }

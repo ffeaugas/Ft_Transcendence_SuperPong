@@ -5,6 +5,8 @@ import * as http from 'http';
 import { Server, Room } from 'colyseus';
 import { GameDto } from './game.dto';
 import { PrismaService } from './prisma/prisma.service';
+import { Users } from './users/users.model';
+import { connect } from 'http2';
 
 type Type<T> = new (...args: any[]) => T;
 
@@ -41,15 +43,28 @@ export class GameService implements OnApplicationShutdown {
     });
     const game = await this.prisma.game.create({
       data: {
-        winner: winner.username,
-        looser: looser.username,
+        winner: { connect: winner },
+        winnerScore: dto.winnerScore,
+        looser: { connect: looser },
+        looserScore: dto.looserScore,
       },
     });
     return game;
   }
 
-  async getGames() {
-    return await this.prisma.game.findMany();
+  async getGames(req: any) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    const games = await this.prisma.game.findMany({
+      where: { OR: [{ winner: user }, { looser: user }] },
+      include: { winner: true, looser: true },
+    });
+    games.forEach((game) => {
+      delete game.winner.hash;
+      delete game.looser.hash;
+    });
+    return games;
   }
 
   onApplicationShutdown(sig) {

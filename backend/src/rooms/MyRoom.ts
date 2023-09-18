@@ -66,11 +66,14 @@ export class MyRoom extends Room<MyRoomState> {
               const player_ = this.state.players.get(cli.sessionId);
               if (this.host != cli) {
                 dto.winner = player_.username;
+                dto.winnerScore = this.state.score[1];
+
                 cli.send('win', player_.username);
               } else {
                 dto.looser = this.state.players.get(
                   this.host.sessionId,
                 ).username;
+                dto.looserScore = this.state.score[0];
                 cli.send(
                   'loose',
                   this.state.players.get(this.host.sessionId).username,
@@ -89,11 +92,13 @@ export class MyRoom extends Room<MyRoomState> {
               const player_ = this.state.players.get(cli.sessionId);
               if (this.host != cli) {
                 dto.looser = player_.username;
+                dto.looserScore = this.state.score[1];
                 cli.send('loose', player_.username);
               } else {
                 dto.winner = this.state.players.get(
                   this.host.sessionId,
                 ).username;
+                dto.winnerScore = this.state.score[0];
                 cli.send(
                   'win',
                   this.state.players.get(this.host.sessionId).username,
