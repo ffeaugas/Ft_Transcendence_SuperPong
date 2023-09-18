@@ -12,16 +12,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.cursorPos = this.input.mousePointer.position;
     }
 
-    preload() {
-        // if (this.game.scene.getScene("GameBonus")) {
-        //   this.scene.restart();
-        //   console.log("REMOVE GAMESCENEB");
-        // }
-        // if (this.game.scene.getScene("LoadingBonus")) {
-        //   this.scene.remove("LoadingBonus");
-        //   console.log("REMOVE LOADSCENEB");
-        // }
-    }
+    preload() {}
 
     create() {
         console.log("MENU SCENE");
@@ -29,13 +20,17 @@ export default class MainMenuScene extends Phaser.Scene {
 
         // Play button
         const playButton = this.add
-            .rectangle(width * 0.5, height * 0.5, 150, 100, 0xffffff)
+            .rectangle(width * 0.5, height * 0.5, 150, 100, 0xaaaaaa)
             .setDisplaySize(150, 50);
         playButton.setName("PlayButton");
         const textPlay = this.add
-            .text(playButton.x, playButton.y, "Play Normal")
-            .setOrigin(0.5)
-            .setScale(1.2);
+            .text(playButton.x, playButton.y, "Play Normal", {
+                fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
+                fontSize: 25,
+                align: "center",
+                color: "#222222",
+            })
+            .setOrigin(0.5);
         textPlay.setTint(0x00000);
         // Settings button
         const customButton = this.add
@@ -44,12 +39,19 @@ export default class MainMenuScene extends Phaser.Scene {
                 height * 0.5 + playButton.height + 20,
                 150,
                 100,
-                0xffffff
+                0xaaaaaa
             )
             .setDisplaySize(150, 50);
         customButton.setName("CustomButton");
-        this.add.text(customButton.x, customButton.y, "Custom").setOrigin(0.5);
-
+        const textPlayCustom = this.add
+            .text(customButton.x, customButton.y, "Play Custom", {
+                fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
+                fontSize: 25,
+                align: "center",
+                color: "#222222",
+            })
+            .setOrigin(0.5);
+        textPlayCustom.setTint(0x00000);
         this.buttons.push(playButton);
         this.buttons.push(customButton);
     }
@@ -74,7 +76,7 @@ export default class MainMenuScene extends Phaser.Scene {
                     this.input.mousePointer.leftButtonDown()
                 ) {
                     console.log(button.name);
-                    this.scene.start("LoadingBonus");
+                    this.scene.start("LoadingSceneBonus");
                 }
             } else {
                 button.setScale(1);

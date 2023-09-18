@@ -4,7 +4,7 @@ import { Client, Room } from "colyseus.js";
 import { matchMaker } from "colyseus.js";
 
 // custom scene class
-export default class LoadingScene extends Phaser.Scene {
+export default class LoadingSceneBonus extends Phaser.Scene {
     // Initialize the client and room variables
     private client: Client;
     private room: Room;
@@ -24,7 +24,7 @@ export default class LoadingScene extends Phaser.Scene {
     score: number = 0;
 
     constructor() {
-        super("Loading");
+        super("LoadingSceneBonus");
     }
 
     async getUsername(): Promise<string> {
