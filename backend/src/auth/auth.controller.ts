@@ -24,22 +24,6 @@ export class AuthController {
     private userService: UsersService,
   ) {}
 
-  // @Post('2fa/turn-on')
-  // @UseGuards(AuthGuard)
-  // async turnOnTwoFactorAuthentication(
-  //   @Req() request: any,
-  //   @Body() dto: User2Fa,
-  // ) {
-  //   const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-  //     dto.twoFactorAuthenticationCode,
-  //     request.user,
-  //   );
-  //   if (!isCodeValid) {
-  //     throw new UnauthorizedException('Wrong authentication code');
-  //   }
-  //   await this.userService.setTwoFactorAuth(request, true);
-  // }
-
   @ApiOperation({ summary: 'login' })
   @Post('login')
   async login(@Body() dto: AuthDto) {
@@ -51,4 +35,16 @@ export class AuthController {
   async register(@Body() dto: AuthDto) {
     return await this.authService.register(dto);
   }
+
+  @Post('gen-otp')
+  async generateOTP(@Body() dto: GenOTPDTO) {}
+
+  @Post('verif-otp')
+  async verifyOTP(@Body() dto: VerifOTPDTO) {}
+
+  @Post('validate-otp')
+  async validateOTP(@Body() dto: ValidateOTPDTO) {}
+
+  @Post('disable-otp')
+  async disableOTP(@Body() dto: disableOTPDTO) {}
 }

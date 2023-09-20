@@ -234,27 +234,4 @@ export class UsersService {
     await this.profileService.deleteAllProfiles();
     return await this.prismaService.user.deleteMany();
   }
-
-  async setTwoFactorAuthSecret(secret: string, userId: number) {
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) throw new ForbiddenException('User not found');
-    return await this.prismaService.user.update({
-      where: { id: user.id },
-      data: { TwoFaSecret: secret },
-    });
-  }
-
-  async setTwoFactorAuth(req: Request, enabled: boolean) {
-    const user = await this.prismaService.user.update({
-      where: { id: req['user'].sub },
-      data: {
-        isTwoFaEnabled: enabled,
-      },
-    });
-    if (!user) throw new ForbiddenException('User not found');
-    delete user.hash;
-    return user;
-  }
 }
