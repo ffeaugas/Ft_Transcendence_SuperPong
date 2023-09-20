@@ -205,7 +205,7 @@ export default function ProfileEditor() {
                         ) : (
                             <img
                                 className={styles.rounded}
-                                src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
+                                src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
                             />
                         )}
                         <input
@@ -226,7 +226,7 @@ export default function ProfileEditor() {
                 ) : (
                     <img
                         className={styles.rounded}
-                        src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas.profilePicture}`}
+                        src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
                     />
                 )}
                 <button

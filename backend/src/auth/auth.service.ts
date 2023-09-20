@@ -96,46 +96,6 @@ export class AuthService {
     }
   }
 
-  async generateTwoFactorAuthenticationSecret(user: Users) {
-    const secret = authenticator.generateSecret();
-
-    const otpauthUrl = authenticator.keyuri(user.username, 'SuperPong', secret);
-
-    await this.usersService.setTwoFactorAuthSecret(secret, user.id);
-
-    return {
-      secret,
-      otpauthUrl,
-    };
-  }
-
-  isTwoFactorAuthenticationCodeValid(
-    twoFactorAuthenticationCode: string,
-    user: Users,
-  ) {
-    return authenticator.verify({
-      token: twoFactorAuthenticationCode,
-      secret: user.TwoFaSecret,
-    });
-  }
-
-  // @Post('2fa/turn-on')
-  // @UseGuards(JwtAuthGuard)
-  // async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
-  //   const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
-  //     body.twoFactorAuthenticationCode,
-  //     request.user,
-  //   );
-  //   if (!isCodeValid) {
-  //     throw new UnauthorizedException('Wrong authentication code');
-  //   }
-  //   await this.usersService.setTwoFactorAuth(request, true);
-  // }
-
-  // async generateQrCodeDataURL(otpAuthUrl: string) {
-  //   return toDataURL(otpAuthUrl);
-  // }
-
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);
     const payload = { sub: user.id, login: user.login, role: user.role };
