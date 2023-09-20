@@ -36,7 +36,11 @@
     "axios": "^1.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+<<<<<<< HEAD
     "colyseus": "^0.15.7",
+=======
+    "otplib": "^12.0.1",
+>>>>>>> cb6fdcd (two factor impl)
     "passport": "^0.6.0",
     "phaser": "^3.60.0",
     "reflect-metadata": "^0.1.13",
@@ -61,6 +65,7 @@
     "prettier": "^2.8.8",
     "prisma": "^5.3.1",
     "prisma-dbml-generator": "^0.10.0",
+    "qrcode": "^1.5.3",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",

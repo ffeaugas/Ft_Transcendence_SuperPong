@@ -9,6 +9,8 @@ import { Users } from 'src/users/users.model';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'node:fs';
 import { firstValueFrom } from 'rxjs';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -93,12 +95,55 @@ export class AuthService {
     }
   }
 
+  async generateTwoFactorAuthenticationSecret(user: Users) {
+    const secret = authenticator.generateSecret();
+
+    const otpauthUrl = authenticator.keyuri(user.username, 'SuperPong', secret);
+
+    await this.usersService.setTwoFactorAuthSecret(secret, user.id);
+
+    return {
+      secret,
+      otpauthUrl,
+    };
+  }
+
+  isTwoFactorAuthenticationCodeValid(
+    twoFactorAuthenticationCode: string,
+    user: Users,
+  ) {
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.TwoFaSecret,
+    });
+  }
+
+  @Post('2fa/turn-on')
+  @UseGuards(JwtAuthGuard)
+  async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+    const isCodeValid = this.isTwoFactorAuthenticationCodeValid(
+      body.twoFactorAuthenticationCode,
+      request.user,
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+    await this.usersService.setTwoFactorAuth(request, true);
+  }
+
+  async generateQrCodeDataURL(otpAuthUrl: string) {
+    return toDataURL(otpAuthUrl);
+  }
+
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);
     const payload = { sub: user.id, login: user.login, role: user.role };
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
+    } else if (user.isTwoFaEnabled) {
+      // if () {}
+      // TODO VERIFY THE 2FA
     }
     return { access_token: await this.jwtService.signAsync(payload) };
   }
