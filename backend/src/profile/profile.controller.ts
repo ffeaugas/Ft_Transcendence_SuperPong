@@ -7,23 +7,15 @@ import {
   Post,
   Query,
   Req,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ProfileBioUpdateDto, ProfileDto } from './dto';
+import { ProfileBioUpdateDto, ProfilePictureUpdateDto } from './dto';
 import { Request } from 'express';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
-import { Express } from 'express';
 
 @Controller('profiles')
 @ApiBearerAuth()
@@ -50,27 +42,15 @@ export class ProfileController {
   @UseInterceptors(FileInterceptor('image'))
   async updateProfilePicture(
     @Req() req: Request,
-    @UploadedFile() image: Express.Multer.File,
+    @Body() dto: ProfilePictureUpdateDto,
   ) {
-    return await this.profileService.updateProfilePicture(req, image);
+    return await this.profileService.updateProfilePicture(req, dto);
   }
 
   @Patch('update-bio')
   async updateProfileBio(@Body() dto: ProfileBioUpdateDto) {
     return await this.profileService.updateProfileBio(dto);
   }
-
-  // @Patch('')
-  // @ApiCreatedResponse({
-  //   description: 'Update profile bio.',
-  //   type: ProfileDto,
-  // })
-  // async updateBioProfile(
-  //   @Query('username') user: string,
-  //   @Body() dto: ProfileDto,
-  // ) {
-  //   return await this.profileService.updateBioProfile(user, dto);
-  // }
 
   @Delete()
   async deleteProfiles(

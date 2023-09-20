@@ -12,7 +12,6 @@ export const useRegister = () => {
     };
 
     const handleRegister = async (values: any, { resetForm }: any) => {
-        console.log("ALOALOALOALOALOALOALO");
         const { login, password } = values;
         const registeredUser = { login, password };
         const res = await fetch(

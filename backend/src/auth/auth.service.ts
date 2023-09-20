@@ -55,6 +55,7 @@ export class AuthService {
           profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
+      console.log('USERDATA : ', userData);
       this.downloadImage(
         userData.image.link,
         userData.login + '_' + +newUser.id,
