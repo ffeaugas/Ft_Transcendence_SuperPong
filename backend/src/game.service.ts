@@ -50,6 +50,18 @@ export class GameService implements OnApplicationShutdown {
       },
       include: { winner: true, looser: true },
     });
+    const winnerProfile = await this.prisma.profile.update({
+      where: { userId: winner.id },
+      data: {
+        winCount: { increment: 1 },
+      },
+    });
+    const looserProfile = await this.prisma.profile.update({
+      where: { userId: looser.id },
+      data: {
+        loseCount: { increment: 1 },
+      },
+    });
     return game;
   }
 
