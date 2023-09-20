@@ -55,15 +55,13 @@ export class AuthService {
           profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
-      console.log('USERDATA : ', userData);
-      this.downloadImage(
+      await this.downloadImage(
         userData.image.link,
         userData.login + '_' + +newUser.id,
       );
     } else {
       user.login = userData.login;
       user.password = userFound.hash;
-      console.log(userData.email);
     }
     const res = await this.login(user);
     return [res, isFirstConnection];
