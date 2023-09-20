@@ -37,6 +37,11 @@ export class MyRoom extends Room<MyRoomState> {
         this.mooving_ball = 1;
       }
     });
+    this.onMessage('leave', (cli) => {
+      this.clients.forEach((client) => {
+        client.send('otherLeft');
+      });
+    });
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       if (this.mooving_ball == 0 && player.get_ball != 0) {
@@ -67,7 +72,6 @@ export class MyRoom extends Room<MyRoomState> {
               if (this.host != cli) {
                 dto.winner = player_.username;
                 dto.winnerScore = this.state.score[1];
-
                 cli.send('win', player_.username);
               } else {
                 dto.looser = this.state.players.get(

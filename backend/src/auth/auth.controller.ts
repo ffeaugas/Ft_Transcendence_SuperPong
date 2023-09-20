@@ -36,15 +36,15 @@ export class AuthController {
     return await this.authService.register(dto);
   }
 
-  @Post('gen-otp')
-  async generateOTP(@Body() dto: GenOTPDTO) {}
+  // @Post('gen-otp')
+  // async generateOTP(@Body() dto: GenOTPDTO) {}
 
-  @Post('verif-otp')
-  async verifyOTP(@Body() dto: VerifOTPDTO) {}
+  // @Post('verif-otp')
+  // async verifyOTP(@Body() dto: VerifOTPDTO) {}
 
-  @Post('validate-otp')
-  async validateOTP(@Body() dto: ValidateOTPDTO) {}
+  // @Post('validate-otp')
+  // async validateOTP(@Body() dto: ValidateOTPDTO) {}
 
-  @Post('disable-otp')
-  async disableOTP(@Body() dto: disableOTPDTO) {}
+  // @Post('disable-otp')
+  // async disableOTP(@Body() dto: disableOTPDTO) {}
 }

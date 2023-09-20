@@ -40,6 +40,11 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
         this.mooving_ball = 1;
       }
     });
+    this.onMessage('leave', (cli) => {
+      this.clients.forEach((client) => {
+        client.send('otherLeft');
+      });
+    });
     this.onMessage('ball', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       if (this.mooving_ball == 0 && player.get_ball != 0) {
@@ -48,8 +53,8 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
       else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
       if (this.bonus == 0) {
-        const xBonus = Math.random() * data.w;
-        const yBonus = Math.random() * data.h;
+        const xBonus = Math.random() * (data.w / 1.5) + 50;
+        const yBonus = Math.random() * (data.h / 1.5) + 50;
         this.random = Math.random();
         this.clients.forEach((client) => {
           client.send('spawnBonus', {
