@@ -26,7 +26,7 @@ export class UsersService {
     const passwordHash: string = await argon.hash(dto.password);
     const newUser = await this.prismaService.user.create({
       data: {
-        username: dto.login + '_' + Math.random().toString(36).slice(-16),
+        username: dto.login + '_' + Math.random().toString(36).slice(-3),
         login: dto.login,
         hash: passwordHash,
         user42: user42,

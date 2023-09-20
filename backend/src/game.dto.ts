@@ -13,4 +13,8 @@ export class GameDto {
   winner: string;
   @IsString()
   looser: string;
+  @IsString()
+  winnerScore: number;
+  @IsString()
+  looserScore: number;
 }

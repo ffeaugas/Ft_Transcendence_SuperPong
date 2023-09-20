@@ -3,18 +3,21 @@ import { MyRoomState, Player, Ball } from './schema/MyRoomState';
 import { GameDto } from 'src/game.dto';
 import { GameService } from 'src/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { getRandomValues } from 'crypto';
 
 const prisma = new PrismaService();
 
-export class MyRoom extends Room<MyRoomState> {
+export class MyRoomGameBonus extends Room<MyRoomState> {
   maxClients = 2;
   player = ['', ''];
   direction = 0;
   refresh = 0;
+  bonus = 0;
   i = 0;
   mooving_ball = 0;
   host: Client;
   game: GameService;
+  random = 0;
 
   onCreate(options: any) {
     this.game = new GameService(prisma);
@@ -44,11 +47,47 @@ export class MyRoom extends Room<MyRoomState> {
       }
       if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
       else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
+      if (this.bonus == 0) {
+        const xBonus = Math.random() * data.w;
+        const yBonus = Math.random() * data.h;
+        this.random = Math.random();
+        this.clients.forEach((client) => {
+          client.send('spawnBonus', {
+            x: xBonus,
+            y: yBonus,
+          });
+        });
+        this.bonus = 1;
+      }
+      if (
+        data.bonusPos[0] - 10 < this.state.balls.x + 14 &&
+        data.bonusPos[0] + 10 > this.state.balls.x - 14 &&
+        data.bonusPos[1] - 10 < this.state.balls.y + 8 &&
+        data.bonusPos[1] + 10 > this.state.balls.y - 8 &&
+        this.bonus == 1
+      ) {
+        this.clients.forEach((cli) => {
+          if (this.direction > 0 && this.host.sessionId == cli.sessionId) {
+            if (this.random > 0.5)
+              cli.send('touchBonus', { cli: this.host, wrong: 0 });
+            else cli.send('touchBonus', { cli: this.host, wrong: 1 });
+          } else if (this.direction < 0 && this.host.sessionId != cli.sessionId)
+            if (this.random > 0.5)
+              cli.send('touchBonus', { cli: cli, wrong: 0 });
+            else cli.send('touchBonus', { cli: cli, wrong: 1 });
+          else {
+            if (this.random > 0.5)
+              cli.send('otherTouch', { cli: cli, wrong: 0 });
+            else cli.send('otherTouch', { cli: cli, wrong: 1 });
+          }
+        });
+        this.bonus = 0;
+      }
       if (
         player.x < this.state.balls.x + 14 &&
         player.x > this.state.balls.x - 14 &&
-        player.y - 50 < this.state.balls.y + 8 &&
-        player.y + 50 > this.state.balls.y - 8 &&
+        player.y - data.playerHeight < this.state.balls.y + 8 &&
+        player.y + data.playerHeight > this.state.balls.y - 8 &&
         this.refresh == 0
       ) {
         this.direction *= -1.05;
@@ -143,6 +182,7 @@ export class MyRoom extends Room<MyRoomState> {
     const player = new Player();
     player.username = options.name;
     // console.log(player.username);
+
     if (!this.player[0]) {
       player.x = mapWidth * 0.01;
       player.y = mapHeight / 2;
@@ -176,12 +216,8 @@ export class MyRoom extends Room<MyRoomState> {
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, 'left!');
+    client.leave();
     this.state.players.delete(client.sessionId);
-    if (this.player[0] == client.sessionId) {
-      this.player[0] = '';
-    } else {
-      this.player[1] = '';
-    }
   }
 
   onDispose() {

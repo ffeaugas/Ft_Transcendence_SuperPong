@@ -1,6 +1,8 @@
 import MainMenuScene from "./scenes/menu";
 import GameScene from "./scenes/main";
+import GameSceneBonus from "./scenes/gameBonus";
 import LoadingScene from "./scenes/loading";
+import LoadingSceneBonus from "./scenes/loadingBonusGame";
 import { useEffect } from "react";
 import "phaser";
 
@@ -33,8 +35,14 @@ export default function Index() {
                     min: 60,
                     forceSetTimeOut: true,
                 },
-                pixelArt: true,
-                scene: [MainMenuScene, GameScene, LoadingScene],
+                // pixelArt: true,
+                scene: [
+                    MainMenuScene,
+                    GameScene,
+                    LoadingScene,
+                    LoadingSceneBonus,
+                    GameSceneBonus,
+                ],
             };
             gameInstance = new Phaser.Game(config);
         };

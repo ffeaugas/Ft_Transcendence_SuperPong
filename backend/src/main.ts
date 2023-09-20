@@ -7,13 +7,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
 import { PrismaService } from './prisma/prisma.service';
 import { MyRoom } from './rooms/MyRoom';
+import { MyRoomGameBonus } from './rooms/MyRoomGameBonus';
 
 const prisma = new PrismaService();
 
-const ROOMS = [MyRoom];
+const ROOMS = [MyRoom, MyRoomGameBonus];
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableCors({ origin: '*' });
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     index: false,
     prefix: '/uploads',
@@ -31,7 +33,6 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  app.enableCors({ origin: '*' });
   const name = 'General';
   try {
     const general = await prisma.channel.create({

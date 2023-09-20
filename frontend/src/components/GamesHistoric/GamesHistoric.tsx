@@ -9,8 +9,8 @@ type GamesHistoricProps = {
 
 type GameHistoricItem = {
     id: number;
-    winner: string;
-    looser: string;
+    // winner: string;
+    // looser: string;
     // leftScore: number;
     // rightScore: number;
 };
@@ -21,13 +21,13 @@ export default function GamesHistoric({ username }: GamesHistoricProps) {
     async function getGames(): Promise<any> {
         try {
             const res = await axios.get(
-                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/games`
-                // {
-                //     headers: {
-                //         Authorization:
-                //             "Bearer " + localStorage.getItem("token"),
-                //     },
-                // }
+                `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/games`,
+                {
+                    headers: {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("token"),
+                    },
+                }
             );
             const games = res.data;
             return games;

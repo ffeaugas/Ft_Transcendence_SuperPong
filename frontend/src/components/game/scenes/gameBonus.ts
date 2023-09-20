@@ -1,9 +1,10 @@
 import "phaser";
 import { Client, Room } from "colyseus.js";
 import { matchMaker } from "colyseus.js";
+import LoadingSceneBonus from "./loadingBonusGame";
 
 // custom scene class
-export default class GameScene extends Phaser.Scene {
+export default class GameSceneBonus extends Phaser.Scene {
     // Initialize the client and room variables
     private room: Room;
     nb_client: number = 0;
@@ -21,11 +22,12 @@ export default class GameScene extends Phaser.Scene {
     counter = 0;
     score: number = 0;
     KeyF;
+    bonusPos = [0, 0];
+    bonusEntity;
     player: any;
-    ball_satus = 0;
 
     constructor() {
-        super("Game");
+        super("GameBonus");
     }
 
     // async postGame(data): Promise<string> {
@@ -48,6 +50,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.scene.stop("LoadingBonus");
         // preload scene
         let dim = [this.game.canvas.width, this.game.canvas.height];
         this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -70,10 +73,11 @@ export default class GameScene extends Phaser.Scene {
         this.ballEntity = this.add.rectangle(dim[0], dim[1], 15, 15, 0x006600);
         this.ballLight = this.add.pointlight(dim[0], dim[1], 0x000a10, 275);
         this.ballLight.intensity = 0.25;
+        this.bonusEntity = this.add.rectangle(-500, -500, 20, 20, 0xff0000);
     }
 
     async create() {
-        console.log("Joining game normal room...");
+        console.log("Joining custom game room...");
 
         try {
             // this.scale.displaySize.setAspectRatio(
@@ -131,6 +135,10 @@ export default class GameScene extends Phaser.Scene {
                 entity.setData("serverX", player.x);
                 //entity.y=player.y;
                 if (player.status == 1) {
+                    this.room.onMessage("connected", (players) => {
+                        // this.player = players.username;
+                        console.log(this.player);
+                    });
                     this.room.send("updateStatus", 2);
                     entity.setData("serverY", player.y);
                 }
@@ -167,13 +175,8 @@ export default class GameScene extends Phaser.Scene {
                     this.room.send("move", dim[1] - 50);
                 else this.room.send("move", this.input.mousePointer.y);
             }
-            if (
-                this.room &&
-                this.cursorKeys.space.isDown &&
-                this.ball_satus == 0
-            ) {
+            if (this.room && this.cursorKeys.space.isDown) {
                 this.room.send("launch");
-                this.ball_satus = 1;
             }
             if (this.room && this.KeyF.isDown) {
                 try {
@@ -183,31 +186,50 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
             if (this.room) {
+                this.room.onMessage("spawnBonus", (data) => {
+                    this.bonusEntity.x = data.x;
+                    this.bonusEntity.y = data.y;
+                    this.bonusPos[0] = data.x;
+                    this.bonusPos[1] = data.y;
+                });
+                this.room.onMessage("touchBonus", (struct) => {
+                    this.bonusEntity.x = -500;
+                    this.bonusEntity.y = -500;
+                    var entity = this.playerEntities[struct.cli.sessionId];
+                    if (struct.wrong == 0) entity.setScale(1.5);
+                    if (struct.wrong == 1) entity.setScale(0.5);
+                });
+                this.room.onMessage("otherTouch", (struct) => {
+                    for (let sessionId in this.playerEntities) {
+                        if (sessionId != struct.cli.sessionId) {
+                            this.bonusEntity.x = -500;
+                            this.bonusEntity.y = -500;
+                            if (struct.wrong == 0)
+                                this.playerEntities[sessionId].setScale(1.5);
+                            if (struct.wrong == 1)
+                                this.playerEntities[sessionId].setScale(0.5);
+                        }
+                    }
+                });
+                // this.room.onMessage("otherWrongTouch", (cli) => {
+                //   for (let sessionId in this.playerEntities) {
+                //     if (sessionId != cli.sessionId) {
+                //       this.playerEntities[sessionId].setScale(0.75);
+                //       this.bonusEntity.x = -500;
+                //       this.bonusEntity.y = -500;
+                //     }
+                //   }
+                // });
                 for (let sessionId in this.playerEntities) {
                     const entity = this.playerEntities[sessionId];
                     const light = this.playersLight[sessionId];
 
                     if (entity.data) {
                         const { serverX, serverY } = entity.data.values;
-                        entity.x = Phaser.Math.Interpolation.Linear(
-                            [entity.x, serverX],
-                            0.8
-                        );
-                        entity.y = Phaser.Math.Interpolation.Linear(
-                            [entity.y, serverY],
-                            0.8
-                        );
-                        light.x = Phaser.Math.Interpolation.Linear(
-                            [entity.x, serverX],
-                            0.8
-                        );
-                        light.y = Phaser.Math.Interpolation.Linear(
-                            [entity.y, serverY],
-                            0.8
-                        );
-                        if (this.ballEntity) {
-                            this.room.send("ball", { h: dim[1], w: dim[0] });
-                        }
+                        entity.x = Phaser.Math.Linear(entity.x, serverX, 0.7);
+                        entity.y = Phaser.Math.Linear(entity.y, serverY, 0.7);
+                        light.x = Phaser.Math.Linear(entity.x, serverX, 0.7);
+                        light.y = Phaser.Math.Linear(entity.y, serverY, 0.7);
                         this.room.onMessage("ballPos", (ball) => {
                             this.ballEntity.x = ball.x;
                             this.ballEntity.y = ball.y;
@@ -215,6 +237,15 @@ export default class GameScene extends Phaser.Scene {
                             this.ballLight.y = ball.y;
                         });
                         if (this.finish !== 1) {
+                            if (this.ballEntity) {
+                                this.room.send("ball", {
+                                    h: dim[1],
+                                    w: dim[0],
+                                    bonusPos: this.bonusPos,
+                                    playerHeight:
+                                        (entity.height * entity.scale) / 2,
+                                });
+                            }
                             this.room.onMessage("score", (score) => {
                                 this.scoreEntities[0].setText(
                                     score[0].toString() +
@@ -222,7 +253,6 @@ export default class GameScene extends Phaser.Scene {
                                         score[1].toString()
                                 );
                             });
-                            this.ball_satus = 0;
                         }
                         if (this.room && this.ballEntity) {
                             this.room.onMessage("boom", (client) => {
@@ -311,6 +341,7 @@ export default class GameScene extends Phaser.Scene {
                         }
 
                         this.events.on("destroy", () => {
+                            this.registry.destroy(); // destroy registry
                             this.room.leave();
                         });
                     }
