@@ -25,7 +25,7 @@ export class UsersService {
     const passwordHash: string = await argon.hash(dto.password);
     const newUser = await this.prismaService.user.create({
       data: {
-        username: dto.login + '_' + Math.random().toString(36).slice(-16),
+        username: dto.login + '_' + Math.random().toString(36).slice(-3),
         login: dto.login,
         hash: passwordHash,
         user42: user42,
@@ -38,6 +38,28 @@ export class UsersService {
     });
     delete newUser.hash;
     return newUser;
+  }
+
+  async getOnlineUsers() {
+    const users = await this.prismaService.user.findMany();
+    const date = Math.floor(Date.now() / 1000); //Time in second
+    const onlineUsers = users.filter((user) => {
+      return date - user.lastConnexionPing < 2; //Consider "offline" every user that hasnt ping during 2 sec
+    });
+    return onlineUsers.map((onlineUser) => onlineUser.username);
+  }
+
+  async updateUserStatus(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const date = Math.floor(Date.now() / 1000); //Time in second
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: req.user.sub },
+      data: { lastConnexionPing: date },
+    });
+    return updatedUser;
   }
 
   async updateUserRelation(req: any, dto: UserRelationChangeDto) {
@@ -72,7 +94,7 @@ export class UsersService {
       updatedFriends = [...user.friends, targetUser];
     } else {
       updatedFriends = user.friends.filter(
-        (friend) => friend.username != dto.targetUsername,
+        (friend: User) => friend.username != dto.targetUsername,
       );
     }
     const updatedFriendUsers = await this.prismaService.user.update({
@@ -96,7 +118,7 @@ export class UsersService {
       updatedBlockeds = [...user.blockedUsers, targetUser];
     } else {
       updatedBlockeds = user.blockedUsers.filter(
-        (blockedUser) => blockedUser.username != dto.targetUsername,
+        (blockedUser: User) => blockedUser.username != dto.targetUsername,
       );
     }
     const updatedBlockedUsers = await this.prismaService.user.update({

@@ -1,10 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProfileBioUpdateDto, ProfileDto } from './dto';
+import { ProfileBioUpdateDto, ProfilePictureUpdateDto } from './dto';
 import { Request, Express } from 'express';
-import { Multer } from 'multer';
-import { HttpService } from '@nestjs/axios';
 import * as fs from 'node:fs';
 import { join } from 'path';
 
@@ -48,26 +46,40 @@ export class ProfileService {
     });
   }
 
-  private async updateUserProfilePicture(
-    userId: number,
-    imageUrl: string,
-  ): Promise<void> {
-    await this.prisma.profile.update({
-      where: { userId },
-      data: { profilePicture: imageUrl },
-    });
-  }
+  // async downloadImage(picture: string, imageName: string) {
+  //   const writer = fs.createWriteStream(`./uploads/avatar/${imageName}.jpeg`);
+  //   const response = await this.httpService.axiosRef({
+  //     url: picture,
+  //     method: 'GET',
+  //     responseType: 'stream',
+  //   });
+  //   response.data.pipe(writer);
+  //   return new Promise((resolve, reject) => {
+  //     writer.on('finish', resolve);
+  //     writer.on('error', reject);
+  //   });
+  // }
 
-  async updateProfilePicture(req: Request, image: any) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: req['user'].sub },
-    });
-    if (!user) throw new ForbiddenException('User not found.');
-    const newImgUrl = await this.saveImage(image);
-    await this.updateUserProfilePicture(user.id, newImgUrl);
+  // private async updateUserProfilePicture(
+  //   userId: number,
+  //   imageUrl: string,
+  // ): Promise<void> {
+  //   await this.prisma.profile.update({
+  //     where: { userId },
+  //     data: { profilePicture: imageUrl },
+  //   });
+  // }
 
-    return { message: 'Profile picture updated successfully' };
-  }
+  // async updateProfilePicture(req: Request, dto: ProfilePictureUpdateDto) {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: req['user'].sub },
+  //   });
+  //   if (!user) throw new ForbiddenException('User not found.');
+  //   const newImgUrl = await this.saveImage(dto.image);
+  //   await this.updateUserProfilePicture(user.id, newImgUrl);
+
+  //   return { message: 'Profile picture updated successfully' };
+  // }
 
   async updateProfileBio(dto: ProfileBioUpdateDto) {
     const userFounded = await this.prisma.user.findUnique({

@@ -29,7 +29,7 @@ export class UsersController {
 
   @Get('blockeds')
   async getBlockeds(@Req() req: Request) {
-    return this.usersService.getFriends(req);
+    return this.usersService.getBlockeds(req);
   }
 
   @Get('relation')
@@ -40,12 +40,22 @@ export class UsersController {
     return this.usersService.getRelationToUser(req, username);
   }
 
+  @Get('onlineUsers')
+  async getOnlineUsers() {
+    return this.usersService.getOnlineUsers();
+  }
+
   @Patch('changeRelation')
   async updateUserRelation(
     @Req() req: Request,
     @Body() dto: UserRelationChangeDto,
   ) {
     return await this.usersService.updateUserRelation(req, dto);
+  }
+
+  @Patch('updateStatus')
+  async updateUserStatus(@Req() req: Request) {
+    return await this.usersService.updateUserStatus(req);
   }
 
   @Get('channels')

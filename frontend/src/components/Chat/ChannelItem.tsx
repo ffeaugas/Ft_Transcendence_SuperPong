@@ -3,8 +3,6 @@
 import axios from "axios";
 import styles from "../../styles/Chat/ChannelItem.module.css";
 import { useEffect, useState } from "react";
-import userSlice from "@/app/GlobalRedux/Features/user/userSlice";
-import { useRegister } from "../Register/hook/useRegister";
 
 enum ChannelType {
   PUBLIC = "PUBLIC",
@@ -44,7 +42,7 @@ export default function ChannelItem({
 
     try {
       const res = await axios.patch(
-        "http://10.5.0.3:3001/channels/get-authorization",
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/get-authorization`,
         {
           channelName: channelName,
           password: password,

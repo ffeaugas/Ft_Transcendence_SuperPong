@@ -3,46 +3,49 @@ import Header from "@/components/Header";
 import AchievementItem from "@/components/Achievements/AchievementItem";
 
 type Achievement = {
-  id: number;
-  title: string;
-  description: string;
-  picture: string;
+    id: number;
+    title: string;
+    description: string;
+    picture: string;
 };
 
 export default async function Achievements() {
-  const achievements: Achievement[] | undefined = await getAchievements();
+    const achievements: Achievement[] | undefined = await getAchievements();
 
-  async function getAchievements(): Promise<Achievement[] | undefined> {
-    const res = await fetch("http://10.5.0.3:3001/achievement/all", {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      console.log(res);
-      throw new Error("Failed fetching achievements");
+    async function getAchievements(): Promise<Achievement[] | undefined> {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/achievement/all`,
+            {
+                cache: "no-store",
+            }
+        );
+        if (!res.ok) {
+            console.log(res);
+            throw new Error("Failed fetching achievements");
+        }
+        const response = await res.json();
+        return response;
     }
-    const response = await res.json();
-    return response;
-  }
 
-  if (!achievements) {
-    return <p>...</p>;
-  }
+    if (!achievements) {
+        return <p>...</p>;
+    }
 
-  return (
-    <section className={styles.page}>
-      <Header />
-      <h1>Achievements</h1>
-      <div className={styles.achievements}>
-        <ul>
-          {achievements.map((achievement) => (
-            <AchievementItem
-              key={achievement.id}
-              achievement={achievement}
-              isPageDisplay={true}
-            />
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
+    return (
+        <section className={styles.page}>
+            <Header />
+            <h1>Achievements</h1>
+            <div className={styles.achievements}>
+                <ul>
+                    {achievements.map((achievement) => (
+                        <AchievementItem
+                            key={achievement.id}
+                            achievement={achievement}
+                            isPageDisplay={true}
+                        />
+                    ))}
+                </ul>
+            </div>
+        </section>
+    );
 }

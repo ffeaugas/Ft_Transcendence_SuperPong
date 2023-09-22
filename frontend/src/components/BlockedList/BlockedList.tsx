@@ -1,53 +1,99 @@
-import styles from "@/styles/BlockedList/BlockedList.module.css";
-import BlockedItem from "./BlockedItem";
-import { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import styles from "@/styles/BlockedList/BlockedList.module.css";
 
-type BlockedListProps = {
+enum RelationType {
+  FRIEND = "FRIEND",
+  BLOCK = "BLOCK",
+}
+
+type BlockedUser = {
+  id: number;
   username: string;
 };
 
-type BlockedItem = {
-  id: string;
-  username: string;
-  profile: any;
-  status: string;
-};
+export default function BlockedList() {
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[] | undefined>(
+    undefined
+  );
+  const [userToDeblock, setUserToDeblock] = useState<string>("");
 
-export default function BlockedList({ username }: BlockedListProps) {
-  const [blockeds, setFriends] = useState<BlockedItem[] | undefined>(undefined);
-
-  async function getFriends(): Promise<BlockedItem[] | undefined> {
+  async function getBlockedUsers(): Promise<BlockedUser[] | undefined> {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/users/blockeds", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-      const blockeds = res.data;
-      console.log(blockeds);
-      return blockeds;
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/blockeds`,
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          cache: "no-store",
+        }
+      );
+      const blocked = await res.json();
+      console.log("BLOCKED :", blocked);
+      return blocked;
     } catch (error) {
-      console.error("Error fetching user blockeds", error);
+      console.error("Error fetching blocked users", error);
       return undefined;
     }
   }
 
-  useEffect(() => {
-    getFriends().then((blockeds) => {
-      setFriends(blockeds);
-    });
-  }, []);
+  const handleRelationChange = async (evt: any) => {
+    evt.preventDefault();
 
-  if (!blockeds) return <p>...</p>;
+    try {
+      const res = await axios.patch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/changeRelation`,
+        {
+          targetUsername: userToDeblock,
+          relationType: RelationType.BLOCK,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const profileDatas = res.data;
+      setTimeout(() => {
+        getBlockedUsers().then((res) => setBlockedUsers(res));
+      }, 300);
+      return profileDatas;
+    } catch (error) {
+      console.error("Error fetching profile datas", error);
+      return undefined;
+    }
+  };
+
+  function handleChange(evt: any): void {
+    const { name, value } = evt.target;
+    setUserToDeblock(value);
+  }
+
+  useEffect(() => {
+    getBlockedUsers().then((res) => setBlockedUsers(res));
+  }, []);
   return (
-    <div className={styles.blockedList}>
-      <h3>{username}'s blocked list :</h3>
-      <ul>
-        {blockeds.map((blocked) => (
-          <BlockedItem key={blocked.id} blockedDatas={blocked} />
-        ))}
-      </ul>
-    </div>
+    <form onSubmit={(evt) => handleRelationChange(evt)}>
+      <div className={styles.subform}>
+        <label htmlFor="deblock">Deblock user :</label>
+        <select
+          name="deblock"
+          id="deblock"
+          value={userToDeblock}
+          onChange={handleChange}
+        >
+          <option value=""></option>
+          {blockedUsers
+            ? blockedUsers.map((optionUser: BlockedUser) => (
+                <option key={optionUser.id} value={optionUser.username}>
+                  {optionUser.username}
+                </option>
+              ))
+            : undefined}
+        </select>
+        <input type="submit" value="Deblock" />
+      </div>
+    </form>
   );
 }

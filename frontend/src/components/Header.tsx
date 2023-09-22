@@ -18,12 +18,15 @@ async function getProfileDatas(
 ): Promise<ProfileDatas | undefined> {
   if (username) {
     try {
-      const res = await axios.get("http://10.5.0.3:3001/profiles", {
-        params: { username: username },
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+      const res = await axios.get(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
+        {
+          params: { username: username },
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
       const profileDatas = res.data;
       return profileDatas;
     } catch (error) {
@@ -43,12 +46,15 @@ export default function Header() {
   const username = useSelector((state: RootState) => state.user.username);
 
   async function getUsername(): Promise<string> {
-    const res = await fetch("http://10.5.0.3:3001/users/me", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/me`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
     const user = await res.json();
     return user["username"];
   }
@@ -64,7 +70,28 @@ export default function Header() {
     router.push("/");
   };
 
+  async function updateStatus() {
+    if (!username || username === "") return;
+    try {
+      const updatedStatus = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/updatestatus`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
+    setInterval(() => {
+      updateStatus();
+    }, 1000);
     const auth = localStorage.getItem("Authenticate") === "true";
     setAuth(auth);
     if (auth) {
@@ -89,22 +116,26 @@ export default function Header() {
               Home
             </Link>
           </li>
-          <li>
-            <Link
-              href="/game"
-              className={pathname == "/game" ? styles.isActive : ""}
-            >
-              Game
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/social"
-              className={pathname == "/social" ? styles.isActive : ""}
-            >
-              Social
-            </Link>
-          </li>
+          {auth && (
+            <li>
+              <Link
+                href="/game"
+                className={pathname == "/game" ? styles.isActive : ""}
+              >
+                Game
+              </Link>
+            </li>
+          )}
+          {auth && (
+            <li>
+              <Link
+                href="/social"
+                className={pathname == "/social" ? styles.isActive : ""}
+              >
+                Social
+              </Link>
+            </li>
+          )}
           <li>
             <Link
               href="/achievements"
@@ -137,7 +168,7 @@ export default function Header() {
                 ) : (
                   <img
                     className={`${styles.rounded}`}
-                    src={`http://10.5.0.3:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+                    src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
                   />
                 )}
                 <div className={styles.userInfo}>

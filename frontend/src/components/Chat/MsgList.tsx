@@ -33,7 +33,7 @@ export default function MsgList({
   const username = useSelector((state: RootState) => state.user.username);
 
   async function socketInitializer(): Promise<any> {
-    const socket = io("http://10.5.0.3:3001");
+    const socket = io(`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
 
     socket?.on("connect", () => {
       console.log("connected");
@@ -67,14 +67,17 @@ export default function MsgList({
           receiver: activeDiscussion,
         };
       }
-      const res = await fetch("http://10.5.0.3:3001/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(data),
+        }
+      );
     } catch (error) {
       console.error("Error adding a new message", error);
     }
@@ -83,12 +86,15 @@ export default function MsgList({
   async function getMessages(): Promise<Message[] | undefined> {
     if (activeDiscussionType === ActiveDiscussionType.CHANNEL) {
       try {
-        const res = await axios.get("http://10.5.0.3:3001/channels/messages", {
-          params: { channelName: activeDiscussion },
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        });
+        const res = await axios.get(
+          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/channels/messages`,
+          {
+            params: { channelName: activeDiscussion },
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
         const messages = res.data;
         return messages;
       } catch (error) {
@@ -98,7 +104,7 @@ export default function MsgList({
     } else {
       try {
         const res = await axios.get(
-          `http://10.5.0.3:3001/message/${activeDiscussion}`,
+          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/message/${activeDiscussion}`,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token"),

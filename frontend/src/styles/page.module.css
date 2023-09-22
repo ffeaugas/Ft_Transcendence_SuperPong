@@ -37,9 +37,10 @@ img.rounded {
   align-items: center;
   gap: 10px;
   width: 30%;
-  background-color: rgba(151, 59, 236, 0.151);
+  border: 2px solid var(--backgroundColor3);
+  background-color: #03121daf;
   padding: var(--padding1);
-  border-radius: 10px;
+  /* border-radius: 10px; */
 }
 
 .editProfile {
@@ -110,11 +111,11 @@ img.rounded {
 /*================ ACHIEVEMENT PAGE ================*/
 
 .achievements {
-  /* background-color: var(--backgroundColor1); */
-  background-color: #03121da4;
+  background-color: #03121de1;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  border-radius: 5px;
 }
 
 .achievements ul {
@@ -184,4 +185,11 @@ img.rounded {
 
 .rankTitle {
   flex: 3;
+}
+
+/*================ HOME PAGE ================*/
+
+.centered-element {
+  margin-left: auto;
+  margin-right: auto;
 }

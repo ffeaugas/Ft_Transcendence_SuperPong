@@ -4,21 +4,22 @@ type FriendItem = {
   id: string;
   username: string;
   profile: any;
-  status: string;
 };
 
 type FriendDatasProps = {
   friendDatas: FriendItem;
+  isOnline: boolean;
 };
 
-export default function FriendItem({ friendDatas }: FriendDatasProps) {
-  let status = friendDatas.status;
-  let dynamicClassName = `${styles[status]}`;
+export default function FriendItem({
+  friendDatas,
+  isOnline,
+}: FriendDatasProps) {
   return (
     <div className={styles.friendItem}>
       <img
-        className={`${styles[status]}`}
-        src={`http://10.5.0.3:3001/uploads/avatar/${friendDatas.profile["profilePicture"]}`}
+        className={isOnline ? styles.ONLINE : styles.OFFLINE}
+        src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${friendDatas.profile["profilePicture"]}`}
       />
       <p>{friendDatas.username}</p>
     </div>

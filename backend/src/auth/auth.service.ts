@@ -9,6 +9,8 @@ import { Users } from 'src/users/users.model';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'node:fs';
 import { firstValueFrom } from 'rxjs';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +55,7 @@ export class AuthService {
           profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
+      console.log('USERDATA : ', userData);
       this.downloadImage(
         userData.image.link,
         userData.login + '_' + +newUser.id,
@@ -99,6 +102,9 @@ export class AuthService {
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
+    } else if (user.isTwoFaEnabled) {
+      // if () {}
+      // TODO VERIFY THE 2FA
     }
     return { access_token: await this.jwtService.signAsync(payload) };
   }
