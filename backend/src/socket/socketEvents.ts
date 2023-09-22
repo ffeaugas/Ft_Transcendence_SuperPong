@@ -2,10 +2,9 @@ import {
   WebSocketServer,
   WebSocketGateway,
   SubscribeMessage,
-  ConnectedSocket,
   MessageBody,
 } from '@nestjs/websockets';
-import { Channel, Message } from '@prisma/client';
+import { Message } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
