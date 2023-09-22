@@ -19,7 +19,6 @@ export class ExchangeCodeController {
       const clientId = process.env.OAUTH42_UID as string;
       const clientSecret = process.env.OAUTH42_SECRET as string;
       const tokenEndpoint = 'https://api.intra.42.fr/oauth/token';
-      console.log('JE SUIS LE POST DU BACK');
       const response = await fetch(tokenEndpoint, {
         method: 'POST',
         headers: {
