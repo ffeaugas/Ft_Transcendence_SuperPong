@@ -42,21 +42,10 @@ export class UsersService {
 
   async getOnlineUsers() {
     const users = await this.prismaService.user.findMany();
-    const date = Math.floor(Date.now() / 1000); //Date in second
-    console.log(
-      'time user :',
-      users[0]?.lastConnexionPing,
-      'current date: ',
-      date,
-    );
-    console.log('Users :', users);
+    const date = Math.floor(Date.now() / 1000); //Time in second
     const onlineUsers = users.filter((user) => {
-      return date - user.lastConnexionPing < 2;
+      return date - user.lastConnexionPing < 2; //Consider "offline" every user that hasnt ping during 2 sec
     });
-    // console.log(
-    //   'Online users :',
-    //   onlineUsers.map((onlineUser) => onlineUser.username),
-    // );
     return onlineUsers.map((onlineUser) => onlineUser.username);
   }
 
@@ -65,12 +54,11 @@ export class UsersService {
       where: { id: req.user.sub },
     });
     if (!user) throw new ForbiddenException('User not found');
-    const date = Math.floor(Date.now() / 1000); //Date in second
+    const date = Math.floor(Date.now() / 1000); //Time in second
     const updatedUser = await this.prismaService.user.update({
       where: { id: req.user.sub },
       data: { lastConnexionPing: date },
     });
-    // console.log('Player status updated ! ', date);
     return updatedUser;
   }
 
