@@ -40,6 +40,23 @@ img.rounded {
     flex: 4;
 }
 
+.player a {
+    font-size: var(--titleSize2);
+    text-decoration: none;
+    color: var(--titleColor2);
+    transition: 0.2s;
+    font-family: "Teko", sans-serif;
+}
+
+.player a:hover {
+    color: var(--titleColor3);
+}
+
+.isActive {
+    font-weight: bold;
+    color: var(--titleColor3) !important;
+}
+
 .player {
     display: flex;
     flex-direction: row;
