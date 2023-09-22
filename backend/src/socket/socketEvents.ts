@@ -25,21 +25,24 @@ export class SocketEvents {
     console.log(`client disconnected : ${client.id}`);
   }
 
-  @SubscribeMessage('message')
-  handleEvent(@MessageBody() data: string, client: any) {
+  @SubscribeMessage('NEW_MESSAGE')
+  handleEvent(@MessageBody() data: string) {
     console.log('data:', data);
   }
 
   sendMessage(message: Message) {
-    console.log(message);
-    this.server.emit('message', message);
+    this.server.emit('NEW_MESSAGE', message);
   }
 
-  deletedChannel(channel: Channel) {
-    this.server.emit('deleted-channel', channel);
+  deletedChannel(channelName: string) {
+    this.server.emit('CHANNEL_DELETE', channelName);
   }
 
-  createdChannel(channel: Channel) {
-    this.server.emit('created-channel', channel);
+  updateChannel() {
+    this.server.emit('CHANNEL_UPDATE');
+  }
+
+  kickFromChannel(channelName: string, kickedUser: string) {
+    this.server.emit('KICKED_FROM_CHANNEL', channelName, kickedUser);
   }
 }
