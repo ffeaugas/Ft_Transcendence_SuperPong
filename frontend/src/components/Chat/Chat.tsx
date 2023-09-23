@@ -6,10 +6,15 @@ import MsgList from "./MsgList";
 import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
-import { addMessage, getChannels, getMessages, getUserInfos } from "./actions";
+import {
+  addMessage,
+  getChannels,
+  getMessages,
+  getUserInfos,
+  isBlocked,
+  removeBlockedMessages,
+} from "./actions";
 import { Socket, io } from "socket.io-client";
-// import { RootState } from "@/app/GlobalRedux/store";
-// import { useSelector } from "react-redux";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -25,7 +30,6 @@ enum ActiveDiscussionType {
 
 export default function Chat() {
   const [user, setUser] = useState<User | undefined>(undefined);
-  // const username = useSelector((state: RootState) => state.user.username);
   const [socket, setSocket] = useState<Socket>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<Channels>();
@@ -109,20 +113,9 @@ export default function Chat() {
   }
 
   function messageListner(message: Message) {
-    if (!messages) return;
-    if (
-      !message.isPrivMessage &&
-      message.Channel.channelName === activeDiscussion
-    )
-      setMessages([...messages, message]);
-    if (
-      message.isPrivMessage &&
-      ((message.receiver.username === activeDiscussion &&
-        message.sender.username === user?.username) ||
-        (message.receiver.username === user?.username &&
-          message.sender.username === activeDiscussion))
-    )
-      setMessages([...messages, message]);
+    getMessages(activeDiscussionType, activeDiscussion).then((messages) => {
+      setMessages(messages);
+    });
     return;
   }
 
@@ -157,7 +150,7 @@ export default function Chat() {
     });
   }, [activeDiscussion]);
 
-  // if (!activeDiscussion) return <p>...</p>;
+  if (!user) return <p>...</p>;
 
   return (
     <div className={`${styles.chat}`}>
@@ -175,7 +168,7 @@ export default function Chat() {
         activeDiscussionType={activeDiscussionType}
         showUserInfos={showUserInfos}
         submitNewMessage={submitNewMessage}
-        messages={messages}
+        messages={removeBlockedMessages(messages, user.blockedUsers)}
       />
       {targetUser ? (
         <TargetUserMenu

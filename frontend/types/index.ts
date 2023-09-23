@@ -23,7 +23,7 @@ type ChannelDisplay = {
 type User = {
   id: string;
   username: string;
-  status: UserStatus;
+  blockedUsers: User[];
 };
 
 type ChannelInfos = {

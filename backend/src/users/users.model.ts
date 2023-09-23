@@ -10,6 +10,7 @@ export class Users implements Prisma.UserCreateInput {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   lastConnexionPing?: number;
+  blockedUsers?: any;
   role?: Role;
   login: string;
   username: string;
