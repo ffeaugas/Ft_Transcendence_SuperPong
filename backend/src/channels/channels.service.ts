@@ -53,6 +53,7 @@ export class ChannelsService {
       const createdChannel = await this.prisma.channel.create({
         data: channelDatas,
       });
+      this.socketEvents.updateChannel();
       return createdChannel;
     } catch (error) {
       throw error;
@@ -81,6 +82,7 @@ export class ChannelsService {
       where: { channelName: dto.channelName },
       data: channelPatch,
     });
+    this.socketEvents.updateChannel();
     return updateChannel;
   }
 
@@ -96,7 +98,8 @@ export class ChannelsService {
       const deletedChannel = await this.prisma.channel.delete({
         where: { channelName: dto.channelName },
       });
-      this.socketEvents.deletedChannel(deletedChannel);
+      this.socketEvents.deletedChannel(deletedChannel.channelName);
+      this.socketEvents.updateChannel();
       return deletedChannel;
     } else {
       const updatedInvitations = channelToLeave.invitedUsers.filter(
@@ -230,6 +233,7 @@ export class ChannelsService {
         return;
       if (mode === UpdateType.BAN_PLAYER) {
         updatedBans = [...targetChannel.banUsers, targetUser];
+        this.socketEvents.kickFromChannel(channelName, targetUser.username);
       } else {
         //DEBAN_PLAYER
         updatedBans = targetChannel.banUsers.filter(
@@ -294,6 +298,7 @@ export class ChannelsService {
       updatedInvitations = targetChannel.invitedUsers.filter(
         (invitedUser) => invitedUser.username !== targetUser.username,
       );
+      this.socketEvents.kickFromChannel(channelName, targetUser.username);
     }
     const updateChannelInvitations = await this.prisma.channel.update({
       where: { channelName: channelName },
@@ -414,7 +419,8 @@ export class ChannelsService {
       const deletedChannel = await this.prisma.channel.delete({
         where: { channelName: channelName },
       });
-      this.socketEvents.deletedChannel(deletedChannel);
+      this.socketEvents.deletedChannel(deletedChannel.channelName);
+      this.socketEvents.updateChannel();
       return deletedChannel;
     } catch (error) {
       return error;

@@ -1,11 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import { useState, useEffect } from "react";
 import styles from "../../styles/Chat/Chat.module.css";
 import MsgList from "./MsgList";
 import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
+import {
+  addMessage,
+  getChannels,
+  getMessages,
+  getUserInfos,
+  isBlocked,
+  removeBlockedMessages,
+} from "./actions";
+import { Socket, io } from "socket.io-client";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -20,6 +29,10 @@ enum ActiveDiscussionType {
 }
 
 export default function Chat() {
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [socket, setSocket] = useState<Socket>();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [channels, setChannels] = useState<Channels>();
   const [targetUser, setTargetUser] = useState<string | null>(null);
   const [selectedMenu, setSelectedMenu] = useState<MenuType>(
     MenuType.CHANNEL_SELECTOR
@@ -41,9 +54,6 @@ export default function Chat() {
   ): void {
     setActiveDiscussion(discussionName);
     setActiveDiscussionType(discussionType);
-    // if (selectedMenu === MenuType.CHANNEL_SELECTOR)
-    //   setActiveDiscussionType(ActiveDiscussionType.CHANNEL);
-    // else setActiveDiscussionType(ActiveDiscussionType.PRIV_MSG);
   }
 
   function showUserInfos(username: string | null): void {
@@ -54,7 +64,93 @@ export default function Chat() {
     setTargetUser(null);
   }
 
-  if (!activeDiscussion) return <p>...</p>;
+  //--------------------------------------------------
+  // SOCKET ACTIONS   --------------------------------
+  //--------------------------------------------------
+
+  async function socketInitializer(): Promise<any> {
+    const socket = io(`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
+
+    socket?.on("connect", () => {
+      console.log("connected");
+    });
+    setSocket(socket);
+  }
+
+  function sendMessage(data: string) {
+    socket?.emit("NEW_MESSAGE", data);
+  }
+
+  useEffect(() => {
+    socketInitializer();
+  }, [setSocket]);
+
+  function submitNewMessage(textInput: string) {
+    addMessage(textInput, activeDiscussionType, activeDiscussion);
+    sendMessage(textInput);
+  }
+
+  function updateChannelList() {
+    getChannels().then((channels) => setChannels(channels));
+  }
+
+  function activeChannelReset(channelName: string) {
+    if (
+      channelName === activeDiscussion &&
+      activeDiscussionType === ActiveDiscussionType.CHANNEL
+    )
+      setActiveDiscussion("General");
+  }
+
+  //Redirect yourself on general if you where on a channel where you were just kicked
+  function kickedFromChannel(channelName: string, kickedUser: string) {
+    if (
+      activeDiscussionType === ActiveDiscussionType.CHANNEL &&
+      activeDiscussion === channelName &&
+      kickedUser === user?.username
+    )
+      setActiveDiscussion("General");
+  }
+
+  function messageListner(message: Message) {
+    getMessages(activeDiscussionType, activeDiscussion).then((messages) => {
+      setMessages(messages);
+    });
+    return;
+  }
+
+  useEffect((): any => {
+    socket?.on("NEW_MESSAGE", messageListner);
+    socket?.on("CHANNEL_DELETE", activeChannelReset);
+    socket?.on("CHANNEL_UPDATE", updateChannelList);
+    socket?.on("KICKED_FROM_CHANNEL", kickedFromChannel);
+
+    return () => {
+      socket?.off("NEW_MESSAGE", messageListner);
+      socket?.off("CHANNEL_DELETE", activeChannelReset);
+      socket?.off("CHANNEL_UPDATE", updateChannelList);
+      socket?.off("KICKED_FROM_CHANNEL", kickedFromChannel);
+    };
+  }, [messageListner]);
+
+  //--------------------------------------------------
+  //--------------------------------------------------
+
+  useEffect(() => {
+    getUserInfos().then((infos) => setUser(infos));
+  }, []);
+
+  useEffect(() => {
+    getChannels().then((channels) => setChannels(channels));
+  }, [selectedMenu]);
+
+  useEffect(() => {
+    getMessages(activeDiscussionType, activeDiscussion).then((messages) => {
+      setMessages(messages);
+    });
+  }, [activeDiscussion]);
+
+  if (!user) return <p>...</p>;
 
   return (
     <div className={`${styles.chat}`}>
@@ -63,6 +159,7 @@ export default function Chat() {
         selectedMenu={selectedMenu}
         activeDiscussionType={activeDiscussionType}
         activeDiscussion={activeDiscussion}
+        channels={channels}
         switchChannel={switchChannel}
         changeMenu={changeMenu}
       />
@@ -70,6 +167,8 @@ export default function Chat() {
         activeDiscussion={activeDiscussion}
         activeDiscussionType={activeDiscussionType}
         showUserInfos={showUserInfos}
+        submitNewMessage={submitNewMessage}
+        messages={removeBlockedMessages(messages, user.blockedUsers)}
       />
       {targetUser ? (
         <TargetUserMenu
