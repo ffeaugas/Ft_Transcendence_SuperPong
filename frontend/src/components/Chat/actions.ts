@@ -139,3 +139,33 @@ export async function getUserInfos(): Promise<User | undefined> {
     return undefined;
   }
 }
+
+export const isBlocked = (message: Message, blockedUsers: User[]) => {
+  console.log(
+    "comparion :",
+    blockedUsers[0]?.id,
+    "  ",
+    message.senderId.toString()
+  );
+  if (
+    blockedUsers.some(
+      (blockedUser) => blockedUser.id == message.senderId.toString()
+    )
+  )
+    return true;
+  return false;
+};
+
+export function removeBlockedMessages(
+  messages: Message[],
+  blockedUsers: User[]
+) {
+  console.log("BLOCKER USERS :  ", blockedUsers);
+  console.log("BEFORE FILTER", messages);
+  const filtratedMessages = messages.filter((message) => {
+    return !isBlocked(message, blockedUsers);
+  });
+  console.log("AFTER FILTER", filtratedMessages);
+
+  return filtratedMessages;
+}

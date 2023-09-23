@@ -173,6 +173,7 @@ export class UsersService {
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
+      include: { blockedUsers: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;
