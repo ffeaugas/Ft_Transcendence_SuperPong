@@ -33,31 +33,33 @@ enum ChannelMode {
 }
 
 model User {
-    id                Int       @id @default(autoincrement())
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt()
-    lastConnexionPing Int?      @default(0)
-    role              Role      @default(USER)
-    login             String    @unique
-    username          String    @unique
-    hash              String    @unique
-    user42            Boolean   @default(true)
+    id                Int             @id @default(autoincrement())
+    createdAt         DateTime        @default(now())
+    updatedAt         DateTime        @updatedAt()
+    lastConnexionPing Int?            @default(0)
+    role              Role            @default(USER)
+    login             String          @unique
+    username          String          @unique
+    hash              String          @unique
+    user42            Boolean         @default(true)
     profile           Profile?
-    channelsOwned     Channel[] @relation(name: "OwnedChannel")
-    channelsInvited   Channel[] @relation(name: "Whitelist")
-    channelsAdmin     Channel[] @relation(name: "Administrators")
-    channelsBan       Channel[] @relation(name: "Bans")
-    messagesSent      Message[] @relation("sender")
-    messagesReceived  Message[] @relation("receiver")
-    gameAsWinner      Game[]    @relation(name: "Player1")
-    gameAsLooser      Game[]    @relation(name: "Player2")
-    friends           User[]    @relation(name: "friends")
-    friendsAddedMe    User[]    @relation(name: "friends")
-    blockedUsers      User[]    @relation(name: "blocked")
-    blockedByUsers    User[]    @relation(name: "blocked")
+    channelsOwned     Channel[]       @relation(name: "OwnedChannel")
+    channelsInvited   Channel[]       @relation(name: "Whitelist")
+    channelsAdmin     Channel[]       @relation(name: "Administrators")
+    channelsBan       Channel[]       @relation(name: "Bans")
+    messagesSent      Message[]       @relation("sender")
+    messagesReceived  Message[]       @relation("receiver")
+    friendReqSent     FriendRequest[] @relation("friendReqSender")
+    friendReqReceived FriendRequest[] @relation("friendReqReceiver")
+    gameAsWinner      Game[]          @relation(name: "Player1")
+    gameAsLooser      Game[]          @relation(name: "Player2")
+    friends           User[]          @relation(name: "friends")
+    friendsAddedMe    User[]          @relation(name: "friends")
+    blockedUsers      User[]          @relation(name: "blocked")
+    blockedByUsers    User[]          @relation(name: "blocked")
     channelId         Int?
-    muted             Mute[]    @relation("userMuted")
-    isTwoFaEnabled    Boolean   @default(false)
+    muted             Mute[]          @relation("userMuted")
+    isTwoFaEnabled    Boolean         @default(false)
     TwoFaSecret       String?
 
     @@map("users")
@@ -104,6 +106,16 @@ model Mute {
     mutedPlayerId Int
     channel       Channel  @relation("channelMute", fields: [channelId], references: [id])
     channelId     Int
+}
+
+model FriendRequest {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt()
+    senderId   Int?
+    sender     User?    @relation("friendReqSender", fields: [senderId], references: [id])
+    receiverId Int?
+    receiver   User?    @relation("friendReqReceiver", fields: [receiverId], references: [id])
 }
 
 model Channel {

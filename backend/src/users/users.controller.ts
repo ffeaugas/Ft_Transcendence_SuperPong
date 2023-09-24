@@ -58,6 +58,22 @@ export class UsersController {
     return await this.usersService.updateUserStatus(req);
   }
 
+  @Get('getFriendRequests')
+  async getFriendRequests(@Req() req) {
+    return await this.usersService.getFriendRequests(req);
+  }
+
+  @Delete('acceptFriendRequest')
+  async acceptFriendRequest(@Req() req: Request, @Body() dto: any) {
+    console.log('REPONSE :::  ', dto);
+    return await this.usersService.acceptFriendRequest(req, dto.senderId);
+  }
+
+  @Delete('rejectFriendRequest')
+  async rejectFriendRequest(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.deleteFriendRequest(req, dto.senderId);
+  }
+
   @Get('channels')
   async getPrivateChannels(@Query('username') username: string) {
     return this.usersService.getPrivateChannels(username);

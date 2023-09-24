@@ -1,0 +1,32 @@
+.requestItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+  padding-top: 10px;
+}
+
+.requestItem img {
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(40px, 40px + 3vw, 80px);
+  height: clamp(40px, 40px + 3vw, 80px);
+  overflow: hidden;
+  border-radius: 50%;
+  animation: pulsate 0.24s ease-in-out infinite alternate;
+
+  /* border: 0.2rem solid #fff; */
+  padding: 0.4em;
+  overflow: visible;
+}
+
+.requestItem p {
+  margin: 0 auto;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  /* z-index: 200; */
+  justify-content: space-around;
+}

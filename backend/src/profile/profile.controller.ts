@@ -4,18 +4,13 @@ import {
   Delete,
   Get,
   Patch,
-  Post,
   Query,
-  Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ProfileBioUpdateDto, ProfilePictureUpdateDto } from './dto';
-import { Request } from 'express';
+import { ProfileBioUpdateDto } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('profiles')
 @ApiBearerAuth()

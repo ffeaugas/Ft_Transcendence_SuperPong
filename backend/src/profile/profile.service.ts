@@ -29,6 +29,7 @@ export class ProfileService {
   async getProfileById(uid: number) {
     const profile = await this.prisma.profile.findUnique({
       where: { userId: uid },
+      include: { user: true },
     });
     if (!profile) throw new ForbiddenException('This profile did not exist');
     return profile;
