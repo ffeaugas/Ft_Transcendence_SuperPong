@@ -117,18 +117,12 @@ export class UsersService {
   async sendFriendRequest(req: Request, sender: any, receiver: any) {
     const existingSentFriendRequest =
       await this.prismaService.friendRequest.findMany({
-        where: {
-          senderId: sender.id,
-          receiverId: receiver.id,
-        },
+        where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
       });
     if (existingSentFriendRequest.length > 0) return; //Return void if request was already sent
     const existingReceivedFriendRequest =
       await this.prismaService.friendRequest.findMany({
-        where: {
-          senderId: sender.id,
-          receiverId: receiver.id,
-        },
+        where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
       });
     if (existingReceivedFriendRequest.length > 0) {
       // Accept request if receiver has also sent a request
@@ -199,17 +193,11 @@ export class UsersService {
     });
     if (!receiver) throw new ForbiddenException('User not found');
     const friendRequest = await this.prismaService.friendRequest.findMany({
-      where: {
-        senderId: senderId,
-        receiverId: receiver.id,
-      },
+      where: { AND: [{ senderId: senderId }, { receiverId: receiver.id }] },
     });
     if (!friendRequest) throw new ForbiddenException('Request not found');
     const deleteFriendRequest = this.prismaService.friendRequest.deleteMany({
-      where: {
-        senderId: senderId,
-        receiverId: receiver.id,
-      },
+      where: { AND: [{ senderId: senderId }, { receiverId: receiver.id }] },
     });
     return deleteFriendRequest;
   }
