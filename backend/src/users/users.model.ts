@@ -1,15 +1,17 @@
-import { $Enums, Prisma, Role, Status } from '@prisma/client';
+import { $Enums, Prisma, Role } from '@prisma/client';
 
 export class Users implements Prisma.UserCreateInput {
   hash: string;
-  status?: $Enums.Status;
+  otp_secret?: string;
+  otp_url?: string;
   user42?: boolean;
   channelId?: number;
-  isTwoFaEnabled?: boolean;
-  TwoFaSecret?: string;
+  otpEnabled?: boolean;
+  otpValidated?: boolean;
   id: number;
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  lastConnexionPing?: number;
   role?: Role;
   login: string;
   username: string;

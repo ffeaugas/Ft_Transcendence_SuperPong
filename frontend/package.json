@@ -14,6 +14,7 @@
         "@types/react": "^18.2.15",
         "@types/react-dom": "18.2.7",
         "axios": "^1.4.0",
+        "bufferutil": "^4.0.7",
         "colyseus.js": "^0.15.0-preview.7",
         "cookies-next": "^2.1.2",
         "eslint": "8.45.0",
@@ -26,6 +27,7 @@
         "react-dom": "18.2.0",
         "react-redux": "^8.1.2",
         "socket.io-client": "^4.7.2",
+        "utf-8-validate": "^5.0.10",
         "uuid": "^9.0.0",
         "ws": "^8.13.0",
         "yup": "^1.2.0"

@@ -8,7 +8,6 @@ import * as argon from 'argon2';
 import { ChannelMode, User } from '@prisma/client';
 import { UserUpdateDto } from './dto/userUpdate.dto';
 import { UserRelationChangeDto } from './dto/userRelationChange.dto';
-import { authenticator } from 'otplib';
 
 enum RelationType {
   FRIEND = 'FRIEND',
@@ -30,6 +29,7 @@ export class UsersService {
         login: dto.login,
         hash: passwordHash,
         user42: user42,
+        otpEnabled: false,
       },
     });
     await this.prismaService.profile.create({
@@ -39,6 +39,28 @@ export class UsersService {
     });
     delete newUser.hash;
     return newUser;
+  }
+
+  async getOnlineUsers() {
+    const users = await this.prismaService.user.findMany();
+    const date = Math.floor(Date.now() / 1000); //Time in second
+    const onlineUsers = users.filter((user) => {
+      return date - user.lastConnexionPing < 2; //Consider "offline" every user that hasnt ping during 2 sec
+    });
+    return onlineUsers.map((onlineUser) => onlineUser.username);
+  }
+
+  async updateUserStatus(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const date = Math.floor(Date.now() / 1000); //Time in second
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: req.user.sub },
+      data: { lastConnexionPing: date },
+    });
+    return updatedUser;
   }
 
   async updateUserRelation(req: any, dto: UserRelationChangeDto) {
@@ -152,6 +174,7 @@ export class UsersService {
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
+      include: { blockedUsers: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;

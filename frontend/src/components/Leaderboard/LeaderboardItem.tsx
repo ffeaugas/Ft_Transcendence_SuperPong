@@ -1,5 +1,6 @@
 import styles from "@/styles/Leaderboard/LeaderboardItem.module.css";
 import Link from "next/link";
+import axios from "axios";
 
 type Profile = {
     id: number;

@@ -2,11 +2,6 @@
 
 import styles from "../../styles/Chat/UserItem.module.css";
 
-enum UserStatus {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
-}
-
 enum ActiveDiscussionType {
   PRIV_MSG = "PRIV_MSG",
   CHANNEL = "CHANNEL",
@@ -33,16 +28,7 @@ export default function UserItem({
         switchChannel(user.username, ActiveDiscussionType.PRIV_MSG)
       }
     >
-      <p>
-        {user.username}
-        <b
-          className={
-            user.status === UserStatus.ONLINE ? styles.online : undefined
-          }
-        >
-          &nbsp;&#8226;
-        </b>
-      </p>
+      <p>{user.username}</p>
     </div>
   );
 }
