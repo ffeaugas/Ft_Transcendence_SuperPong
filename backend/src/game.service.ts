@@ -62,6 +62,24 @@ export class GameService implements OnApplicationShutdown {
         loseCount: { increment: 1 },
       },
     });
+    if (winnerProfile.winCount === 5) {
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Serial Winner' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: winner.id },
+        data: { achievements: { connect: achievement } },
+      });
+    }
+    if (looserProfile.loseCount === 5) {
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Serial Looser' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: looser.id },
+        data: { achievements: { connect: achievement } },
+      });
+    }
     await this.updateRatings(dto, 32);
     return game;
   }

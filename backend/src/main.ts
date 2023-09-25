@@ -43,23 +43,8 @@ async function bootstrap() {
     const achievements = await prisma.achievement.createMany({
       data: [
         {
-          title: 'Gros naaaze',
-          description: 'etre un gros nul',
-          picture: 'default.png',
-        },
-        {
-          title: 'Moyen naaaze',
-          description: 'etre un peu un gros nul',
-          picture: 'default.png',
-        },
-        {
-          title: 'Pierre',
-          description: 'etre Pierre',
-          picture: 'default.png',
-        },
-        {
-          title: 'QueryLord',
-          description: 'Faire trop de Query',
+          title: 'Roger', //fait
+          description: 'etre Roger',
           picture: 'default.png',
         },
         {
@@ -73,12 +58,12 @@ async function bootstrap() {
           picture: 'default.png',
         },
         {
-          title: 'Boutonneux',
+          title: 'Boutonneux', //fait
           description: "Ce connecter via l'intra 42",
           picture: 'default.png',
         },
         {
-          title: 'Ami de Roger',
+          title: 'Ami de Roger', //fait
           description: 'Etre ami avec Roger',
           picture: 'default.png',
         },
@@ -89,7 +74,7 @@ async function bootstrap() {
           picture: 'default.png',
         },
         {
-          title: 'Type sympa',
+          title: 'Type sympa', //fait
           description: 'Dire Bonjour dans le chat general',
           picture: 'default.png',
         },

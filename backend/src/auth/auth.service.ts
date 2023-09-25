@@ -59,6 +59,13 @@ export class AuthService {
         userData.image.link,
         userData.login + '_' + +newUser.id,
       );
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Boutonneux' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: newUser.id },
+        data: { achievements: { connect: achievement } },
+      });
     } else {
       user.login = userData.login;
       user.password = userFound.hash;

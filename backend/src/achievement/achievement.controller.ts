@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AchievementService } from './achievement.service';
 
@@ -10,5 +10,10 @@ export class AchievementController {
   @Get('all')
   async getAllAchievements() {
     return await this.achievementService.getAllAchievements();
+  }
+
+  @Get('')
+  async getUserAchievement(@Query('user') username: string) {
+    return await this.achievementService.getUserAchievements(username);
   }
 }
