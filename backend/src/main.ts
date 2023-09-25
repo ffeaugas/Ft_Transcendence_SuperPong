@@ -48,12 +48,12 @@ async function bootstrap() {
           picture: 'default.png',
         },
         {
-          title: 'Serial Looser',
+          title: 'Serial Looser', //fait
           description: 'Perdre 5 fois de suite',
           picture: 'default.png',
         },
         {
-          title: 'Serial Winner',
+          title: 'Serial Winner', //fait
           description: 'Gagner 5 fois de suite',
           picture: 'default.png',
         },
