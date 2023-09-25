@@ -62,6 +62,7 @@ export class GameService implements OnApplicationShutdown {
         loseCount: { increment: 1 },
       },
     });
+    await this.updateRatings(dto, 32);
     return game;
   }
 
@@ -78,6 +79,51 @@ export class GameService implements OnApplicationShutdown {
       delete game.looser.hash;
     });
     return games;
+  }
+
+  async getExpectedOutcome(
+    winnerRating: any,
+    looserRating: any,
+  ): Promise<number> {
+    const exponent = (looserRating - winnerRating) / 400;
+    return 1 / (1 + Math.pow(10, exponent));
+  }
+
+  async updateRatings(dto: GameDto, kFactor: number = 32) {
+    const winner = await this.prisma.user.findUnique({
+      where: {
+        username: dto.winner,
+      },
+    });
+    const looser = await this.prisma.user.findUnique({
+      where: {
+        username: dto.looser,
+      },
+    });
+
+    const winnerProfile = await this.prisma.profile.findUnique({
+      where: { userId: winner.id },
+    });
+    const looserProfile = await this.prisma.profile.findUnique({
+      where: { userId: looser.id },
+    });
+
+    const expectedOutcome = await this.getExpectedOutcome(
+      winnerProfile.eloMatchMaking,
+      looserProfile.eloMatchMaking,
+    );
+
+    const ratingChangeA = kFactor * (1 - expectedOutcome);
+    const ratingChangeB = -kFactor * expectedOutcome;
+
+    await this.prisma.profile.update({
+      where: { userId: winner.id },
+      data: { eloMatchMaking: { increment: ratingChangeA } },
+    });
+    await this.prisma.profile.update({
+      where: { userId: looser.id },
+      data: { eloMatchMaking: { increment: ratingChangeB } },
+    });
   }
 
   onApplicationShutdown(sig) {
