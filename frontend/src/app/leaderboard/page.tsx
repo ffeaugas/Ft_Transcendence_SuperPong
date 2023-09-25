@@ -22,19 +22,19 @@ export default async function Leaderboard() {
             }
         );
         if (!res.ok) {
-            console.log(res);
             throw new Error("Failed fetching profiles");
         }
-        const profiles = await res.json();
-        profiles.sort(function compareElo(a: Profile, b: Profile) {
-            return a.eloMatchMaking - b.eloMatchMaking;
-        });
+        const profiles = res.json();
         return profiles;
     }
 
     if (!profiles) {
         return <p>...</p>;
     }
+
+    const sortedProfiles = [...profiles];
+    sortedProfiles.sort((a, b) => b.eloMatchMaking - a.eloMatchMaking);
+    console.log(sortedProfiles);
 
     return (
         <section className={styles.page}>
@@ -59,7 +59,7 @@ export default async function Leaderboard() {
                     </div>
                 </div>
                 <ul>
-                    {profiles.map((profile, index) => (
+                    {sortedProfiles.map((profile, index) => (
                         <LeaderboardItem
                             rank={index + 1}
                             key={profile.id}
