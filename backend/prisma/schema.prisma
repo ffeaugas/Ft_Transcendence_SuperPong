@@ -33,32 +33,34 @@ enum ChannelMode {
 }
 
 model User {
-    id                Int       @id @default(autoincrement())
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt()
-    lastConnexionPing Int?      @default(0)
-    role              Role      @default(USER)
-    login             String    @unique
-    username          String    @unique
-    hash              String    @unique
-    user42            Boolean   @default(true)
-    profile           Profile?
-    channelsOwned     Channel[] @relation(name: "OwnedChannel")
-    channelsInvited   Channel[] @relation(name: "Whitelist")
-    channelsAdmin     Channel[] @relation(name: "Administrators")
-    channelsBan       Channel[] @relation(name: "Bans")
-    messagesSent      Message[] @relation("sender")
-    messagesReceived  Message[] @relation("receiver")
-    gameAsWinner      Game[]    @relation(name: "Player1")
-    gameAsLooser      Game[]    @relation(name: "Player2")
-    friends           User[]    @relation(name: "friends")
-    friendsAddedMe    User[]    @relation(name: "friends")
-    blockedUsers      User[]    @relation(name: "blocked")
-    blockedByUsers    User[]    @relation(name: "blocked")
-    channelId         Int?
-    muted             Mute[]    @relation("userMuted")
-    isTwoFaEnabled    Boolean   @default(false)
-    TwoFaSecret       String?
+    id               Int       @id @default(autoincrement())
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt()
+    role             Role      @default(USER)
+    login            String    @unique
+    username         String    @unique
+    hash             String    @unique
+    status           Status    @default(ONLINE)
+    user42           Boolean   @default(true)
+    profile          Profile?
+    channelsOwned    Channel[] @relation(name: "OwnedChannel")
+    channelsInvited  Channel[] @relation(name: "Whitelist")
+    channelsAdmin    Channel[] @relation(name: "Administrators")
+    channelsBan      Channel[] @relation(name: "Bans")
+    messagesSent     Message[] @relation("sender")
+    messagesReceived Message[] @relation("receiver")
+    gameAsWinner     Game[]    @relation(name: "Player1")
+    gameAsLooser     Game[]    @relation(name: "Player2")
+    friends          User[]    @relation(name: "friends")
+    friendsAddedMe   User[]    @relation(name: "friends")
+    blockedUsers     User[]    @relation(name: "blocked")
+    blockedByUsers   User[]    @relation(name: "blocked")
+    channelId        Int?
+    muted            Mute[]    @relation("userMuted")
+    otpEnabled       Boolean   @default(false)
+    otpValidated     Boolean   @default(false)
+    otp_secret       String?
+    otp_url          String?
 
     @@map("users")
 }

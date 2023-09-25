@@ -98,11 +98,17 @@ export class AuthService {
 
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);
-    const payload = { sub: user.id, login: user.login, role: user.role };
+    const payload = {
+      sub: user.id,
+      login: user.login,
+      role: user.role,
+      otpenabled: user.otpEnabled,
+      otpvalidated: user.otpValidated,
+    };
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
-    } else if (user.isTwoFaEnabled) {
+    } else if (user.otpEnabled) {
       // if () {}
       // TODO VERIFY THE 2FA
     }

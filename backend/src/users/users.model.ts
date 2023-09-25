@@ -4,8 +4,8 @@ export class Users implements Prisma.UserCreateInput {
   hash: string;
   user42?: boolean;
   channelId?: number;
-  isTwoFaEnabled?: boolean;
-  TwoFaSecret?: string;
+  otpEnabled?: boolean;
+  otpValidated?: boolean;
   id: number;
   createdAt?: string | Date;
   updatedAt?: string | Date;

@@ -46,5 +46,5 @@ export class AuthController {
   // async validateOTP(@Body() dto: ValidateOTPDTO) {}
 
   // @Post('disable-otp')
-  // async disableOTP(@Body() dto: disableOTPDTO) {}
+  // async disableOTP(@Body() dto: DisableOTPDTO) {}
 }

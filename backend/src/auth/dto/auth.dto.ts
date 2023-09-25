@@ -12,3 +12,14 @@ export class AuthDto {
   @ApiProperty({ description: 'Password' })
   password: string;
 }
+
+export class GenOTPDTO {
+  @IsNotEmpty()
+  id: string;
+}
+
+export class VerifOTPDTO {}
+
+export class ValidateOTPDTO {}
+
+export class DisableOTPDTO {}
