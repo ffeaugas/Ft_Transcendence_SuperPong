@@ -59,8 +59,10 @@ model User {
     blockedByUsers    User[]          @relation(name: "blocked")
     channelId         Int?
     muted             Mute[]          @relation("userMuted")
-    isTwoFaEnabled    Boolean         @default(false)
-    TwoFaSecret       String?
+    otpEnabled        Boolean         @default(false)
+    otpValidated      Boolean         @default(false)
+    otp_secret        String?
+    otp_url           String?
 
     @@map("users")
 }

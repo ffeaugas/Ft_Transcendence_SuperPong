@@ -29,6 +29,7 @@ export class UsersService {
         login: dto.login,
         hash: passwordHash,
         user42: user42,
+        otpEnabled: false,
       },
     });
     await this.prismaService.profile.create({

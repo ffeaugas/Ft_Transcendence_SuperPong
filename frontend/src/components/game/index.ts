@@ -5,9 +5,11 @@ import LoadingScene from "./scenes/loading";
 import LoadingSceneBonus from "./scenes/loadingBonusGame";
 import { useEffect } from "react";
 import "phaser";
+import { getCookie } from "cookies-next";
 
 export default function Index() {
     let gameInstance; // Declare a variable to hold the game instance
+
     useEffect(() => {
         const loadGame = async () => {
             if (typeof window !== "object") {
