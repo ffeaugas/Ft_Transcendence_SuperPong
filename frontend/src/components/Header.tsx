@@ -71,7 +71,7 @@ export default function Header() {
   };
 
   async function updateStatus() {
-    if (!username || username === "") return;
+    if (localStorage.getItem("Authenticate") !== "true") return;
     try {
       const updatedStatus = await fetch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/updatestatus`,
@@ -107,7 +107,11 @@ export default function Header() {
   return (
     <div className={`${styles.header}`}>
       <div className={`${styles.subdiv}`}>
-        <h1>
+        <h1
+          onClick={() => {
+            router.push("/");
+          }}
+        >
           Super<b>Pong</b>
         </h1>
         <ul className={styles.menu}>
@@ -179,7 +183,8 @@ export default function Header() {
                     </button>
                     <Link
                       className={styles.button}
-                      href={`/profile/${username}`}
+                      href={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles?username=${username}`}
+                      as={`/profile/${username}`}
                     >
                       Profile
                     </Link>
