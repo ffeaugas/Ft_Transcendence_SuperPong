@@ -18,9 +18,9 @@ export default function Achievements({ username }: AchievementsProps) {
     undefined
   );
 
-  async function getAchievements(): Promise<Achievement[] | undefined> {
+  async function getMyAchievements(): Promise<Achievement[] | undefined> {
     const res = await fetch(
-      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/achievement/all`
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/achievement/?user=${username}`
     );
     if (!res.ok) {
       console.log(res);
@@ -31,7 +31,7 @@ export default function Achievements({ username }: AchievementsProps) {
   }
 
   useEffect(() => {
-    getAchievements().then((achievements) => setAchievements(achievements));
+    getMyAchievements().then((achievements) => setAchievements(achievements));
   }, []);
 
   if (!achievements) {
