@@ -34,7 +34,6 @@ export default async function Leaderboard() {
 
     const sortedProfiles = [...profiles];
     sortedProfiles.sort((a, b) => b.eloMatchMaking - a.eloMatchMaking);
-    console.log(sortedProfiles);
 
     return (
         <section className={styles.page}>

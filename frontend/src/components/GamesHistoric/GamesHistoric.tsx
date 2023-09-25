@@ -40,7 +40,6 @@ export default function GamesHistoric({ username }: GamesHistoricProps) {
     useEffect(() => {
         getGames().then((games) => {
             setGames(games);
-            console.log(games);
         });
     }, []);
 

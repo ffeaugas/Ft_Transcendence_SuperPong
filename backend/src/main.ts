@@ -39,8 +39,6 @@ async function bootstrap() {
     const general = await prisma.channel.create({
       data: { channelName: name, password: '', mode: 'PUBLIC' },
     });
-    console.log('New channel created:', general);
-    console.log(general);
 
     const achievements = await prisma.achievement.createMany({
       data: [
@@ -97,8 +95,6 @@ async function bootstrap() {
         },
       ],
     });
-    console.log('New channel created:', achievements);
-    console.log(achievements);
   } catch (error) {
     console.error('Error creating :', error.message);
   }

@@ -139,7 +139,6 @@ export default function ProfileEditor() {
     useEffect(() => {
         if (username) {
             getProfileDatas(username).then((datas) => {
-                console.log(datas);
                 setProfileDatas(datas);
             });
         }

@@ -65,7 +65,6 @@ export class UsersController {
 
   @Delete('acceptFriendRequest')
   async acceptFriendRequest(@Req() req: Request, @Body() dto: any) {
-    console.log('REPONSE :::  ', dto);
     return await this.usersService.acceptFriendRequest(req, dto.senderId);
   }
 

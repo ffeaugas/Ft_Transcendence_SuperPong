@@ -151,7 +151,6 @@ export class UsersService {
   }
 
   async acceptFriendRequest(req: any, senderId: number) {
-    console.log('ACEPT REQUEST : ', senderId);
     const receiver = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
       include: { friends: true },
@@ -185,8 +184,6 @@ export class UsersService {
   }
 
   async deleteFriendRequest(req: any, senderId: number) {
-    console.log('REJEECTTTT REQUEST : ', senderId);
-
     const receiver = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
       include: { friends: true },
@@ -259,7 +256,6 @@ export class UsersService {
     const isBlocked = user.blockedUsers.some(
       (blockedUser) => blockedUser.username === targetUsername,
     );
-    console.log({ isFriend, isBlocked });
     return { isFriend, isBlocked };
   }
 
