@@ -3,7 +3,6 @@ import { MyRoomState, Player, Ball } from './schema/MyRoomState';
 import { GameDto } from 'src/game.dto';
 import { GameService } from 'src/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getRandomValues } from 'crypto';
 
 const prisma = new PrismaService();
 
@@ -16,6 +15,8 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
   i = 0;
   mooving_ball = 0;
   host: Client;
+  host_username: string;
+  client_username: string;
   game: GameService;
   random = 0;
 
@@ -41,6 +42,19 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       }
     });
     this.onMessage('leave', (cli) => {
+      const dto = new GameDto();
+      if (this.host != cli) {
+        dto.looser = this.host_username;
+        dto.looserScore = this.state.score[1];
+        dto.winner = this.client_username;
+        dto.winnerScore = this.state.score[0];
+      } else {
+        dto.winner = this.host_username;
+        dto.winnerScore = this.state.score[1];
+        dto.looser = this.client_username;
+        dto.looserScore = this.state.score[0];
+      }
+      this.game.createGameHistory(dto);
       this.clients.forEach((client) => {
         client.send('otherLeft');
       });
@@ -52,7 +66,7 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       }
       if (this.state.balls.y <= 0) this.state.balls.angle *= -1;
       else if (this.state.balls.y >= data.h) this.state.balls.angle *= -1;
-      if (this.bonus == 0) {
+      if (this.bonus == 0 && player.status != 0) {
         const xBonus = Math.random() * (data.w / 1.5) + 50;
         const yBonus = Math.random() * (data.h / 1.5) + 50;
         this.random = Math.random();
@@ -125,7 +139,6 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               }
               this.i++;
             });
-            // CREE la ligne dans la db
             this.game.createGameHistory(dto);
           } else this.direction = -2.5;
         } else {
@@ -150,7 +163,6 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
               }
               this.i++;
             });
-            // CREE la ligne dans la dbs
             this.game.createGameHistory(dto);
           } else this.direction = 2.5;
         }
@@ -193,9 +205,11 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       player.y = mapHeight / 2;
       this.player[0] = client.sessionId;
       this.host = client;
+      this.host_username = player.username;
       player.get_ball = 1;
     } else {
       const ball = this.state.balls;
+      this.client_username = player.username;
       player.x = mapWidth * 0.99;
       player.y = mapHeight / 2;
       ball.r = 10;
