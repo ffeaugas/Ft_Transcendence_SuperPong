@@ -14,6 +14,14 @@ export class ProfileService {
     return await this.prisma.profile.findMany();
   }
 
+  async uploadFile(req: any, file: any) {
+    await this.prisma.profile.update({
+      where: { userId: req.user.sub },
+      data: { profilePicture: file.filename },
+    });
+    return { message: 'File uploaded successfully' };
+  }
+
   async getProfileByUsername(username: string) {
     const user = await this.prisma.user.findUnique({
       where: { username: username },
