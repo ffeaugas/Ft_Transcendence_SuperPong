@@ -124,12 +124,26 @@ export default class LoadingScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(6);
       this.client = new Client(`ws://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
-      this.room = await this.client.joinOrCreate("MyRoom", {
-        dim,
-        name: await this.getUsername(),
-        //PpUrl: await this.getPP(),
-      }); // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
-      // this.room = await this.client.; // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
+      if (
+        window.location.href.replace("http://10.11.250.74:3000/game/", "") ===
+        ""
+      ) {
+        this.room = await this.client.joinOrCreate("MyRoom", {
+          dim,
+          name: await this.getUsername(),
+        });
+      } else {
+        this.room = await this.client.joinOrCreate("MyRoom", {
+          roomId: window.location.href.replace(
+            "http://10.11.250.74:3000/game/",
+            ""
+          ),
+          dim,
+          name: await this.getUsername(),
+          locked: true,
+        });
+      }
+      console.log(this.room);
       this.game.canvas.style.cursor = "none";
       console.log("Joined successfully!");
     } catch (e) {

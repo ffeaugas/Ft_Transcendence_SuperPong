@@ -8,56 +8,56 @@ import "phaser";
 import { getCookie } from "cookies-next";
 
 export default function Index() {
-    let gameInstance; // Declare a variable to hold the game instance
+  let gameInstance; // Declare a variable to hold the game instance
 
-    useEffect(() => {
-        const loadGame = async () => {
-            if (typeof window !== "object") {
-                return;
-            }
+  useEffect(() => {
+    const loadGame = async () => {
+      if (typeof window !== "object") {
+        return;
+      }
 
-            // Create the game instance here
-            const config: Phaser.Types.Core.GameConfig = {
-                type: Phaser.AUTO,
-                scale: {
-                    //   mode: Phaser.Scale.RESIZE,
-                    mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                },
-                backgroundColor: "#000000",
-                parent: "phaser-example",
-                physics: {
-                    default: "arcade",
-                    arcade: {
-                        debug: false,
-                    },
-                },
-                fps: {
-                    target: 60,
-                    min: 60,
-                    forceSetTimeOut: true,
-                },
-                // pixelArt: true,
-                scene: [
-                    MainMenuScene,
-                    GameScene,
-                    LoadingScene,
-                    LoadingSceneBonus,
-                    GameSceneBonus,
-                ],
-            };
-            gameInstance = new Phaser.Game(config);
-        };
+      // Create the game instance here
+      const config: Phaser.Types.Core.GameConfig = {
+        type: Phaser.AUTO,
+        scale: {
+          //   mode: Phaser.Scale.RESIZE,
+          mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+        },
+        backgroundColor: "#000000",
+        parent: "phaser-example",
+        physics: {
+          default: "arcade",
+          arcade: {
+            debug: false,
+          },
+        },
+        fps: {
+          target: 60,
+          min: 60,
+          forceSetTimeOut: true,
+        },
+        // pixelArt: true,
+        scene: [
+          //   MainMenuScene,
+          LoadingScene,
+          GameScene,
+          LoadingSceneBonus,
+          GameSceneBonus,
+        ],
+      };
+      gameInstance = new Phaser.Game(config);
+    };
 
-        loadGame();
+    loadGame();
 
-        return () => {
-            // Destroy the game instance in the cleanup function
-            if (gameInstance) {
-                gameInstance.scene.remove("Game");
-                gameInstance.destroy(true);
-                console.log(gameInstance.scene);
-            }
-        };
-    }, []);
+    return () => {
+      // Destroy the game instance in the cleanup function
+      if (gameInstance) {
+        gameInstance.scene.remove("Game");
+        gameInstance.destroy(true);
+        console.log(gameInstance.scene);
+      }
+    };
+  }, []);
 }
