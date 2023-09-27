@@ -9,6 +9,7 @@ import { RootState } from "@/app/GlobalRedux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
 import BlockedList from "../BlockedList/BlockedList";
+import { setProfilePicture } from "@/app/GlobalRedux/Features/profilePicture/profilePictureSlice";
 
 const USERNAME_MAX_LENGTH: number = 12;
 const BIO_MAX_LENGTH: number = 150;
@@ -17,7 +18,6 @@ export default function ProfileEditor() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [objectURL, setObjectURL] = useState<any | undefined>(undefined);
-  const [objectFile, setObjectFile] = useState<any | undefined>(undefined);
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
@@ -33,6 +33,9 @@ export default function ProfileEditor() {
   });
   const [feedbackMessage, setFeedbackMessage] = useState<string>("");
   const username = useSelector((state: RootState) => state.user.username);
+  const profilePicture = useSelector(
+    (state: RootState) => state.profilePicture.profilePicture
+  );
 
   async function getProfileDatas(
     username: string
@@ -53,6 +56,7 @@ export default function ProfileEditor() {
       return undefined;
     }
   }
+
   function handleChange(evt: any): void {
     const { name, value } = evt.target;
     if (
@@ -132,7 +136,6 @@ export default function ProfileEditor() {
 
     const formData = new FormData();
     formData.append("image", editedDatas.profilePicture);
-    console.log(editedDatas.profilePicture);
     const response = await fetch(
       `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles/upload-pp`,
       {
@@ -143,12 +146,20 @@ export default function ProfileEditor() {
         body: formData,
       }
     );
-
     if (response.ok) {
       const data = await response.json();
-      console.log("File uploaded successfully front:", data);
+      dispatch(setProfilePicture(data.filename));
+      setDatasEditor({
+        ...datasEditor,
+        profilePicture: !datasEditor.profilePicture,
+      });
+      router.push(`/profile/${editedDatas.username}`);
     } else {
-      console.error("File upload failed:", response.statusText);
+      const data = await response.json();
+      setFeedbackMessage(data.message);
+      setTimeout(() => {
+        setFeedbackMessage("");
+      }, 2200);
     }
   };
 
@@ -241,7 +252,7 @@ export default function ProfileEditor() {
         ) : (
           <img
             className={styles.rounded}
-            src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas.profilePicture}`}
+            src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profilePicture}`}
           />
         )}
         <button
@@ -286,7 +297,7 @@ export default function ProfileEditor() {
         </button>
       </div>
       <BlockedList />
-      <p>{feedbackMessage}</p>
+      <p className={styles.errorMessage}>{feedbackMessage}</p>
     </div>
   );
 }

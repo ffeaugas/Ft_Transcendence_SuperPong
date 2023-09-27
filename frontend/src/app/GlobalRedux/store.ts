@@ -2,10 +2,12 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./Features/user/userSlice";
+import profilePictureReducer from "./Features/profilePicture/profilePictureSlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    profilePicture: profilePictureReducer,
   },
 });
 
