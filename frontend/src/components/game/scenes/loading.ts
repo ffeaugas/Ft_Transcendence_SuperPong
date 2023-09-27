@@ -14,6 +14,8 @@ export default class LoadingScene extends Phaser.Scene {
     name: { [index: number]: any } = {};
     playerSessionID: { [index: number]: any } = {};
     P1: { [index: number]: any } = {};
+    nameLigth: { [index: number]: any } = {};
+    nameAnim: { [index: number]: any } = {};
     P2: { [index: number]: any } = {};
     load: any;
     loadAnim: any;
@@ -90,6 +92,15 @@ export default class LoadingScene extends Phaser.Scene {
                 300,
                 0.4
             );
+            for (let i = 1; i < 80; i++) {
+                this.backgroundEntities[5 + i] = this.add.pointlight(
+                    dim[0] / 2,
+                    (i - 1) * 12.2,
+                    0xaa00aa,
+                    35,
+                    0.1
+                );
+            }
             this.nameEntities[0] = this.add
                 .text(dim[0] / 4, (dim[1] / 3) * 2.3, "", {
                     fontSize: 35,
@@ -130,8 +141,164 @@ export default class LoadingScene extends Phaser.Scene {
                 if (!this.playerSessionID[0] && this.name[1] != player) {
                     this.playerSessionID[0] = sessionId;
                     this.name[0] = player;
+                    for (let i = 0; i < 50; i++) {
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                dim[0] / 4 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0x11ff11,
+                                0,
+                                0
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: (i + 1) * 1.1,
+                            intensity: 0.8,
+                        });
+                    }
+                    for (let i = 50; i < 100; i++) {
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                dim[0] / 4 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0x11ff11,
+                                0,
+                                0
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
+                            intensity: 0.8,
+                        });
+                    }
                     this.nameEntities[0].setText(player);
+                    for (let i = 0; i < 50; i++) {
+                        this.nameLigth[i].destroy();
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                dim[0] / 4 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0x11ff11,
+                                (i + 1) * 1.1,
+                                0.8
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: 0,
+                            intensity: 0,
+                        });
+                    }
+                    for (let i = 50; i < 100; i++) {
+                        this.nameLigth[i].destroy();
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                dim[0] / 4 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0x11ff11,
+                                (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
+                                0.8
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: 0,
+                            intensity: 0,
+                        });
+                    }
                 } else if (!this.playerSessionID[1] && this.name[0] != player) {
+                    for (let i = 0; i < 50; i++) {
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                (dim[0] / 4) * 3 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0xff1111,
+                                0,
+                                0
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: (i + 1) * 1.1,
+                            intensity: 0.8,
+                        });
+                    }
+                    for (let i = 50; i < 100; i++) {
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                (dim[0] / 4) * 3 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0xff1111,
+                                0,
+                                0
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
+                            intensity: 0.8,
+                        });
+                    }
+                    for (let i = 0; i < 50; i++) {
+                        this.nameLigth[i].destroy();
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                (dim[0] / 4) * 3 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0xff1111,
+                                (i + 1) * 1.1,
+                                0.8
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: 0,
+                            intensity: 0,
+                        });
+                    }
+                    for (let i = 50; i < 100; i++) {
+                        this.nameLigth[i].destroy();
+                        this.nameLigth[i] = this.add
+                            .pointlight(
+                                (dim[0] / 4) * 3 - 200 + i * 4,
+                                (dim[1] / 3) * 2.3,
+                                0xff1111,
+                                (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
+                                0.8
+                            )
+                            .setDepth(8);
+                        this.nameAnim[i] = this.tweens.add({
+                            targets: this.nameLigth[i],
+                            ease: "Quintic.easeInOut",
+                            duration: 250,
+                            repeat: 0,
+                            radius: 0,
+                            intensity: 0,
+                        });
+                    }
                     this.playerSessionID[1] = sessionId;
                     this.name[1] = player;
                     this.nameEntities[1].setText(player);
@@ -273,8 +440,8 @@ export default class LoadingScene extends Phaser.Scene {
                     this.nameEntities[0].setTint(0xff8888);
                     for (let i = 7; i < 18; i++) {
                         this.backgroundEntities[i] = this.add.pointlight(
-                            (dim[1] / 4) * 3 - 200 + (i - 7) * 40,
-                            (dim[0] / 3) * 2.3,
+                            (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
+                            (dim[1] / 3) * 2.3,
                             0x00aa00,
                             70,
                             0.4
