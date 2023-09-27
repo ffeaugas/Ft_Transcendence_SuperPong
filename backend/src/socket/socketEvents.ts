@@ -44,4 +44,8 @@ export class SocketEvents {
   kickFromChannel(channelName: string, kickedUser: string) {
     this.server.emit('KICKED_FROM_CHANNEL', channelName, kickedUser);
   }
+
+  inviteInGame() {
+    this.server.emit('GAME_INVITATION');
+  }
 }

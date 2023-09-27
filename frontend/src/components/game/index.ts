@@ -9,6 +9,7 @@ import { getCookie } from "cookies-next";
 
 export default function Index() {
   let gameInstance; // Declare a variable to hold the game instance
+  let scene = [];
 
   useEffect(() => {
     const loadGame = async () => {
@@ -17,6 +18,20 @@ export default function Index() {
       }
 
       // Create the game instance here
+      if (
+        window.location.href.replace("http://10.11.250.74:3000/game", "") === ""
+      ) {
+        scene = [
+          MainMenuScene,
+          LoadingScene,
+          GameScene,
+          LoadingSceneBonus,
+          GameSceneBonus,
+        ];
+      } else {
+        scene = [LoadingScene, GameScene];
+      }
+
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
         scale: {
@@ -38,13 +53,7 @@ export default function Index() {
           forceSetTimeOut: true,
         },
         // pixelArt: true,
-        scene: [
-          //   MainMenuScene,
-          LoadingScene,
-          GameScene,
-          LoadingSceneBonus,
-          GameSceneBonus,
-        ],
+        scene: scene,
       };
       gameInstance = new Phaser.Game(config);
     };

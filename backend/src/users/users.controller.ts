@@ -7,6 +7,7 @@ import {
   Req,
   Body,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -56,6 +57,16 @@ export class UsersController {
   @Patch('updateStatus')
   async updateUserStatus(@Req() req: Request) {
     return await this.usersService.updateUserStatus(req);
+  }
+
+  @Post('inviteingame')
+  async inviteUserInGame(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.inviteUserInGame(req, dto);
+  }
+
+  @Get('getGameRequests')
+  async getGameRequests(@Req() req) {
+    return await this.usersService.getGameRequests(req);
   }
 
   @Get('getFriendRequests')

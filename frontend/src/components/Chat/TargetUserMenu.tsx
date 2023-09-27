@@ -103,9 +103,28 @@ export default function TargetUserMenu({
   async function goToProfile() {
     route.push("/profile/" + targetUser);
   }
+
   async function goToGame() {
-    const i = Math.round(Math.random() * 1000000);
-    route.push("/game/" + i);
+    const data = {
+      receiver: targetUser,
+      roomId: Math.round(Math.random() * 1000000),
+    };
+    try {
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/inviteingame`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          body: JSON.stringify(data),
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    route.push("/game/" + data.roomId);
   }
 
   useEffect(() => {

@@ -20,4 +20,5 @@ export class Users implements Prisma.UserCreateInput {
   friendReqReceived?: any;
   blockedByUsers?: any;
   blockedUsers?: any;
+  gameReqReceived?: any;
 }

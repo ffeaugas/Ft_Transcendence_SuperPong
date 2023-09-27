@@ -8,6 +8,7 @@ import * as argon from 'argon2';
 import { ChannelMode, User } from '@prisma/client';
 import { UserUpdateDto } from './dto/userUpdate.dto';
 import { UserRelationChangeDto } from './dto/userRelationChange.dto';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 enum RelationType {
   FRIEND = 'FRIEND',
@@ -19,6 +20,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly profileService: ProfileService,
+    private readonly socketEvents: SocketEvents,
   ) {}
 
   async createUser(dto: AuthDto, user42: boolean): Promise<Users> {
@@ -227,6 +229,38 @@ export class UsersService {
       include: { sender: true },
     });
     return friendRequests;
+  }
+
+  async inviteUserInGame(req: any, dto: any) {
+    const sender = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!sender) throw new ForbiddenException('User not found');
+    const receiver = await this.prismaService.user.findUnique({
+      where: { username: dto.receiver },
+    });
+    if (!receiver) throw new ForbiddenException('Receiver not found');
+    const newGameRequest = await this.prismaService.gameRequest.create({
+      data: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        roomId: dto.roomId,
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+    });
+    this.socketEvents.inviteInGame();
+  }
+
+  async getGameRequests(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+      include: { gameReqReceived: true },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    return user.gameReqReceived;
   }
 
   async updateBlock(

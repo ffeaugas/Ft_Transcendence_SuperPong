@@ -15,6 +15,8 @@ import {
   removeBlockedMessages,
 } from "./actions";
 import { Socket, io } from "socket.io-client";
+import Toast from "./Toast";
+import { json } from "stream/consumers";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -34,6 +36,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<Channels>();
   const [targetUser, setTargetUser] = useState<string | null>(null);
+  const [gameRequests, setGameRequests] = useState<Toast[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<MenuType>(
     MenuType.CHANNEL_SELECTOR
   );
@@ -60,8 +63,30 @@ export default function Chat() {
     setTargetUser(username);
   }
 
-  function closeUserInfos(): void {
+  function closeUserInfos() {
     setTargetUser(null);
+  }
+
+  function deleteGameInvitation() {
+    //fonction pr virer la friend request
+  }
+
+  async function getGameRequests(): Promise<Toast[]> {
+    try {
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getGameRequests`,
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const gameRequests = await res.json();
+      return gameRequests;
+    } catch (error) {
+      console.error("Error fetching game requests", error);
+      return [];
+    }
   }
 
   //--------------------------------------------------
@@ -75,6 +100,12 @@ export default function Chat() {
       console.log("connected");
     });
     setSocket(socket);
+  }
+
+  function handleGameInvitation() {
+    getGameRequests().then((request) => {
+      setGameRequests(request);
+    });
   }
 
   function sendMessage(data: string) {
@@ -124,12 +155,14 @@ export default function Chat() {
     socket?.on("CHANNEL_DELETE", activeChannelReset);
     socket?.on("CHANNEL_UPDATE", updateChannelList);
     socket?.on("KICKED_FROM_CHANNEL", kickedFromChannel);
+    socket?.on("GAME_INVITATION", handleGameInvitation);
 
     return () => {
       socket?.off("NEW_MESSAGE", messageListner);
       socket?.off("CHANNEL_DELETE", activeChannelReset);
       socket?.off("CHANNEL_UPDATE", updateChannelList);
       socket?.off("KICKED_FROM_CHANNEL", kickedFromChannel);
+      socket?.off("GAME_INVITATION", handleGameInvitation);
     };
   }, [messageListner]);
 
@@ -138,6 +171,9 @@ export default function Chat() {
 
   useEffect(() => {
     getUserInfos().then((infos) => setUser(infos));
+    getGameRequests().then((request) => {
+      setGameRequests(request);
+    });
   }, []);
 
   useEffect(() => {
@@ -153,29 +189,32 @@ export default function Chat() {
   if (!user) return <p>...</p>;
 
   return (
-    <div className={`${styles.chat}`}>
-      <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
-      <Menu
-        selectedMenu={selectedMenu}
-        activeDiscussionType={activeDiscussionType}
-        activeDiscussion={activeDiscussion}
-        channels={channels}
-        switchChannel={switchChannel}
-        changeMenu={changeMenu}
-      />
-      <MsgList
-        activeDiscussion={activeDiscussion}
-        activeDiscussionType={activeDiscussionType}
-        showUserInfos={showUserInfos}
-        submitNewMessage={submitNewMessage}
-        messages={removeBlockedMessages(messages, user.blockedUsers)}
-      />
-      {targetUser ? (
-        <TargetUserMenu
-          targetUser={targetUser}
-          closeUserInfos={closeUserInfos}
+    <>
+      <Toast gameRequests={gameRequests} />
+      <div className={`${styles.chat}`}>
+        <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
+        <Menu
+          selectedMenu={selectedMenu}
+          activeDiscussionType={activeDiscussionType}
+          activeDiscussion={activeDiscussion}
+          channels={channels}
+          switchChannel={switchChannel}
+          changeMenu={changeMenu}
         />
-      ) : undefined}
-    </div>
+        <MsgList
+          activeDiscussion={activeDiscussion}
+          activeDiscussionType={activeDiscussionType}
+          showUserInfos={showUserInfos}
+          submitNewMessage={submitNewMessage}
+          messages={removeBlockedMessages(messages, user.blockedUsers)}
+        />
+        {targetUser ? (
+          <TargetUserMenu
+            targetUser={targetUser}
+            closeUserInfos={closeUserInfos}
+          />
+        ) : undefined}
+      </div>
+    </>
   );
 }

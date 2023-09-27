@@ -16,9 +16,13 @@ export class MyRoom extends Room<MyRoomState> {
   host: Client;
   game: GameService;
 
-  onCreate(options: any) {
+  async onCreate(options: any) {
     this.game = new GameService(prisma);
     this.setState(new MyRoomState());
+    if (options.roomId) {
+      this.roomId = options.roomId;
+      // this.setPrivate(true);
+    }
     this.onMessage('move', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       player.y = data;

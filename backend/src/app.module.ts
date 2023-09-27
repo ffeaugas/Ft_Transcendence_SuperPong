@@ -20,6 +20,7 @@ import { AchievementModule } from './achievement/achievement.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
+import { SocketEvents } from './socket/socketEvents';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { GameController } from './game.controller';
     SocketModule,
     AchievementModule,
     LeaderboardModule,
+    SocketModule,
   ],
   controllers: [
     AppController,
@@ -47,6 +49,7 @@ import { GameController } from './game.controller';
     ProfileService,
     AchievementService,
     GameService,
+    SocketEvents,
   ],
 })
 export class AppModule {
