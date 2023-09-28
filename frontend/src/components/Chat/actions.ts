@@ -178,3 +178,78 @@ export async function rejectGameRequest(senderUsername: string) {
   }
   return;
 }
+
+export async function getGameRequests(): Promise<Toast[]> {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getGameRequests`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const gameRequests = await res.json();
+    return gameRequests;
+  } catch (error) {
+    console.error("Error fetching game requests", error);
+    return [];
+  }
+}
+
+export async function getFriendRequests() {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getfriendrequests`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const requests = res.json();
+    return requests;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+export async function acceptFriendRequest(senderId: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/acceptFriendRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderId: senderId }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}
+
+export async function rejectFriendRequest(senderId: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/rejectFriendRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderId: senderId }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}

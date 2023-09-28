@@ -141,6 +141,7 @@ export class UsersService {
         receiver: true,
       },
     });
+    this.socketEvents.inviteFriend();
     return newFriendRequest;
   }
 
@@ -221,7 +222,6 @@ export class UsersService {
   async getFriendRequests(req: any) {
     const user = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
-      include: { friends: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     const friendRequests = await this.prismaService.friendRequest.findMany({

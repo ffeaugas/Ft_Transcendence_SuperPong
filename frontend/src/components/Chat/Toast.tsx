@@ -3,11 +3,17 @@ import { useRouter } from "next/navigation";
 
 type ToastProps = {
   gameRequests: Toast[];
+  friendRequests: FriendRequest[];
   deleteGameInvitation: (senderUsername: string) => void;
+  deleteFriendInvitation: (senderId: string) => void;
+  acceptFriendInvitation: (senderId: string) => void;
 };
 
 export default function Toast({
   gameRequests,
+  friendRequests,
+  deleteFriendInvitation,
+  acceptFriendInvitation,
   deleteGameInvitation,
 }: ToastProps) {
   const router = useRouter();
@@ -25,12 +31,23 @@ export default function Toast({
     <div className={styles.toasts}>
       <ul>
         {gameRequests.map((request) => (
-          <li key={request.id} className={styles.toast}>
-            <h4>{request.sender.username} invited you in game !</h4>
+          <li key={request.id} className={styles.gameToast}>
+            <h4>{request.sender.username} invited you in a game !</h4>
             <button onClick={() => goToGame(request)}>Accept</button>
             <button
               onClick={() => deleteGameInvitation(request.sender.username)}
             >
+              Decline
+            </button>
+          </li>
+        ))}
+        {friendRequests.map((request) => (
+          <li key={request.id} className={styles.friendToast}>
+            <h4>{request.sender.username} wants to be friend with you !</h4>
+            <button onClick={() => acceptFriendInvitation(request.sender.id)}>
+              Accept
+            </button>
+            <button onClick={() => deleteFriendInvitation(request.sender.id)}>
               Decline
             </button>
           </li>

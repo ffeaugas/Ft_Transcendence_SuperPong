@@ -7,11 +7,15 @@ import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
 import {
+  acceptFriendRequest,
   addMessage,
   getChannels,
+  getFriendRequests,
+  getGameRequests,
   getMessages,
   getUserInfos,
   isBlocked,
+  rejectFriendRequest,
   rejectGameRequest,
   removeBlockedMessages,
 } from "./actions";
@@ -38,6 +42,7 @@ export default function Chat() {
   const [channels, setChannels] = useState<Channels>();
   const [targetUser, setTargetUser] = useState<string | null>(null);
   const [gameRequests, setGameRequests] = useState<Toast[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<MenuType>(
     MenuType.CHANNEL_SELECTOR
   );
@@ -71,33 +76,33 @@ export default function Chat() {
   function deleteGameInvitation(senderUsername: string) {
     rejectGameRequest(senderUsername);
     setTimeout(() => {
-      getGameRequests().then((request) => {
-        setGameRequests(request);
-      });
+      getGameRequests().then((request) => setGameRequests(request));
     }, 150);
   }
 
-  async function getGameRequests(): Promise<Toast[]> {
-    try {
-      const res = await fetch(
-        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getGameRequests`,
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const gameRequests = await res.json();
-      return gameRequests;
-    } catch (error) {
-      console.error("Error fetching game requests", error);
-      return [];
-    }
+  function deleteFriendInvitation(senderId: string) {
+    rejectFriendRequest(senderId);
+    setTimeout(() => {
+      getFriendRequests().then((request) => setFriendRequests(request));
+    }, 150);
   }
 
-  //--------------------------------------------------
-  // SOCKET ACTIONS   --------------------------------
-  //--------------------------------------------------
+  function acceptFriendInvitation(senderId: string) {
+    acceptFriendRequest(senderId);
+    setTimeout(() => {
+      getFriendRequests().then((request) => setFriendRequests(request));
+    }, 150);
+  }
+
+  function handleGameInvitation() {
+    getGameRequests().then((request) => {
+      setGameRequests(request);
+    });
+  }
+
+  //---------------------------------------------------------------------------
+  // SOCKET ACTIONS   ---------------------------------------------------------
+  //---------------------------------------------------------------------------
 
   async function socketInitializer(): Promise<any> {
     const socket = io(`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
@@ -106,12 +111,6 @@ export default function Chat() {
       console.log("connected");
     });
     setSocket(socket);
-  }
-
-  function handleGameInvitation() {
-    getGameRequests().then((request) => {
-      setGameRequests(request);
-    });
   }
 
   function sendMessage(data: string) {
@@ -125,6 +124,10 @@ export default function Chat() {
   function submitNewMessage(textInput: string) {
     addMessage(textInput, activeDiscussionType, activeDiscussion);
     sendMessage(textInput);
+  }
+
+  function listenFriendInvitation() {
+    getFriendRequests().then((request) => setFriendRequests(request));
   }
 
   function updateChannelList() {
@@ -162,6 +165,7 @@ export default function Chat() {
     socket?.on("CHANNEL_UPDATE", updateChannelList);
     socket?.on("KICKED_FROM_CHANNEL", kickedFromChannel);
     socket?.on("GAME_INVITATION", handleGameInvitation);
+    socket?.on("FRIEND_INVITATION", listenFriendInvitation);
 
     return () => {
       socket?.off("NEW_MESSAGE", messageListner);
@@ -169,17 +173,17 @@ export default function Chat() {
       socket?.off("CHANNEL_UPDATE", updateChannelList);
       socket?.off("KICKED_FROM_CHANNEL", kickedFromChannel);
       socket?.off("GAME_INVITATION", handleGameInvitation);
+      socket?.off("FRIEND_INVITATION", listenFriendInvitation);
     };
   }, [messageListner]);
 
-  //--------------------------------------------------
-  //--------------------------------------------------
+  //---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
 
   useEffect(() => {
     getUserInfos().then((infos) => setUser(infos));
-    getGameRequests().then((request) => {
-      setGameRequests(request);
-    });
+    getGameRequests().then((request) => setGameRequests(request));
+    getFriendRequests().then((request) => setFriendRequests(request));
   }, []);
 
   useEffect(() => {
@@ -198,7 +202,10 @@ export default function Chat() {
     <>
       <Toast
         gameRequests={gameRequests}
+        friendRequests={friendRequests}
         deleteGameInvitation={deleteGameInvitation}
+        deleteFriendInvitation={deleteFriendInvitation}
+        acceptFriendInvitation={acceptFriendInvitation}
       />
       <div className={`${styles.chat}`}>
         <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />

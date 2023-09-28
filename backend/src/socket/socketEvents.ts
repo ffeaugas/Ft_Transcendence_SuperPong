@@ -48,4 +48,8 @@ export class SocketEvents {
   inviteInGame() {
     this.server.emit('GAME_INVITATION');
   }
+
+  inviteFriend() {
+    this.server.emit('FRIEND_INVITATION');
+  }
 }

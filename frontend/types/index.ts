@@ -9,6 +9,11 @@ type Toast = {
   roomId: number;
 };
 
+type FriendRequest = {
+  id: string;
+  sender: User;
+};
+
 type ChannelItem = {
   id: string;
   channelName: string;
