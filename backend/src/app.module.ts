@@ -21,6 +21,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
 import { SocketEvents } from './socket/socketEvents';
+import { MulterModule } from '@nestjs/platform-express';
+import { multerConfig } from './multer/multer.config';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { SocketEvents } from './socket/socketEvents';
     AchievementModule,
     LeaderboardModule,
     SocketModule,
+    MulterModule.register(multerConfig),
   ],
   controllers: [
     AppController,

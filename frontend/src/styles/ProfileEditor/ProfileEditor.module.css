@@ -1,101 +1,109 @@
 .profileEditor {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-    font-family: "Teko", sans-serif;
-    font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  font-family: "Teko", sans-serif;
+  font-size: 14px;
 }
 
 .imageUploader {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  gap: 5px;
 }
 
 /*-------------------------- */
 
 .imageUploader input[type="file"] {
-    color: transparent;
+  color: transparent;
 }
 
 .imageUploader input[type="file"]::file-selector-button {
-    background-color: var(--backgroundColor2);
-    border: none;
-    color: var(--textColor1);
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: 400;
-    font-family: "Teko", sans-serif;
-    font-size: 12px;
-    display: flex;
-    margin: 0 auto;
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+  margin: 0 auto;
 }
 
 .imageUploader input[type="file"]::file-selector-button:hover {
-    background-color: var(--titleColor1);
+  background-color: var(--titleColor1);
 }
 
 /*-------------------------- */
 
 img.rounded {
-    object-fit: cover;
-    display: inline-block;
-    position: relative;
-    width: clamp(50px, 50px + 5vw, 200px);
-    height: clamp(50px, 50px + 5vw, 200px);
-    overflow: hidden;
-    border-radius: 50%;
-    margin: 0 auto;
+  object-fit: cover;
+  display: inline-block;
+  position: relative;
+  width: clamp(50px, 50px + 5vw, 200px);
+  height: clamp(50px, 50px + 5vw, 200px);
+  overflow: hidden;
+  border-radius: 50%;
+  margin: 0 auto;
 }
 
 .editProfile {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 3px;
-    /* max-width: 150px; */
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  /* max-width: 150px; */
+  width: 100%;
+}
+
+.editProfile h4 {
+  font-family: "Teko", sans-serif;
 }
 
 .editProfile button {
-    border-style: none;
-    background: none;
-    color: rgb(214, 133, 197);
-    padding: 0;
-    font-size: var(--titleSize2);
+  border-style: none;
+  background: none;
+  color: rgb(214, 133, 197);
+  padding: 0;
+  font-size: var(--titleSize2);
 }
 
 .editProfile button:hover {
-    color: rgb(191, 197, 195);
+  color: rgb(191, 197, 195);
 }
 
 .editProfile p {
-    word-break: break-all;
-    color: white;
+  word-break: break-all;
+  color: white;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .customButton {
-    background-color: var(--backgroundColor2);
-    border: none;
-    color: var(--textColor1);
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: 400;
-    font-family: "Teko", sans-serif;
-    font-size: 12px;
-    display: flex;
-    margin: 0 auto;
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+  margin: 0 auto;
+}
+
+.errorMessage {
+  color: red;
 }
