@@ -4,7 +4,7 @@
 
 type Toast = {
   id: string;
-  sender: string;
+  sender: User;
   receiver: string;
   roomId: number;
 };

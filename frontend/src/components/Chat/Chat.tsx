@@ -12,6 +12,7 @@ import {
   getMessages,
   getUserInfos,
   isBlocked,
+  rejectGameRequest,
   removeBlockedMessages,
 } from "./actions";
 import { Socket, io } from "socket.io-client";
@@ -67,8 +68,11 @@ export default function Chat() {
     setTargetUser(null);
   }
 
-  function deleteGameInvitation() {
-    //fonction pr virer la friend request
+  function deleteGameInvitation(senderUsername: string) {
+    rejectGameRequest(senderUsername);
+    getGameRequests().then((request) => {
+      setGameRequests(request);
+    });
   }
 
   async function getGameRequests(): Promise<Toast[]> {
@@ -190,7 +194,10 @@ export default function Chat() {
 
   return (
     <>
-      <Toast gameRequests={gameRequests} />
+      <Toast
+        gameRequests={gameRequests}
+        deleteGameInvitation={deleteGameInvitation}
+      />
       <div className={`${styles.chat}`}>
         <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
         <Menu

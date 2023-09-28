@@ -254,13 +254,31 @@ export class UsersService {
     this.socketEvents.inviteInGame();
   }
 
+  async deleteGameRequest(req: any, senderUsername: string) {
+    console.log('SENDER USERNAMEEEE: ', senderUsername);
+    const receiver = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    const sender = await this.prismaService.user.findUnique({
+      where: { username: senderUsername },
+    });
+    if (!receiver) throw new ForbiddenException('User not found');
+    const deleteGameRequest = await this.prismaService.gameRequest.deleteMany({
+      where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
+    });
+    return;
+  }
+
   async getGameRequests(req: any) {
     const user = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
-      include: { gameReqReceived: true },
     });
     if (!user) throw new ForbiddenException('User not found');
-    return user.gameReqReceived;
+    const gameRequests = await this.prismaService.gameRequest.findMany({
+      where: { receiverId: user.id },
+      include: { sender: true },
+    });
+    return gameRequests;
   }
 
   async updateBlock(

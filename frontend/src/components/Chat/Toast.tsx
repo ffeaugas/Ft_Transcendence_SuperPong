@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 
 type ToastProps = {
   gameRequests: Toast[];
-  deleteGameInvitation: () => void;
+  deleteGameInvitation: (senderUsername: string) => void;
 };
 
 export default function Toast({
@@ -12,9 +12,12 @@ export default function Toast({
 }: ToastProps) {
   const router = useRouter();
 
-  function goToGame(roomId: number) {
+  function goToGame(request: Toast) {
+    deleteGameInvitation(request.sender.username);
     router.push(
-      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/${roomId.toString()}`
+      `http://${
+        process.env.NEXT_PUBLIC_DOMAIN
+      }:3000/game/${request.roomId.toString()}`
     );
   }
 
@@ -23,9 +26,11 @@ export default function Toast({
       <ul>
         {gameRequests.map((request) => (
           <li key={request.id} className={styles.toast}>
-            <h3>{request.sender} invited you in game !</h3>
-            <button onClick={() => goToGame(request.roomId)}>Accept</button>
-            <p onClick={deleteGameInvitation}>X</p>
+            <h3>{request.sender.username} invited you in game !</h3>
+            <button onClick={() => goToGame(request)}>Accept</button>
+            <p onClick={() => deleteGameInvitation(request.sender.username)}>
+              X
+            </p>
           </li>
         ))}
       </ul>

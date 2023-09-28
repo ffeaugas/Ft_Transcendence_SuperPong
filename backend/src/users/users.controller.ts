@@ -69,6 +69,11 @@ export class UsersController {
     return await this.usersService.getGameRequests(req);
   }
 
+  @Delete('deleteGameRequest')
+  async deleteGameRequest(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.deleteGameRequest(req, dto.senderUsername);
+  }
+
   @Get('getFriendRequests')
   async getFriendRequests(@Req() req) {
     return await this.usersService.getFriendRequests(req);

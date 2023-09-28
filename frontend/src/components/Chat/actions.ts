@@ -159,3 +159,22 @@ export function removeBlockedMessages(
   });
   return filtratedMessages;
 }
+
+export async function rejectGameRequest(senderUsername: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/deleteGameRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderUsername: senderUsername }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}
