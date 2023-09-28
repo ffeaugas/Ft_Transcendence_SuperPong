@@ -126,7 +126,10 @@ export default class LoadingScene extends Phaser.Scene {
         .setDepth(6);
       this.client = new Client(`ws://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
       if (
-        window.location.href.replace("http://10.11.250.74:3000/game", "") === ""
+        window.location.href.replace(
+          "http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game",
+          ""
+        ) === ""
       ) {
         // const games = await this.client.getAvailableRooms();
         // if (games.length > 0) {
@@ -156,7 +159,7 @@ export default class LoadingScene extends Phaser.Scene {
         });
       } else {
         const id = window.location.href.replace(
-          "http://10.11.250.74:3000/game/",
+          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
           ""
         );
         const games = await this.client.getAvailableRooms();

@@ -26,11 +26,13 @@ export default function Toast({
       <ul>
         {gameRequests.map((request) => (
           <li key={request.id} className={styles.toast}>
-            <h3>{request.sender.username} invited you in game !</h3>
+            <h4>{request.sender.username} invited you in game !</h4>
             <button onClick={() => goToGame(request)}>Accept</button>
-            <p onClick={() => deleteGameInvitation(request.sender.username)}>
-              X
-            </p>
+            <button
+              onClick={() => deleteGameInvitation(request.sender.username)}
+            >
+              Decline
+            </button>
           </li>
         ))}
       </ul>

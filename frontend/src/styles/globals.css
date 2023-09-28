@@ -75,6 +75,11 @@ h2 {
   color: var(--titleColor1);
 }
 
+h4 {
+  color: var(--titleColor1);
+  font-size: var(--textSize1);
+}
+
 h3 {
   color: var(--titleColor1);
   font-size: var(--titleSize1);

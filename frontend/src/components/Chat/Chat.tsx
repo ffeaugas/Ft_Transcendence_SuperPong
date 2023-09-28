@@ -70,9 +70,11 @@ export default function Chat() {
 
   function deleteGameInvitation(senderUsername: string) {
     rejectGameRequest(senderUsername);
-    getGameRequests().then((request) => {
-      setGameRequests(request);
-    });
+    setTimeout(() => {
+      getGameRequests().then((request) => {
+        setGameRequests(request);
+      });
+    }, 150);
   }
 
   async function getGameRequests(): Promise<Toast[]> {

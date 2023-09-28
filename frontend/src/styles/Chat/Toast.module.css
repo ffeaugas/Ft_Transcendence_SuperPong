@@ -1,10 +1,39 @@
 .toasts ul {
-  background-color: rgb(160, 54, 71);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
+  list-style: none;
 }
 
 .toast {
-  background-color: pink;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5em, 0.5em + 1vw, 1em);
+  background-color: var(--backgroundColor1);
+  border: var(--backgroundColor3) solid 1px;
+  border-radius: 5px;
+  /* width: 60%; */
+  margin: 0 auto;
+  padding: 5px 10px;
+  align-items: center;
+}
+
+.toast button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+}
+
+.toast button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
 }

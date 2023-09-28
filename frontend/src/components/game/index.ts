@@ -19,7 +19,10 @@ export default function Index() {
 
       // Create the game instance here
       if (
-        window.location.href.replace("http://10.11.250.74:3000/game", "") === ""
+        window.location.href.replace(
+          `${process.env.NEXT_PUBLIC_DOMAIN}/game`,
+          ""
+        ) === ""
       ) {
         scene = [
           MainMenuScene,
