@@ -55,15 +55,20 @@ export class AuthService {
           profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
-      console.log('USERDATA : ', userData);
       this.downloadImage(
         userData.image.link,
         userData.login + '_' + +newUser.id,
       );
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Boutonneux' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: newUser.id },
+        data: { achievements: { connect: achievement } },
+      });
     } else {
       user.login = userData.login;
       user.password = userFound.hash;
-      console.log(userData.email);
     }
     const res = await this.login(user);
     return [res, isFirstConnection];
@@ -98,11 +103,17 @@ export class AuthService {
 
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);
-    const payload = { sub: user.id, login: user.login, role: user.role };
+    const payload = {
+      sub: user.id,
+      login: user.login,
+      role: user.role,
+      otpenabled: user.otpEnabled,
+      otpvalidated: user.otpValidated,
+    };
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
-    } else if (user.isTwoFaEnabled) {
+    } else if (user.otpEnabled) {
       // if () {}
       // TODO VERIFY THE 2FA
     }

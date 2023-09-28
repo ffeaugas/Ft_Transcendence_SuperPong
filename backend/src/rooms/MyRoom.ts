@@ -16,9 +16,13 @@ export class MyRoom extends Room<MyRoomState> {
   host: Client;
   game: GameService;
 
-  onCreate(options: any) {
+  async onCreate(options: any) {
     this.game = new GameService(prisma);
     this.setState(new MyRoomState());
+    if (options.roomId) {
+      this.roomId = options.roomId;
+      // this.setPrivate(true);
+    }
     this.onMessage('move', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       player.y = data;
@@ -140,13 +144,11 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   onJoin(client: Client, options: any) {
-    console.log(client.sessionId, 'joined!');
     const mapWidth = options.dim[0];
     const mapHeight = options.dim[1];
 
     const player = new Player();
     player.username = options.name;
-    // console.log(player.username);
     if (!this.player[0]) {
       player.x = mapWidth * 0.01;
       player.y = mapHeight / 2;

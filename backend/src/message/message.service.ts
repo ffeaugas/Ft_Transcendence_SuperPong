@@ -64,6 +64,21 @@ export class MessageService {
       include: { sender: true, Channel: true, receiver: true },
     });
     this.socketGateway.sendMessage(newMessage);
+    if (
+      newMessage.content === 'Bonjour' &&
+      newMessage.Channel.channelName === 'General'
+    ) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: req.user.sub },
+      });
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Type sympa' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: user.id },
+        data: { achievements: { connect: achievement } },
+      });
+    }
     return newMessage;
   }
 

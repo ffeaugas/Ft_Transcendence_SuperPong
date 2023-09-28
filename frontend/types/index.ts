@@ -2,6 +2,13 @@
 /*                        [CHAT TYPES]                         */
 /*-------------------------------------------------------------*/
 
+type Toast = {
+  id: string;
+  sender: User;
+  receiver: string;
+  roomId: number;
+};
+
 type ChannelItem = {
   id: string;
   channelName: string;

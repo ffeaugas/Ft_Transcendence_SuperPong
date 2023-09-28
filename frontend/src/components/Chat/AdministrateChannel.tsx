@@ -106,7 +106,6 @@ export default function AdministrateChannel({
         updateType: UpdateType
     ): Promise<void> {
         evt.preventDefault();
-        console.log("UPDATE : ", updateType, " on : ", targetUser);
         if (!targetUser) return;
         try {
             const res = await fetch(
@@ -241,7 +240,6 @@ export default function AdministrateChannel({
                 },
             }
         );
-        console.log("Updated infos : ", res.data);
         return res.data;
     }
 

@@ -8,6 +8,7 @@ import * as argon from 'argon2';
 import { ChannelMode, User } from '@prisma/client';
 import { UserUpdateDto } from './dto/userUpdate.dto';
 import { UserRelationChangeDto } from './dto/userRelationChange.dto';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 enum RelationType {
   FRIEND = 'FRIEND',
@@ -19,6 +20,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly profileService: ProfileService,
+    private readonly socketEvents: SocketEvents,
   ) {}
 
   async createUser(dto: AuthDto, user42: boolean): Promise<Users> {
@@ -29,6 +31,7 @@ export class UsersService {
         login: dto.login,
         hash: passwordHash,
         user42: user42,
+        otpEnabled: false,
       },
     });
     await this.prismaService.profile.create({
@@ -59,7 +62,7 @@ export class UsersService {
       where: { id: req.user.sub },
       data: { lastConnexionPing: date },
     });
-    return updatedUser;
+    return;
   }
 
   async updateUserRelation(req: any, dto: UserRelationChangeDto) {
@@ -70,6 +73,7 @@ export class UsersService {
     if (!user) throw new ForbiddenException('User not found');
     const targetUser = await this.prismaService.user.findUnique({
       where: { username: dto.targetUsername },
+      include: { friends: true },
     });
     if (!targetUser) throw new ForbiddenException('User not found');
     if (req.user.sub === targetUser.id) {
@@ -82,35 +86,208 @@ export class UsersService {
 
   async addOrRemoveFriend(
     user: any,
-    targetUser: User,
+    targetUser: any,
     req: any,
     dto: UserRelationChangeDto,
   ) {
-    let updatedFriends: User[];
     const isFriend = user.friends.find(
       (friend) => friend.username === dto.targetUsername,
     );
+    //ADD FRIEND
     if (!isFriend) {
-      updatedFriends = [...user.friends, targetUser];
-    } else {
-      updatedFriends = user.friends.filter(
-        (friend: User) => friend.username != dto.targetUsername,
-      );
+      return this.sendFriendRequest(req, user, targetUser);
     }
+    //REMOVE FRIEND
+    const updatedSenderFriends = user.friends.filter(
+      (friend: User) => friend.username != dto.targetUsername,
+    );
+    const updatedTargetFriends = targetUser.friends.filter(
+      (friend: User) => friend.username != user.username,
+    );
     const updatedFriendUsers = await this.prismaService.user.update({
       where: { username: user.username },
-      data: { friends: { set: updatedFriends } },
+      data: { friends: { set: updatedSenderFriends } },
+    });
+    const updatedTargetUsers = await this.prismaService.user.update({
+      where: { username: targetUser.username },
+      data: { friends: { set: updatedTargetFriends } },
     });
     return updatedFriendUsers;
   }
 
+  //Return void if request was already sent / Accept request if receiver has also sent a request
+  async sendFriendRequest(req: Request, sender: any, receiver: any) {
+    const existingSentFriendRequest =
+      await this.prismaService.friendRequest.findMany({
+        where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
+      });
+    if (existingSentFriendRequest.length > 0) return; //Return void if request was already sent
+    const existingReceivedFriendRequest =
+      await this.prismaService.friendRequest.findMany({
+        where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
+      });
+    if (existingReceivedFriendRequest.length > 0) {
+      // Accept request if receiver has also sent a request
+      return this.acceptFriendRequest(req, sender.Id);
+    }
+    //Otherwise : create the request
+    const newFriendRequest = await this.prismaService.friendRequest.create({
+      data: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+    });
+    return newFriendRequest;
+  }
+
+  removeFriendsFromUsers(users: Users[]) {
+    const usersWithoutFriends = users.map((user) => {
+      const { friends, ...userWithoutFriends } = user;
+      return userWithoutFriends;
+    });
+    return usersWithoutFriends;
+  }
+
+  async acceptFriendRequest(req: any, senderId: number) {
+    const receiver = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+      include: { friends: true },
+    });
+    if (!receiver) throw new ForbiddenException('User not found');
+    const sender = await this.prismaService.user.findUnique({
+      where: { id: senderId },
+      include: { friends: true },
+    });
+    if (!sender) throw new ForbiddenException('Request sender not found');
+    const existingReceivedFriendRequest =
+      await this.prismaService.friendRequest.findMany({
+        where: {
+          senderId: senderId,
+          receiverId: receiver.id,
+        },
+      });
+    if (existingReceivedFriendRequest.length === 0)
+      throw new ForbiddenException('Request not found');
+    const receiverFriends = [...receiver.friends, sender];
+    const updatedReceiverFriends = await this.prismaService.user.update({
+      where: { id: receiver.id },
+      data: { friends: { set: this.removeFriendsFromUsers(receiverFriends) } },
+    });
+    const senderFriends = [...sender.friends, receiver];
+    const updatedSenderFriends = await this.prismaService.user.update({
+      where: { id: sender.id },
+      data: { friends: { set: this.removeFriendsFromUsers(senderFriends) } },
+    });
+    if (receiver.username === 'Roger') {
+      const achievement = await this.prismaService.achievement.findUnique({
+        where: { title: 'Ami de Roger' },
+      });
+      const updatedAchievement = await this.prismaService.profile.update({
+        where: { userId: sender.id },
+        data: { achievements: { connect: achievement } },
+      });
+    } else if (sender.username === 'Roger') {
+      const achievement = await this.prismaService.achievement.findUnique({
+        where: { title: 'Ami de Roger' },
+      });
+      const updatedAchievement = await this.prismaService.profile.update({
+        where: { userId: receiver.id },
+        data: { achievements: { connect: achievement } },
+      });
+    }
+    return this.deleteFriendRequest(req, senderId);
+  }
+
+  async deleteFriendRequest(req: any, senderId: number) {
+    const receiver = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+      include: { friends: true },
+    });
+    if (!receiver) throw new ForbiddenException('User not found');
+    const friendRequest = await this.prismaService.friendRequest.findMany({
+      where: { AND: [{ senderId: senderId }, { receiverId: receiver.id }] },
+    });
+    if (!friendRequest) throw new ForbiddenException('Request not found');
+    const deleteFriendRequest = this.prismaService.friendRequest.deleteMany({
+      where: { AND: [{ senderId: senderId }, { receiverId: receiver.id }] },
+    });
+    return deleteFriendRequest;
+  }
+
+  async getFriendRequests(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+      include: { friends: true },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const friendRequests = await this.prismaService.friendRequest.findMany({
+      where: { receiverId: user.id },
+      include: { sender: true },
+    });
+    return friendRequests;
+  }
+
+  async inviteUserInGame(req: any, dto: any) {
+    const sender = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!sender) throw new ForbiddenException('User not found');
+    const receiver = await this.prismaService.user.findUnique({
+      where: { username: dto.receiver },
+    });
+    if (!receiver) throw new ForbiddenException('Receiver not found');
+    const newGameRequest = await this.prismaService.gameRequest.create({
+      data: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        roomId: dto.roomId,
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+    });
+    this.socketEvents.inviteInGame();
+  }
+
+  async deleteGameRequest(req: any, senderUsername: string) {
+    console.log('SENDER USERNAMEEEE: ', senderUsername);
+    const receiver = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    const sender = await this.prismaService.user.findUnique({
+      where: { username: senderUsername },
+    });
+    if (!receiver) throw new ForbiddenException('User not found');
+    const deleteGameRequest = await this.prismaService.gameRequest.deleteMany({
+      where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
+    });
+    return;
+  }
+
+  async getGameRequests(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const gameRequests = await this.prismaService.gameRequest.findMany({
+      where: { receiverId: user.id },
+      include: { sender: true },
+    });
+    return gameRequests;
+  }
+
   async updateBlock(
-    user: any,
-    targetUser: User,
+    user: Users,
+    targetUser: Users,
     req: Request,
     dto: UserRelationChangeDto,
   ) {
-    let updatedBlockeds: User[];
+    let updatedBlockeds: Users[];
     const isBlocked = user.blockedUsers.find(
       (blockedUser) => blockedUser.username === dto.targetUsername,
     );
@@ -118,12 +295,16 @@ export class UsersService {
       updatedBlockeds = [...user.blockedUsers, targetUser];
     } else {
       updatedBlockeds = user.blockedUsers.filter(
-        (blockedUser: User) => blockedUser.username != dto.targetUsername,
+        (blockedUser: Users) => blockedUser.username != dto.targetUsername,
       );
     }
+    const updatedBlockedsWithoutFriends = updatedBlockeds.map((user) => {
+      const { friends, ...userWithoutFriends } = user;
+      return userWithoutFriends;
+    });
     const updatedBlockedUsers = await this.prismaService.user.update({
       where: { username: user.username },
-      data: { blockedUsers: { set: updatedBlockeds } },
+      data: { blockedUsers: { set: updatedBlockedsWithoutFriends } },
     });
     return updatedBlockedUsers;
   }
@@ -144,7 +325,6 @@ export class UsersService {
     const isBlocked = user.blockedUsers.some(
       (blockedUser) => blockedUser.username === targetUsername,
     );
-    console.log({ isFriend, isBlocked });
     return { isFriend, isBlocked };
   }
 
@@ -232,6 +412,19 @@ export class UsersService {
     const userFounded = await this.prismaService.user.findUnique({
       where: { username: dto.oldUsername },
     });
+    const alreadyExist = await this.prismaService.user.findUnique({
+      where: { username: dto.newUsername },
+    });
+    if (alreadyExist) throw new ForbiddenException('Username already exist');
+    if (dto.newUsername === 'Roger') {
+      const achievement = await this.prismaService.achievement.findUnique({
+        where: { title: 'Roger' },
+      });
+      const updatedAchievement = await this.prismaService.profile.update({
+        where: { userId: userFounded.id },
+        data: { achievements: { connect: achievement } },
+      });
+    }
     return await this.prismaService.user.update({
       where: { id: userFounded.id },
       data: { username: dto.newUsername },

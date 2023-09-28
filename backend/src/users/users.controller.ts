@@ -7,6 +7,7 @@ import {
   Req,
   Body,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -56,6 +57,36 @@ export class UsersController {
   @Patch('updateStatus')
   async updateUserStatus(@Req() req: Request) {
     return await this.usersService.updateUserStatus(req);
+  }
+
+  @Post('inviteingame')
+  async inviteUserInGame(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.inviteUserInGame(req, dto);
+  }
+
+  @Get('getGameRequests')
+  async getGameRequests(@Req() req) {
+    return await this.usersService.getGameRequests(req);
+  }
+
+  @Delete('deleteGameRequest')
+  async deleteGameRequest(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.deleteGameRequest(req, dto.senderUsername);
+  }
+
+  @Get('getFriendRequests')
+  async getFriendRequests(@Req() req) {
+    return await this.usersService.getFriendRequests(req);
+  }
+
+  @Delete('acceptFriendRequest')
+  async acceptFriendRequest(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.acceptFriendRequest(req, dto.senderId);
+  }
+
+  @Delete('rejectFriendRequest')
+  async rejectFriendRequest(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.deleteFriendRequest(req, dto.senderId);
   }
 
   @Get('channels')

@@ -17,16 +17,16 @@ export class SocketEvents {
   server: Server;
 
   handleConnection(client: Socket) {
-    console.log(`client connected : ${client.id}`);
+    //console.log(`client connected : ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`client disconnected : ${client.id}`);
+    //console.log(`client disconnected : ${client.id}`);
   }
 
   @SubscribeMessage('NEW_MESSAGE')
   handleEvent(@MessageBody() data: string) {
-    console.log('data:', data);
+    //console.log('data:', data);
   }
 
   sendMessage(message: Message) {
@@ -43,5 +43,9 @@ export class SocketEvents {
 
   kickFromChannel(channelName: string, kickedUser: string) {
     this.server.emit('KICKED_FROM_CHANNEL', channelName, kickedUser);
+  }
+
+  inviteInGame() {
+    this.server.emit('GAME_INVITATION');
   }
 }

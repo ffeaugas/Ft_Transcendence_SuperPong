@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProfileBioUpdateDto, ProfilePictureUpdateDto } from './dto';
 import { Request, Express } from 'express';
 import * as fs from 'node:fs';
 import { join } from 'path';
+import path from 'node:path';
 
 @Injectable()
 export class ProfileService {
@@ -12,6 +13,26 @@ export class ProfileService {
 
   async getAllProfiles(): Promise<Profile[]> {
     return await this.prisma.profile.findMany();
+  }
+
+  async uploadFile(req: any, file: any) {
+    const maxSize = 5 * 1024 * 1024;
+    if (!file && file.size > maxSize)
+      return new HttpException('File size exceeds the limit of 5MB.', 401);
+    const user = await this.prisma.profile.findUnique({
+      where: { userId: req.user.sub },
+    });
+    const pathOldPP = `./uploads/avatar/${user.profilePicture}`;
+    fs.unlink(pathOldPP, (err) => {
+      if (err) return console.log(err);
+      console.log('File deleted successfully');
+    });
+    console.log('File uploaded:', file);
+    await this.prisma.profile.update({
+      where: { userId: req.user.sub },
+      data: { profilePicture: file.filename },
+    });
+    return { message: 'File uploaded successfully', filename: file.filename };
   }
 
   async getProfileByUsername(username: string) {
@@ -29,6 +50,7 @@ export class ProfileService {
   async getProfileById(uid: number) {
     const profile = await this.prisma.profile.findUnique({
       where: { userId: uid },
+      include: { user: true },
     });
     if (!profile) throw new ForbiddenException('This profile did not exist');
     return profile;

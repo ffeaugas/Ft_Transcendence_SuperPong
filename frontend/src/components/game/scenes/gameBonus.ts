@@ -25,6 +25,7 @@ export default class GameSceneBonus extends Phaser.Scene {
   bonusPos = [0, 0];
   bonusEntity;
   player: any;
+  scale: number;
 
   constructor() {
     super("GameBonus");
@@ -52,6 +53,7 @@ export default class GameSceneBonus extends Phaser.Scene {
   preload() {
     this.scene.stop("LoadingBonus");
     // preload scene
+    this.scale = 1;
     let dim = [this.game.canvas.width, this.game.canvas.height];
     this.cursorKeys = this.input.keyboard.createCursorKeys();
     this.KeyF = this.input.keyboard.addKey("F");
@@ -114,7 +116,6 @@ export default class GameSceneBonus extends Phaser.Scene {
         //entity.y=player.y;
         if (player.status == 1) {
           this.room.onMessage("connected", (players) => {
-            // this.player = players.username;
             console.log(this.player);
           });
           this.room.send("updateStatus", 2);
@@ -133,11 +134,8 @@ export default class GameSceneBonus extends Phaser.Scene {
       const entity = this.playerEntities[sessionId];
       const light = this.playersLight[sessionId];
       if (entity) {
-        // destroy entity
         entity.destroy();
         light.destroy();
-
-        // clear local reference
         delete this.playersLight[sessionId];
         delete this.playerEntities[sessionId];
       }
@@ -148,12 +146,6 @@ export default class GameSceneBonus extends Phaser.Scene {
   update(time: number, delta: number): void {
     if (this.finish == 0) {
       let dim = [this.game.canvas.width, this.game.canvas.height];
-      if (this.room && this.input.mousePointer.y) {
-        if (this.input.mousePointer.y < 50) this.room.send("move", 50);
-        else if (this.input.mousePointer.y > dim[1] - 50)
-          this.room.send("move", dim[1] - 50);
-        else this.room.send("move", this.input.mousePointer.y);
-      }
       if (this.room && this.cursorKeys.space.isDown) {
         this.room.send("launch");
       }
@@ -175,8 +167,13 @@ export default class GameSceneBonus extends Phaser.Scene {
           this.bonusEntity.x = -500;
           this.bonusEntity.y = -500;
           var entity = this.playerEntities[struct.cli.sessionId];
-          if (struct.wrong == 0) entity.setScale(1.5);
-          if (struct.wrong == 1) entity.setScale(0.5);
+          if (struct.wrong == 0) {
+            entity.setScale(1, 1.5);
+            this.scale = 1.5;
+          } else if (struct.wrong == 1) {
+            entity.setScale(1, 0.5);
+            this.scale = 0.5;
+          }
         });
         this.room.onMessage("otherTouch", (struct) => {
           for (let sessionId in this.playerEntities) {
@@ -184,24 +181,25 @@ export default class GameSceneBonus extends Phaser.Scene {
               this.bonusEntity.x = -500;
               this.bonusEntity.y = -500;
               if (struct.wrong == 0)
-                this.playerEntities[sessionId].setScale(1.5);
+                this.playerEntities[sessionId].setScale(1, 1.5);
               if (struct.wrong == 1)
-                this.playerEntities[sessionId].setScale(0.5);
+                this.playerEntities[sessionId].setScale(1, 0.5);
             }
           }
         });
-        // this.room.onMessage("otherWrongTouch", (cli) => {
-        //   for (let sessionId in this.playerEntities) {
-        //     if (sessionId != cli.sessionId) {
-        //       this.playerEntities[sessionId].setScale(0.75);
-        //       this.bonusEntity.x = -500;
-        //       this.bonusEntity.y = -500;
-        //     }
-        //   }
-        // });
         for (let sessionId in this.playerEntities) {
           const entity = this.playerEntities[sessionId];
           const light = this.playersLight[sessionId];
+          if (this.room && this.input.mousePointer.y) {
+            if (this.input.mousePointer.y < (entity.height * this.scale) / 2)
+              this.room.send("move", (entity.height * this.scale) / 2);
+            else if (
+              this.input.mousePointer.y >
+              dim[1] - (entity.height * this.scale) / 2
+            )
+              this.room.send("move", dim[1] - (entity.height * this.scale) / 2);
+            else this.room.send("move", this.input.mousePointer.y);
+          }
 
           if (entity.data) {
             const { serverX, serverY } = entity.data.values;
@@ -215,6 +213,7 @@ export default class GameSceneBonus extends Phaser.Scene {
               this.ballLight.x = ball.x;
               this.ballLight.y = ball.y;
             });
+
             this.room.onMessage("otherLeft", () => {
               console.log("otherleft");
               this.scoreEntities[0].setText("Player left");
@@ -228,13 +227,14 @@ export default class GameSceneBonus extends Phaser.Scene {
                 }
               }, 3000);
             });
+
             if (this.finish == 0) {
               if (this.ballEntity) {
                 this.room.send("ball", {
                   h: dim[1],
                   w: dim[0],
                   bonusPos: this.bonusPos,
-                  playerHeight: (entity.height * entity.scale) / 2,
+                  playerHeight: (entity.height * this.scale) / 2,
                 });
               }
               this.room.onMessage("score", (score) => {
@@ -243,6 +243,7 @@ export default class GameSceneBonus extends Phaser.Scene {
                 );
               });
             }
+
             if (this.room && this.ballEntity) {
               this.room.onMessage("boom", (client) => {
                 if (
@@ -274,6 +275,7 @@ export default class GameSceneBonus extends Phaser.Scene {
                 }
               });
             }
+
             if (this.room) {
               this.room.onMessage("win", (username) => {
                 this.scoreEntities[0].setText("You are a Winner " + username);
@@ -291,6 +293,7 @@ export default class GameSceneBonus extends Phaser.Scene {
                   }, 3000);
                 }
               });
+
               this.room.onMessage("loose", (username) => {
                 this.scoreEntities[0].setText("You are a Looser " + username);
                 this.room.leave();

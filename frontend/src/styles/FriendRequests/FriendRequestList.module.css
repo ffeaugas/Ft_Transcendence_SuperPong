@@ -1,0 +1,27 @@
+.requestList {
+  border: 2px solid var(--backgroundColor3);
+  background-color: #03121daf;
+  padding: var(--padding2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding2);
+}
+
+.requestList ul {
+  display: flex;
+  flex-direction: row;
+  gap: var(--padding1);
+  overflow-x: scroll;
+  padding: 0 10px;
+  padding-bottom: 15px;
+}
+
+.requestList h3 {
+  font-size: var(--titleSize2);
+}
+
+.requestList p {
+  font-size: var(--textSize2);
+  color: var(--textColor1);
+  font-weight: 600;
+}

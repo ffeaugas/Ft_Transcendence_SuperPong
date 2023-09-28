@@ -31,6 +31,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      transform: true,
     }),
   );
   const name = 'General';
@@ -38,48 +39,31 @@ async function bootstrap() {
     const general = await prisma.channel.create({
       data: { channelName: name, password: '', mode: 'PUBLIC' },
     });
-    console.log('New channel created:', general);
-    console.log(general);
 
     const achievements = await prisma.achievement.createMany({
       data: [
         {
-          title: 'Gros naaaze',
-          description: 'etre un gros nul',
+          title: 'Roger', //fait
+          description: 'etre Roger',
           picture: 'default.png',
         },
         {
-          title: 'Moyen naaaze',
-          description: 'etre un peu un gros nul',
-          picture: 'default.png',
-        },
-        {
-          title: 'Pierre',
-          description: 'etre Pierre',
-          picture: 'default.png',
-        },
-        {
-          title: 'QueryLord',
-          description: 'Faire trop de Query',
-          picture: 'default.png',
-        },
-        {
-          title: 'Serial Looser',
+          title: 'Serial Looser', //fait
           description: 'Perdre 5 fois de suite',
           picture: 'default.png',
         },
         {
-          title: 'Serial Winner',
+          title: 'Serial Winner', //fait
           description: 'Gagner 5 fois de suite',
           picture: 'default.png',
         },
         {
-          title: 'Boutonneux',
+          title: 'Boutonneux', //fait
           description: "Ce connecter via l'intra 42",
           picture: 'default.png',
         },
         {
-          title: 'Ami de Roger',
+          title: 'Ami de Roger', //fait
           description: 'Etre ami avec Roger',
           picture: 'default.png',
         },
@@ -90,14 +74,12 @@ async function bootstrap() {
           picture: 'default.png',
         },
         {
-          title: 'Type sympa',
+          title: 'Type sympa', //fait
           description: 'Dire Bonjour dans le chat general',
           picture: 'default.png',
         },
       ],
     });
-    console.log('New channel created:', achievements);
-    console.log(achievements);
   } catch (error) {
     console.error('Error creating :', error.message);
   }

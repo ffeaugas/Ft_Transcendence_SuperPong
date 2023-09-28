@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { RootState } from "@/app/GlobalRedux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
+import { setProfilePicture } from "@/app/GlobalRedux/Features/profilePicture/profilePictureSlice";
 
 async function getProfileDatas(
   username: string | undefined
@@ -28,7 +29,7 @@ async function getProfileDatas(
         }
       );
       const profileDatas = res.data;
-      return profileDatas;
+      return profileDatas.profilePicture;
     } catch (error) {
       console.error("Error fetching profile datas", error);
       return undefined;
@@ -40,10 +41,13 @@ export default function Header() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [auth, setAuth] = useState(false);
-  const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
-    undefined
-  );
+  // const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
+  //   undefined
+  // );
   const username = useSelector((state: RootState) => state.user.username);
+  const profilePicture = useSelector(
+    (state: RootState) => state.profilePicture.profilePicture
+  );
 
   async function getUsername(): Promise<string> {
     const res = await fetch(
@@ -55,8 +59,13 @@ export default function Header() {
         },
       }
     );
-    const user = await res.json();
-    return user["username"];
+    if (res.ok) {
+      const user = await res.json();
+      return user["username"];
+    } else {
+      setAuth(false);
+      return "";
+    }
   }
 
   const pathname: string | null = usePathname();
@@ -71,7 +80,7 @@ export default function Header() {
   };
 
   async function updateStatus() {
-    if (!username || username === "") return;
+    if (localStorage.getItem("Authenticate") !== "true") return;
     try {
       const updatedStatus = await fetch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/updatestatus`,
@@ -97,8 +106,8 @@ export default function Header() {
     if (auth) {
       getUsername().then((username) => {
         dispatch(setUsername(username));
-        getProfileDatas(username).then((profileDatas) => {
-          setProfileDatas(profileDatas);
+        getProfileDatas(username).then((profilePicture) => {
+          dispatch(setProfilePicture(profilePicture));
         });
       });
     }
@@ -107,7 +116,11 @@ export default function Header() {
   return (
     <div className={`${styles.header}`}>
       <div className={`${styles.subdiv}`}>
-        <h1>
+        <h1
+          onClick={() => {
+            router.push("/");
+          }}
+        >
           Super<b>Pong</b>
         </h1>
         <ul className={styles.menu}>
@@ -163,12 +176,12 @@ export default function Header() {
           ) : (
             <li className={styles.authenticatedUser}>
               <div className={styles.userContainer}>
-                {!profileDatas ? (
+                {!profilePicture ? (
                   <p>...</p>
                 ) : (
                   <img
                     className={`${styles.rounded}`}
-                    src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profileDatas["profilePicture"]}`}
+                    src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${profilePicture}`}
                   />
                 )}
                 <div className={styles.userInfo}>
@@ -179,7 +192,8 @@ export default function Header() {
                     </button>
                     <Link
                       className={styles.button}
-                      href={`/profile/${username}`}
+                      href={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles?username=${username}`}
+                      as={`/profile/${username}`}
                     >
                       Profile
                     </Link>
