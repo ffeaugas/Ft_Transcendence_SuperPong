@@ -9,16 +9,24 @@ type FriendItem = {
 type FriendDatasProps = {
   friendDatas: FriendItem;
   isOnline: boolean;
+  isPlaying: boolean;
 };
 
 export default function FriendItem({
   friendDatas,
   isOnline,
+  isPlaying,
 }: FriendDatasProps) {
   return (
     <div className={styles.friendItem}>
       <img
-        className={isOnline ? styles.ONLINE : styles.OFFLINE}
+        className={
+          !isOnline
+            ? styles.OFFLINE
+            : isPlaying
+            ? styles.PLAYING
+            : styles.ONLINE
+        }
         src={`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/uploads/avatar/${friendDatas.profile["profilePicture"]}`}
       />
       <p>{friendDatas.username}</p>

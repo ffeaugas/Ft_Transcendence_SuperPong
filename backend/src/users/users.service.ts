@@ -47,12 +47,12 @@ export class UsersService {
     const users = await this.prismaService.user.findMany();
     const date = Math.floor(Date.now() / 1000); //Time in second
     const onlineUsers = users.filter((user) => {
-      return date - user.lastConnexionPing < 2; //Consider "offline" every user that hasnt ping during 2 sec
+      return date - user.lastConnexionPing < 5; //Consider "offline" every user that hasnt ping during 6 sec
     });
     return onlineUsers.map((onlineUser) => onlineUser.username);
   }
 
-  async updateUserStatus(req: any) {
+  async updateUserStatus(req: any, isPlaying: boolean) {
     const user = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
     });
@@ -60,7 +60,7 @@ export class UsersService {
     const date = Math.floor(Date.now() / 1000); //Time in second
     const updatedUser = await this.prismaService.user.update({
       where: { id: req.user.sub },
-      data: { lastConnexionPing: date },
+      data: { lastConnexionPing: date, isPlaying: isPlaying },
     });
     return;
   }
@@ -112,7 +112,7 @@ export class UsersService {
       where: { username: targetUser.username },
       data: { friends: { set: updatedTargetFriends } },
     });
-    this.socketEvents.updateFriend();
+    this.socketEvents.updateRelation();
     return updatedFriendUsers;
   }
 
@@ -257,7 +257,6 @@ export class UsersService {
   }
 
   async deleteGameRequest(req: any, senderUsername: string) {
-    console.log('SENDER USERNAMEEEE: ', senderUsername);
     const receiver = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
     });
