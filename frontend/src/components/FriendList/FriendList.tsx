@@ -11,6 +11,7 @@ type FriendItem = {
   id: string;
   username: string;
   profile: any;
+  isPlaying: boolean;
 };
 
 export default function FriendList({ username }: FriendListProps) {
@@ -28,7 +29,6 @@ export default function FriendList({ username }: FriendListProps) {
         }
       );
       const friends = res.data;
-      console.log(friends);
       return friends;
     } catch (error) {
       console.error("Error fetching user friends", error);
@@ -36,7 +36,7 @@ export default function FriendList({ username }: FriendListProps) {
     }
   }
 
-  async function getOnlineUsers(): Promise<FriendItem[]> {
+  async function getOnlineUsers(): Promise<string[]> {
     try {
       const res = await axios.get(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/onlineusers`,
@@ -55,12 +55,19 @@ export default function FriendList({ username }: FriendListProps) {
   }
 
   useEffect(() => {
-    getFriends().then((friends) => {
-      setFriends(friends);
-    });
-    getOnlineUsers().then((res) => {
-      setOnlineUsers(res);
-    });
+    getFriends().then((friends) => setFriends(friends));
+    getOnlineUsers().then((res) => setOnlineUsers(res));
+    const interval = setInterval(() => {
+      getFriends().then((friends) => {
+        setFriends(friends);
+      });
+      getOnlineUsers().then((res) => {
+        setOnlineUsers(res);
+      });
+    }, 3000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -72,6 +79,7 @@ export default function FriendList({ username }: FriendListProps) {
             key={friend.id}
             friendDatas={friend}
             isOnline={onlineUsers.includes(friend.username) ? true : false}
+            isPlaying={friend.isPlaying}
           />
         ))}
       </ul>

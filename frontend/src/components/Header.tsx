@@ -4,7 +4,7 @@
 
 import styles from "../styles/Header.module.css";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -17,8 +17,9 @@ import { getProfileDatas } from "./globalActions";
 export default function Header() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [auth, setAuth] = useState(false);
+  const [auth, setAuth] = useState<boolean>(false);
   const username = useSelector((state: RootState) => state.user.username);
+  const [pathname, setPathname] = useState<string>("");
   const profilePicture = useSelector(
     (state: RootState) => state.profilePicture.profilePicture
   );
@@ -42,8 +43,6 @@ export default function Header() {
     }
   }
 
-  const pathname: string | null = usePathname();
-
   const handleLogout = () => {
     setAuth(localStorage.getItem("Authenticate") !== "true");
     localStorage.setItem("Authenticate", "false");
@@ -54,6 +53,8 @@ export default function Header() {
   };
 
   async function updateStatus() {
+    const path = window.location.href;
+    if (!username || username === "") return;
     if (localStorage.getItem("Authenticate") !== "true") return;
     try {
       const updatedStatus = await fetch(
@@ -64,17 +65,19 @@ export default function Header() {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
+          body: JSON.stringify({
+            isPlaying: path.includes("/game"),
+          }),
         }
       );
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   useEffect(() => {
-    setInterval(() => {
+    setPathname(window.location.href);
+    const interval = setInterval(() => {
       updateStatus();
-    }, 1000);
+    }, 2000);
     const auth = localStorage.getItem("Authenticate") === "true";
     setAuth(auth);
     if (auth) {
@@ -85,6 +88,7 @@ export default function Header() {
         });
       });
     }
+    return () => clearInterval(interval);
   }, []);
 
   return (
