@@ -55,15 +55,20 @@ export class AuthService {
           profilePicture: newUser.login + '_' + +newUser.id + '.jpeg',
         },
       });
-      console.log('USERDATA : ', userData);
       this.downloadImage(
         userData.image.link,
         userData.login + '_' + +newUser.id,
       );
+      const achievement = await this.prisma.achievement.findUnique({
+        where: { title: 'Boutonneux' },
+      });
+      const updatedAchievement = await this.prisma.profile.update({
+        where: { userId: newUser.id },
+        data: { achievements: { connect: achievement } },
+      });
     } else {
       user.login = userData.login;
       user.password = userFound.hash;
-      console.log(userData.email);
     }
     const res = await this.login(user);
     return [res, isFirstConnection];

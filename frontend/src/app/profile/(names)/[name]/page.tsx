@@ -93,7 +93,10 @@ export default function Profile({ params }: { params: { name: string } }) {
           <div className={styles.winslooses}>
             <h4 className={styles.wins}>W : {profileDatas["winCount"]}</h4>
             <h4 className={styles.looses}>L : {profileDatas["loseCount"]}</h4>
-            <h4> Elo : {profileDatas["eloMatchMaking"]}</h4>
+            <h4 className={styles.elo}>
+              {" "}
+              Elo : {profileDatas["eloMatchMaking"]}
+            </h4>
           </div>
         </div>
         <div className={styles.stats}>

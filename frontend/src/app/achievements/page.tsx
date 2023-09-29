@@ -20,7 +20,6 @@ export default async function Achievements() {
             }
         );
         if (!res.ok) {
-            console.log(res);
             throw new Error("Failed fetching achievements");
         }
         const response = await res.json();

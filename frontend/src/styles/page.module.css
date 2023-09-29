@@ -97,6 +97,7 @@ img.rounded {
 }
 
 .winslooses h4 {
+  font-family: "Teko", sans-serif;
   font-size: var(--titleSize2);
 }
 
@@ -106,6 +107,10 @@ img.rounded {
 
 .looses {
   color: rgb(235, 108, 108);
+}
+
+.elo {
+  color: rgb(188, 241, 255);
 }
 
 /*================ ACHIEVEMENT PAGE ================*/
@@ -137,6 +142,7 @@ img.rounded {
   justify-content: center;
   text-align: center;
   gap: 10px;
+  font-family: "Teko", sans-serif;
 }
 
 .customProfilePage {
@@ -145,6 +151,7 @@ img.rounded {
   width: 40%;
   border-radius: 5%;
   padding: var(--padding1);
+  font-family: "Teko", sans-serif;
 }
 
 /*================ LEADERBOARD PAGE ================*/

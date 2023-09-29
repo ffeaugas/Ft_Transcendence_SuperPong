@@ -20,6 +20,8 @@ import { AchievementModule } from './achievement/achievement.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import { multerConfig } from './multer/multer.config';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { GameController } from './game.controller';
     SocketModule,
     AchievementModule,
     LeaderboardModule,
+    MulterModule.register(multerConfig),
   ],
   controllers: [
     AppController,
