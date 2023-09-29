@@ -5,6 +5,11 @@ enum ActiveDiscussionType {
   CHANNEL = "CHANNEL",
 }
 
+enum RelationType {
+  FRIEND = "FRIEND",
+  BLOCK = "BLOCK",
+}
+
 export async function getMessages(
   activeDiscussionType: ActiveDiscussionType,
   activeDiscussion: string | undefined
@@ -252,4 +257,29 @@ export async function rejectFriendRequest(senderId: string) {
     console.log(error);
   }
   return;
+}
+
+export async function changeRelation(
+  relationType: RelationType,
+  targetUsername: string
+) {
+  try {
+    const res = await axios.patch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/changeRelation`,
+      {
+        targetUsername: targetUsername,
+        relationType: relationType,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const profileDatas = res.data;
+    return profileDatas;
+  } catch (error) {
+    console.error("Error fetching profile datas", error);
+    return undefined;
+  }
 }

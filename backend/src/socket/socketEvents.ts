@@ -52,4 +52,8 @@ export class SocketEvents {
   inviteFriend() {
     this.server.emit('FRIEND_INVITATION');
   }
+
+  updateRelation() {
+    this.server.emit('RELATION_UPDATE');
+  }
 }

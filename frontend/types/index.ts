@@ -36,6 +36,7 @@ type User = {
   id: string;
   username: string;
   blockedUsers: User[];
+  friends: User[];
 };
 
 type ChannelInfos = {

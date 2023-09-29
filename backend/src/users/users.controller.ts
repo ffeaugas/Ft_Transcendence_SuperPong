@@ -33,13 +33,13 @@ export class UsersController {
     return this.usersService.getBlockeds(req);
   }
 
-  @Get('relation')
-  async getRelationToUser(
-    @Req() req: Request,
-    @Query('username') username: string,
-  ) {
-    return this.usersService.getRelationToUser(req, username);
-  }
+  // @Get('relation')
+  // async getRelationToUser(
+  //   @Req() req: Request,
+  //   @Query('username') username: string,
+  // ) {
+  //   return this.usersService.getRelationToUser(req, username);
+  // }
 
   @Get('onlineUsers')
   async getOnlineUsers() {

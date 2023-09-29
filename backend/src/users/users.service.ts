@@ -112,6 +112,7 @@ export class UsersService {
       where: { username: targetUser.username },
       data: { friends: { set: updatedTargetFriends } },
     });
+    this.socketEvents.updateFriend();
     return updatedFriendUsers;
   }
 
@@ -200,6 +201,7 @@ export class UsersService {
         data: { achievements: { connect: achievement } },
       });
     }
+    this.socketEvents.updateRelation();
     return this.deleteFriendRequest(req, senderId);
   }
 
@@ -306,6 +308,7 @@ export class UsersService {
       where: { username: user.username },
       data: { blockedUsers: { set: updatedBlockedsWithoutFriends } },
     });
+    this.socketEvents.updateRelation();
     return updatedBlockedUsers;
   }
 
@@ -353,7 +356,7 @@ export class UsersService {
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
-      include: { blockedUsers: true },
+      include: { blockedUsers: true, friends: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;

@@ -4,7 +4,6 @@
 
 import styles from "../styles/Header.module.css";
 import Link from "next/link";
-import axios from "axios";
 import { usePathname } from "next/navigation";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
@@ -13,37 +12,12 @@ import { RootState } from "@/app/GlobalRedux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsername } from "@/app/GlobalRedux/Features/user/userSlice";
 import { setProfilePicture } from "@/app/GlobalRedux/Features/profilePicture/profilePictureSlice";
-
-async function getProfileDatas(
-  username: string | undefined
-): Promise<ProfileDatas | undefined> {
-  if (username) {
-    try {
-      const res = await axios.get(
-        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/profiles`,
-        {
-          params: { username: username },
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const profileDatas = res.data;
-      return profileDatas.profilePicture;
-    } catch (error) {
-      console.error("Error fetching profile datas", error);
-      return undefined;
-    }
-  }
-}
+import { getProfileDatas } from "./globalActions";
 
 export default function Header() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [auth, setAuth] = useState(false);
-  // const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
-  //   undefined
-  // );
   const username = useSelector((state: RootState) => state.user.username);
   const profilePicture = useSelector(
     (state: RootState) => state.profilePicture.profilePicture
