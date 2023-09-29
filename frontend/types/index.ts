@@ -2,6 +2,18 @@
 /*                        [CHAT TYPES]                         */
 /*-------------------------------------------------------------*/
 
+type Toast = {
+  id: string;
+  sender: User;
+  receiver: string;
+  roomId: number;
+};
+
+type FriendRequest = {
+  id: string;
+  sender: User;
+};
+
 type ChannelItem = {
   id: string;
   channelName: string;
@@ -24,6 +36,7 @@ type User = {
   id: string;
   username: string;
   blockedUsers: User[];
+  friends: User[];
 };
 
 type ChannelInfos = {

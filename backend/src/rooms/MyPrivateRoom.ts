@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 const prisma = new PrismaService();
 
-export class MyRoom extends Room<MyRoomState> {
+export class MyPrivateRoom extends Room<MyRoomState> {
   maxClients = 2;
   player = ['', ''];
   direction = 0;
@@ -16,13 +16,11 @@ export class MyRoom extends Room<MyRoomState> {
   host: Client;
   game: GameService;
 
-  async onCreate(options: any) {
+  onCreate(options: any) {
     this.game = new GameService(prisma);
     this.setState(new MyRoomState());
-    if (options.roomId) {
-      this.roomId = options.roomId;
-      // this.setPrivate(true);
-    }
+    this.seatReservationTime = 999999;
+    this.roomId = options.roomId;
     this.onMessage('move', (client, data) => {
       const player = this.state.players.get(client.sessionId);
       player.y = data;

@@ -2,6 +2,7 @@ import "phaser";
 import axios from "axios";
 import { Client, Room } from "colyseus.js";
 import { matchMaker } from "colyseus.js";
+import { string } from "yup";
 
 // custom scene class
 export default class LoadingScene extends Phaser.Scene {
@@ -65,10 +66,10 @@ export default class LoadingScene extends Phaser.Scene {
 
   async create() {
     console.log("Joining normal room...");
+    // this.scale.displaySize.setAspectRatio(
+    //   window.outerWidth / window.outerHeight
+    // );
     try {
-      // this.scale.displaySize.setAspectRatio(
-      //   window.outerWidth / window.outerHeight
-      // );
       let dim = [this.game.canvas.width, this.game.canvas.height];
       this.scale.refresh();
       /*this.turningRoger[0] = this.add
@@ -124,17 +125,71 @@ export default class LoadingScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(6);
       this.client = new Client(`ws://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
-      this.room = await this.client.joinOrCreate("MyRoom", {
-        dim,
-        name: await this.getUsername(),
-        //PpUrl: await this.getPP(),
-      }); // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
-      // this.room = await this.client.; // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
-      this.game.canvas.style.cursor = "none";
-      console.log("Joined successfully!");
-    } catch (e) {
-      console.error(e);
+      if (
+        window.location.href.replace(
+          "http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game",
+          ""
+        ) === ""
+      ) {
+        // const games = await this.client.getAvailableRooms();
+        // if (games.length > 0) {
+        //   await Promise.all(
+        //     games.map(async (availableRoom) => {
+        //       if (availableRoom.roomId === id) {   //check si ya des alpha
+        //         console.log("LAROOMIDZEBI", id);
+        //         this.room = await this.client.joinById(id, {   //si oui join la room by name
+        //           dim,
+        //           name: await this.getUsername(),
+        //         });
+        //       }
+        //     })
+        //   );
+        // } else {
+        //   console.log("create ZEBI");
+        //   this.room = await this.client.joinOrCreate("MyRoom", { //si pas de resultat creer une room random
+        //     roomId: id,
+        //     dim,
+        //     name: await this.getUsername(),
+        //   });
+        // }
+        this.room = await this.client.joinOrCreate("MyRoom", {
+          rommId: undefined,
+          dim,
+          name: await this.getUsername(),
+        });
+      } else {
+        const id = window.location.href.replace(
+          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+          ""
+        );
+        const games = await this.client.getAvailableRooms();
+        if (games.length > 0) {
+          await Promise.all(
+            games.map(async (availableRoom) => {
+              if (availableRoom.roomId === id) {
+                console.log("LAROOMIDZEBI", id);
+                this.room = await this.client.joinById(id, {
+                  dim,
+                  name: await this.getUsername(),
+                });
+              }
+            })
+          );
+        } else {
+          console.log("create ZEBI");
+          this.room = await this.client.joinOrCreate("MyRoom", {
+            roomId: id,
+            dim,
+            name: await this.getUsername(),
+          });
+        }
+      }
+      console.log(this.room);
+    } catch (err) {
+      console.log(err);
     }
+    this.game.canvas.style.cursor = "none";
+    console.log("Joined successfully!");
 
     this.room.state.players.onAdd((player, sessionId) => {
       this.nb_client++;

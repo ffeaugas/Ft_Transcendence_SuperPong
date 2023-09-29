@@ -8,6 +8,7 @@ import * as argon from 'argon2';
 import { ChannelMode, User } from '@prisma/client';
 import { UserUpdateDto } from './dto/userUpdate.dto';
 import { UserRelationChangeDto } from './dto/userRelationChange.dto';
+import { SocketEvents } from 'src/socket/socketEvents';
 
 enum RelationType {
   FRIEND = 'FRIEND',
@@ -19,6 +20,7 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly profileService: ProfileService,
+    private readonly socketEvents: SocketEvents,
   ) {}
 
   async createUser(dto: AuthDto, user42: boolean): Promise<Users> {
@@ -110,6 +112,7 @@ export class UsersService {
       where: { username: targetUser.username },
       data: { friends: { set: updatedTargetFriends } },
     });
+    this.socketEvents.updateFriend();
     return updatedFriendUsers;
   }
 
@@ -139,6 +142,7 @@ export class UsersService {
         receiver: true,
       },
     });
+    this.socketEvents.inviteFriend();
     return newFriendRequest;
   }
 
@@ -197,6 +201,7 @@ export class UsersService {
         data: { achievements: { connect: achievement } },
       });
     }
+    this.socketEvents.updateRelation();
     return this.deleteFriendRequest(req, senderId);
   }
 
@@ -219,7 +224,6 @@ export class UsersService {
   async getFriendRequests(req: any) {
     const user = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
-      include: { friends: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     const friendRequests = await this.prismaService.friendRequest.findMany({
@@ -227,6 +231,56 @@ export class UsersService {
       include: { sender: true },
     });
     return friendRequests;
+  }
+
+  async inviteUserInGame(req: any, dto: any) {
+    const sender = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!sender) throw new ForbiddenException('User not found');
+    const receiver = await this.prismaService.user.findUnique({
+      where: { username: dto.receiver },
+    });
+    if (!receiver) throw new ForbiddenException('Receiver not found');
+    const newGameRequest = await this.prismaService.gameRequest.create({
+      data: {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        roomId: dto.roomId,
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+    });
+    this.socketEvents.inviteInGame();
+  }
+
+  async deleteGameRequest(req: any, senderUsername: string) {
+    console.log('SENDER USERNAMEEEE: ', senderUsername);
+    const receiver = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    const sender = await this.prismaService.user.findUnique({
+      where: { username: senderUsername },
+    });
+    if (!receiver) throw new ForbiddenException('User not found');
+    const deleteGameRequest = await this.prismaService.gameRequest.deleteMany({
+      where: { AND: [{ senderId: sender.id }, { receiverId: receiver.id }] },
+    });
+    return;
+  }
+
+  async getGameRequests(req: any) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: req.user.sub },
+    });
+    if (!user) throw new ForbiddenException('User not found');
+    const gameRequests = await this.prismaService.gameRequest.findMany({
+      where: { receiverId: user.id },
+      include: { sender: true },
+    });
+    return gameRequests;
   }
 
   async updateBlock(
@@ -254,6 +308,7 @@ export class UsersService {
       where: { username: user.username },
       data: { blockedUsers: { set: updatedBlockedsWithoutFriends } },
     });
+    this.socketEvents.updateRelation();
     return updatedBlockedUsers;
   }
 
@@ -301,7 +356,7 @@ export class UsersService {
     const id = req['user'].sub;
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
-      include: { blockedUsers: true },
+      include: { blockedUsers: true, friends: true },
     });
     if (!user) throw new ForbiddenException('User not found');
     delete user.hash;

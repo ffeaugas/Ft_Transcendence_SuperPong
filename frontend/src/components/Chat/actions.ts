@@ -5,6 +5,11 @@ enum ActiveDiscussionType {
   CHANNEL = "CHANNEL",
 }
 
+enum RelationType {
+  FRIEND = "FRIEND",
+  BLOCK = "BLOCK",
+}
+
 export async function getMessages(
   activeDiscussionType: ActiveDiscussionType,
   activeDiscussion: string | undefined
@@ -158,4 +163,123 @@ export function removeBlockedMessages(
     return !isBlocked(message, blockedUsers);
   });
   return filtratedMessages;
+}
+
+export async function rejectGameRequest(senderUsername: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/deleteGameRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderUsername: senderUsername }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}
+
+export async function getGameRequests(): Promise<Toast[]> {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getGameRequests`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const gameRequests = await res.json();
+    return gameRequests;
+  } catch (error) {
+    console.error("Error fetching game requests", error);
+    return [];
+  }
+}
+
+export async function getFriendRequests() {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/getfriendrequests`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const requests = res.json();
+    return requests;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+export async function acceptFriendRequest(senderId: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/acceptFriendRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderId: senderId }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}
+
+export async function rejectFriendRequest(senderId: string) {
+  try {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/rejectFriendRequest`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ senderId: senderId }),
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+  return;
+}
+
+export async function changeRelation(
+  relationType: RelationType,
+  targetUsername: string
+) {
+  try {
+    const res = await axios.patch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/changeRelation`,
+      {
+        targetUsername: targetUsername,
+        relationType: relationType,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    const profileDatas = res.data;
+    return profileDatas;
+  } catch (error) {
+    console.error("Error fetching profile datas", error);
+    return undefined;
+  }
 }

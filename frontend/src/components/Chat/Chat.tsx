@@ -7,14 +7,20 @@ import TargetUserMenu from "./TargetUserMenu";
 import MenuSelector from "./MenuSelector";
 import Menu from "./Menu";
 import {
+  acceptFriendRequest,
   addMessage,
+  changeRelation,
   getChannels,
+  getFriendRequests,
+  getGameRequests,
   getMessages,
   getUserInfos,
-  isBlocked,
+  rejectFriendRequest,
+  rejectGameRequest,
   removeBlockedMessages,
 } from "./actions";
 import { Socket, io } from "socket.io-client";
+import Toast from "./Toast";
 
 enum MenuType {
   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
@@ -28,12 +34,19 @@ enum ActiveDiscussionType {
   CHANNEL = "CHANNEL",
 }
 
+enum RelationType {
+  FRIEND = "FRIEND",
+  BLOCK = "BLOCK",
+}
+
 export default function Chat() {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [socket, setSocket] = useState<Socket>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<Channels>();
   const [targetUser, setTargetUser] = useState<string | null>(null);
+  const [gameRequests, setGameRequests] = useState<Toast[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<MenuType>(
     MenuType.CHANNEL_SELECTOR
   );
@@ -60,13 +73,49 @@ export default function Chat() {
     setTargetUser(username);
   }
 
-  function closeUserInfos(): void {
+  function closeUserInfos() {
     setTargetUser(null);
   }
 
-  //--------------------------------------------------
-  // SOCKET ACTIONS   --------------------------------
-  //--------------------------------------------------
+  function deleteGameInvitation(senderUsername: string) {
+    rejectGameRequest(senderUsername);
+    setTimeout(() => {
+      getGameRequests().then((request) => setGameRequests(request));
+    }, 150);
+  }
+
+  function deleteFriendInvitation(senderId: string) {
+    rejectFriendRequest(senderId);
+    setTimeout(() => {
+      getFriendRequests().then((request) => setFriendRequests(request));
+    }, 150);
+  }
+
+  function acceptFriendInvitation(senderId: string) {
+    acceptFriendRequest(senderId);
+    setTimeout(() => {
+      getFriendRequests().then((request) => setFriendRequests(request));
+    }, 150);
+  }
+
+  function submitNewMessage(textInput: string) {
+    addMessage(textInput, activeDiscussionType, activeDiscussion);
+    sendMessage(textInput);
+  }
+
+  function handleRelationChange(
+    relationType: RelationType,
+    targetUsername: string
+  ) {
+    changeRelation(relationType, targetUsername);
+    setTimeout(() => {
+      getUserInfos().then((infos) => setUser(infos));
+    }, 150);
+  }
+
+  //---------------------------------------------------------------------------
+  // SOCKET ACTIONS   ---------------------------------------------------------
+  //---------------------------------------------------------------------------
 
   async function socketInitializer(): Promise<any> {
     const socket = io(`http://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
@@ -85,16 +134,25 @@ export default function Chat() {
     socketInitializer();
   }, [setSocket]);
 
-  function submitNewMessage(textInput: string) {
-    addMessage(textInput, activeDiscussionType, activeDiscussion);
-    sendMessage(textInput);
+  function listenFriendInvitation() {
+    getFriendRequests().then((request) => setFriendRequests(request));
   }
 
-  function updateChannelList() {
+  function listenGameInvitation() {
+    getGameRequests().then((request) => {
+      setGameRequests(request);
+    });
+  }
+
+  function listenChannelUpdate() {
     getChannels().then((channels) => setChannels(channels));
   }
 
-  function activeChannelReset(channelName: string) {
+  function listenRelationUpdate() {
+    getUserInfos().then((infos) => setUser(infos));
+  }
+
+  function listenChannelDeleted(channelName: string) {
     if (
       channelName === activeDiscussion &&
       activeDiscussionType === ActiveDiscussionType.CHANNEL
@@ -103,7 +161,7 @@ export default function Chat() {
   }
 
   //Redirect yourself on general if you where on a channel where you were just kicked
-  function kickedFromChannel(channelName: string, kickedUser: string) {
+  function listenChannelKick(channelName: string, kickedUser: string) {
     if (
       activeDiscussionType === ActiveDiscussionType.CHANNEL &&
       activeDiscussion === channelName &&
@@ -112,7 +170,7 @@ export default function Chat() {
       setActiveDiscussion("General");
   }
 
-  function messageListner(message: Message) {
+  function listenMessage(message: Message) {
     getMessages(activeDiscussionType, activeDiscussion).then((messages) => {
       setMessages(messages);
     });
@@ -120,24 +178,32 @@ export default function Chat() {
   }
 
   useEffect((): any => {
-    socket?.on("NEW_MESSAGE", messageListner);
-    socket?.on("CHANNEL_DELETE", activeChannelReset);
-    socket?.on("CHANNEL_UPDATE", updateChannelList);
-    socket?.on("KICKED_FROM_CHANNEL", kickedFromChannel);
+    socket?.on("NEW_MESSAGE", listenMessage);
+    socket?.on("CHANNEL_DELETE", listenChannelDeleted);
+    socket?.on("CHANNEL_UPDATE", listenChannelUpdate);
+    socket?.on("KICKED_FROM_CHANNEL", listenChannelKick);
+    socket?.on("GAME_INVITATION", listenGameInvitation);
+    socket?.on("FRIEND_INVITATION", listenFriendInvitation);
+    socket?.on("RELATION_UPDATE", listenRelationUpdate);
 
     return () => {
-      socket?.off("NEW_MESSAGE", messageListner);
-      socket?.off("CHANNEL_DELETE", activeChannelReset);
-      socket?.off("CHANNEL_UPDATE", updateChannelList);
-      socket?.off("KICKED_FROM_CHANNEL", kickedFromChannel);
+      socket?.off("NEW_MESSAGE", listenMessage);
+      socket?.off("CHANNEL_DELETE", listenChannelDeleted);
+      socket?.off("CHANNEL_UPDATE", listenChannelUpdate);
+      socket?.off("KICKED_FROM_CHANNEL", listenChannelKick);
+      socket?.off("GAME_INVITATION", listenGameInvitation);
+      socket?.off("FRIEND_INVITATION", listenFriendInvitation);
+      socket?.off("RELATION_UPDATE", listenRelationUpdate);
     };
-  }, [messageListner]);
+  }, [listenMessage]);
 
-  //--------------------------------------------------
-  //--------------------------------------------------
+  //---------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
 
   useEffect(() => {
     getUserInfos().then((infos) => setUser(infos));
+    getGameRequests().then((request) => setGameRequests(request));
+    getFriendRequests().then((request) => setFriendRequests(request));
   }, []);
 
   useEffect(() => {
@@ -153,29 +219,46 @@ export default function Chat() {
   if (!user) return <p>...</p>;
 
   return (
-    <div className={`${styles.chat}`}>
-      <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
-      <Menu
-        selectedMenu={selectedMenu}
-        activeDiscussionType={activeDiscussionType}
-        activeDiscussion={activeDiscussion}
-        channels={channels}
-        switchChannel={switchChannel}
-        changeMenu={changeMenu}
+    <>
+      <Toast
+        gameRequests={gameRequests}
+        friendRequests={friendRequests}
+        deleteGameInvitation={deleteGameInvitation}
+        deleteFriendInvitation={deleteFriendInvitation}
+        acceptFriendInvitation={acceptFriendInvitation}
       />
-      <MsgList
-        activeDiscussion={activeDiscussion}
-        activeDiscussionType={activeDiscussionType}
-        showUserInfos={showUserInfos}
-        submitNewMessage={submitNewMessage}
-        messages={removeBlockedMessages(messages, user.blockedUsers)}
-      />
-      {targetUser ? (
-        <TargetUserMenu
-          targetUser={targetUser}
-          closeUserInfos={closeUserInfos}
+      <div className={`${styles.chat}`}>
+        <MenuSelector selectedMenu={selectedMenu} changeMenu={changeMenu} />
+        <Menu
+          selectedMenu={selectedMenu}
+          activeDiscussionType={activeDiscussionType}
+          activeDiscussion={activeDiscussion}
+          channels={channels}
+          switchChannel={switchChannel}
+          changeMenu={changeMenu}
         />
-      ) : undefined}
-    </div>
+        <MsgList
+          activeDiscussion={activeDiscussion}
+          activeDiscussionType={activeDiscussionType}
+          showUserInfos={showUserInfos}
+          submitNewMessage={submitNewMessage}
+          messages={removeBlockedMessages(messages, user.blockedUsers)}
+        />
+        {targetUser ? (
+          <TargetUserMenu
+            username={user.username}
+            targetUser={targetUser}
+            isFriend={user.friends.some(
+              (friend) => friend.username === targetUser
+            )}
+            isBlocked={user.blockedUsers.some(
+              (blockedUser) => blockedUser.username === targetUser
+            )}
+            closeUserInfos={closeUserInfos}
+            handleRelationChange={handleRelationChange}
+          />
+        ) : undefined}
+      </div>
+    </>
   );
 }

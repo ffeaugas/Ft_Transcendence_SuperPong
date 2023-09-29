@@ -1,0 +1,47 @@
+.toasts ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  list-style: none;
+}
+
+.gameToast,
+.friendToast {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5em, 0.5em + 1vw, 1em);
+  background-color: var(--backgroundColor1);
+  border: var(--backgroundColor3) solid 1px;
+  border-radius: 5px;
+  margin: 0 auto;
+  padding: 5px 10px;
+  align-items: center;
+}
+
+.friendToast {
+  border: green solid 1px;
+}
+
+.friendToast h4 {
+  color: green;
+}
+
+.toasts button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 12px;
+  display: flex;
+}
+
+.toasts button:hover {
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
+}

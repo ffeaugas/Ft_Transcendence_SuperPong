@@ -1,47 +1,37 @@
 import styles from "@/styles/GamesHistoric/GameHistoricItem.module.css";
 
 type GameHistoricItem = {
-    winner: { username: string };
-    looser: { username: string };
-    winnerScore: number;
-    looserScore: number;
+  winner: { username: string };
+  looser: { username: string };
+  winnerScore: number;
+  looserScore: number;
 };
 
 type GameHistoricItemProps = {
-    username: string;
-    game: GameHistoricItem;
+  username: string;
+  game: GameHistoricItem;
 };
 
 export default function GameHistoricItem({
-    username,
-    game,
+  username,
+  game,
 }: GameHistoricItemProps) {
-    // function isWinner() {
-    //   if (
-    //     (username === game.leftPlayer && game.leftScore === 5) ||
-    //     (username === game.rightPlayer && game.rightScore === 5)
-    //   )
-    //     return true;
-    //   return false;
-    // }
-    return (
-        <div className={styles.gameHistoricItem}>
-            {username === game.winner.username && (
-                <h2 className={styles.win}>Win</h2>
-            )}
-            {username === game.looser.username && (
-                <h2 className={styles.loose}>Loose</h2>
-            )}
-            <div className={styles.infos}>
-                <p>{game.winner.username}</p>
-                <p>
-                    <b>{game.winnerScore}</b>
-                </p>
-                <p>
-                    <b>{game.looserScore}</b>
-                </p>
-                <p>{game.looser.username}</p>
-            </div>
-        </div>
-    );
+  return (
+    <div className={styles.gameHistoricItem}>
+      {username === game.winner.username && <h2 className={styles.win}>Win</h2>}
+      {username === game.looser.username && (
+        <h2 className={styles.loose}>Loose</h2>
+      )}
+      <div className={styles.infos}>
+        <p>{game.winner.username}</p>
+        <p>
+          <b>{game.winnerScore}</b>
+        </p>
+        <p>
+          <b>{game.looserScore}</b>
+        </p>
+        <p>{game.looser.username}</p>
+      </div>
+    </div>
+  );
 }

@@ -192,14 +192,21 @@ export default class GameScene extends Phaser.Scene {
               console.log("otherleft");
               this.scoreEntities[0].setText("Player left");
               this.finish = 1;
-              setTimeout(() => {
-                if (this.game.isRunning) {
-                  this.registry.destroy(); // destroy registry
-                  this.game.destroy(false, true);
-                  window.location.reload();
-                  return;
-                }
-              }, 3000);
+              if (
+                window.location.href.replace(
+                  `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+                  ""
+                ) === ""
+              ) {
+                setTimeout(() => {
+                  if (this.game.isRunning) {
+                    this.registry.destroy(); // destroy registry
+                    this.game.destroy(false, true);
+                    window.location.reload();
+                    return;
+                  }
+                }, 3000);
+              }
             });
             if (this.finish == 0) {
               this.room.onMessage("score", (score) => {
@@ -246,15 +253,22 @@ export default class GameScene extends Phaser.Scene {
                 this.room.leave();
                 if (this.finish == 0) {
                   this.finish = 1;
-                  setTimeout(() => {
-                    if (this.game.isRunning) {
-                      this.registry.destroy(); // destroy registry
-                      this.scene.stop();
-                      this.game.destroy(false, true);
-                      window.location.reload();
-                      return;
-                    }
-                  }, 3000);
+                  if (
+                    window.location.href.replace(
+                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+                      ""
+                    ) === ""
+                  ) {
+                    setTimeout(() => {
+                      if (this.game.isRunning) {
+                        this.registry.destroy(); // destroy registry
+                        this.scene.stop();
+                        this.game.destroy(false, true);
+                        window.location.reload();
+                        return;
+                      }
+                    }, 3000);
+                  }
                 }
               });
               this.room.onMessage("loose", (username) => {
@@ -262,15 +276,22 @@ export default class GameScene extends Phaser.Scene {
                 this.room.leave();
                 if (this.finish == 0) {
                   this.finish = 1;
-                  setTimeout(() => {
-                    if (this.game.isRunning) {
-                      this.registry.destroy(); // destroy registry
-                      this.scene.stop();
-                      this.game.destroy(false, true);
-                      window.location.reload();
-                      return;
-                    }
-                  }, 3000);
+                  if (
+                    window.location.href.replace(
+                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+                      ""
+                    ) === ""
+                  ) {
+                    setTimeout(() => {
+                      if (this.game.isRunning) {
+                        this.registry.destroy(); // destroy registry
+                        this.scene.stop();
+                        this.game.destroy(false, true);
+                        window.location.reload();
+                        return;
+                      }
+                    }, 3000);
+                  }
                 }
               });
             }
