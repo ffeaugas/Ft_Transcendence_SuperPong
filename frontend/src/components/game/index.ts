@@ -20,7 +20,7 @@ export default function Index() {
       // Create the game instance here
       if (
         window.location.href.replace(
-          `${process.env.NEXT_PUBLIC_DOMAIN}/game`,
+          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game`,
           ""
         ) === ""
       ) {
@@ -38,8 +38,7 @@ export default function Index() {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
         scale: {
-          //   mode: Phaser.Scale.RESIZE,
-          mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+          mode: Phaser.Scale.FIT,
           autoCenter: Phaser.Scale.CENTER_BOTH,
         },
         backgroundColor: "#000000",

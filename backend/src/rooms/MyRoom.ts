@@ -19,7 +19,7 @@ export class MyRoom extends Room<MyRoomState> {
   async onCreate(options: any) {
     this.game = new GameService(prisma);
     this.setState(new MyRoomState());
-    if (options.roomId) {
+    if (options.roomId != undefined) {
       this.roomId = options.roomId;
       // this.setPrivate(true);
     }

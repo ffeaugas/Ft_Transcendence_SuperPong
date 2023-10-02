@@ -255,7 +255,7 @@ export default class GameScene extends Phaser.Scene {
                   this.finish = 1;
                   if (
                     window.location.href.replace(
-                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game`,
                       ""
                     ) === ""
                   ) {
@@ -278,7 +278,7 @@ export default class GameScene extends Phaser.Scene {
                   this.finish = 1;
                   if (
                     window.location.href.replace(
-                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+                      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game`,
                       ""
                     ) === ""
                   ) {
