@@ -126,40 +126,35 @@ export default class LoadingScene extends Phaser.Scene {
         .setDepth(6);
       this.client = new Client(`ws://${process.env.NEXT_PUBLIC_DOMAIN}:3001`);
       if (
-        window.location.href.replace(
-          "http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game",
-          ""
-        ) === ""
+        window.location.href.replace("http://10.11.250.74:3000/game", "") === ""
       ) {
-        // const games = await this.client.getAvailableRooms();
-        // if (games.length > 0) {
-        //   await Promise.all(
-        //     games.map(async (availableRoom) => {
-        //       if (availableRoom.roomId === id) {   //check si ya des alpha
-        //         console.log("LAROOMIDZEBI", id);
-        //         this.room = await this.client.joinById(id, {   //si oui join la room by name
-        //           dim,
-        //           name: await this.getUsername(),
-        //         });
-        //       }
-        //     })
-        //   );
-        // } else {
-        //   console.log("create ZEBI");
-        //   this.room = await this.client.joinOrCreate("MyRoom", { //si pas de resultat creer une room random
-        //     roomId: id,
-        //     dim,
-        //     name: await this.getUsername(),
-        //   });
-        // }
-        this.room = await this.client.joinOrCreate("MyRoom", {
-          rommId: undefined,
-          dim,
-          name: await this.getUsername(),
-        });
+        const games = await this.client.getAvailableRooms();
+        if (games.length > 0) {
+          await Promise.all(
+            games.map(async (availableRoom) => {
+              if (availableRoom.roomId.match(/^[a-z,A-Z]{0,}$/)) {
+                //check si ya des alpha
+                this.room = await this.client.join("MyRoom", {
+                  //si oui join la room by name
+                  dim,
+                  name: await this.getUsername(),
+                });
+                console.log(this.room.roomId);
+              }
+            })
+          );
+        } else {
+          console.log("create ZEBI");
+          this.room = await this.client.create("MyRoom", {
+            //si pas de resultat creer une room random
+            roomId: undefined,
+            dim,
+            name: await this.getUsername(),
+          });
+        }
       } else {
         const id = window.location.href.replace(
-          `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
+          "http://10.11.250.74:3000/game/",
           ""
         );
         const games = await this.client.getAvailableRooms();
