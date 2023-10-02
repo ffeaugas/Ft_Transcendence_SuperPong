@@ -152,6 +152,7 @@ export default class LoadingScene extends Phaser.Scene {
             dim,
             name: await this.getUsername(),
           });
+          this.client.consumeSeatReservation(this.room);
         }
       } else {
         const id = window.location.href.replace(
