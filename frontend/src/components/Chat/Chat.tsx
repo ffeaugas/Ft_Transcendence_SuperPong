@@ -202,9 +202,13 @@ export default function Chat() {
 
   useEffect(() => {
     getUserInfos().then((infos) => setUser(infos));
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
     getGameRequests().then((request) => setGameRequests(request));
     getFriendRequests().then((request) => setFriendRequests(request));
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     getChannels().then((channels) => setChannels(channels));

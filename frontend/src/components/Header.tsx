@@ -76,6 +76,7 @@ export default function Header() {
   useEffect(() => {
     setPathname(window.location.href);
     const interval = setInterval(() => {
+      console.log("update");
       updateStatus();
     }, 2000);
     const auth = localStorage.getItem("Authenticate") === "true";

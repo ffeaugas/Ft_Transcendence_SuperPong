@@ -271,6 +271,7 @@ export class UsersService {
   }
 
   async getGameRequests(req: any) {
+    console.log('GAMMMMMEEEEE REQUESTTTTTTT ::  ', req.user.sub);
     const user = await this.prismaService.user.findUnique({
       where: { id: req.user.sub },
     });
