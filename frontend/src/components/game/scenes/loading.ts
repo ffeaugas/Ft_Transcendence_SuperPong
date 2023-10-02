@@ -134,8 +134,9 @@ export default class LoadingScene extends Phaser.Scene {
             games.map(async (availableRoom) => {
               if (availableRoom.roomId.match(/^[a-z,A-Z]{0,}$/)) {
                 //check si ya des alpha
-                this.room = await this.client.join("MyRoom", {
+                this.room = await this.client.join(availableRoom.roomId, {
                   //si oui join la room by name
+                  roomId: undefined,
                   dim,
                   name: await this.getUsername(),
                 });
