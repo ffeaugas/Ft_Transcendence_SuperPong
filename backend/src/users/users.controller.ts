@@ -33,14 +33,6 @@ export class UsersController {
     return this.usersService.getBlockeds(req);
   }
 
-  @Get('relation')
-  async getRelationToUser(
-    @Req() req: Request,
-    @Query('username') username: string,
-  ) {
-    return this.usersService.getRelationToUser(req, username);
-  }
-
   @Get('onlineUsers')
   async getOnlineUsers() {
     return this.usersService.getOnlineUsers();
@@ -55,8 +47,8 @@ export class UsersController {
   }
 
   @Patch('updateStatus')
-  async updateUserStatus(@Req() req: Request) {
-    return await this.usersService.updateUserStatus(req);
+  async updateUserStatus(@Req() req: Request, @Body() dto: any) {
+    return await this.usersService.updateUserStatus(req, dto.isPlaying);
   }
 
   @Post('inviteingame')

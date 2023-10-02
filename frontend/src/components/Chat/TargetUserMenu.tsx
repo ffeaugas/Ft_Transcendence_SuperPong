@@ -1,58 +1,39 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import axios from "axios";
 import styles from "../../styles/Chat/TargetUserMenu.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
-import { RootState } from "@/app/GlobalRedux/store";
 
 enum RelationType {
   FRIEND = "FRIEND",
   BLOCK = "BLOCK",
 }
 
-type Relation = {
+type TargetUserMenuProps = {
+  username: string;
+  targetUser: string;
   isFriend: boolean;
   isBlocked: boolean;
-};
-
-type TargetUserMenuProps = {
-  targetUser: string;
   closeUserInfos: () => void;
+  handleRelationChange: (
+    relationType: RelationType,
+    targetUsername: string
+  ) => void;
 };
 
 export default function TargetUserMenu({
+  username,
   targetUser,
+  isFriend,
+  isBlocked,
   closeUserInfos,
+  handleRelationChange,
 }: TargetUserMenuProps) {
+  const route = useRouter();
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
   );
-  const [relationToTarget, setRelationToTarget] = useState<
-    Relation | undefined
-  >(undefined);
-  const route = useRouter();
-  const username = useSelector((state: RootState) => state.user.username);
-
-  async function getRelationToTarget(): Promise<Relation | undefined> {
-    try {
-      const res = await axios.get(
-        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/relation`,
-        {
-          params: { username: targetUser },
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      return res.data;
-    } catch (error) {
-      console.error("Error fetching relations with target", error);
-      return undefined;
-    }
-  }
 
   async function getProfileDatas(): Promise<ProfileDatas | undefined> {
     try {
@@ -72,33 +53,6 @@ export default function TargetUserMenu({
       return undefined;
     }
   }
-
-  const handleRelationChange = async (relationType: RelationType) => {
-    try {
-      const res = await axios.patch(
-        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/changeRelation`,
-        {
-          targetUsername: targetUser,
-          relationType: relationType,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const profileDatas = res.data;
-      setTimeout(() => {
-        getRelationToTarget().then((relation) => {
-          if (relation) setRelationToTarget(relation);
-        });
-      }, 300);
-      return profileDatas;
-    } catch (error) {
-      console.error("Error fetching profile datas", error);
-      return undefined;
-    }
-  };
 
   async function goToProfile() {
     route.push("/profile/" + targetUser);
@@ -131,13 +85,9 @@ export default function TargetUserMenu({
     if (targetUser) {
       getProfileDatas().then((datas) => setProfileDatas(datas));
     }
-    getRelationToTarget().then((relation) => {
-      if (relation) setRelationToTarget(relation);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetUser]);
 
-  if (!profileDatas || !relationToTarget) {
+  if (!profileDatas) {
     return <>...</>;
   }
 
@@ -157,11 +107,17 @@ export default function TargetUserMenu({
       {username === targetUser ? undefined : (
         <>
           <button onClick={goToGame}>Invite in game</button>
-          <button onClick={() => handleRelationChange(RelationType.FRIEND)}>
-            {relationToTarget.isFriend ? "Remove friend" : "Add friend"}
+          <button
+            onClick={() =>
+              handleRelationChange(RelationType.FRIEND, targetUser)
+            }
+          >
+            {isFriend ? "Remove friend" : "Add friend"}
           </button>
-          <button onClick={() => handleRelationChange(RelationType.BLOCK)}>
-            {relationToTarget.isBlocked ? "Deblock" : "Block"}
+          <button
+            onClick={() => handleRelationChange(RelationType.BLOCK, targetUser)}
+          >
+            {isBlocked ? "Deblock" : "Block"}
           </button>
         </>
       )}

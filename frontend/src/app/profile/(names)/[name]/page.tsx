@@ -100,7 +100,6 @@ export default function Profile({ params }: { params: { name: string } }) {
           </div>
         </div>
         <div className={styles.stats}>
-          <FriendRequestList />
           <FriendList username={params.name} />
           <GamesHistoric username={params.name} />
           <Achievements username={params.name} />
