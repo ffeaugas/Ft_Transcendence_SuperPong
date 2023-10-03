@@ -117,6 +117,10 @@ export class AuthService {
       // if () {}
       // TODO VERIFY THE 2FA
     }
-    return { access_token: await this.jwtService.signAsync(payload) };
+    return {
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
+    };
   }
 }
