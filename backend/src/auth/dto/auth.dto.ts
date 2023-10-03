@@ -13,13 +13,16 @@ export class AuthDto {
   password: string;
 }
 
-export class GenOTPDTO {
+export class VerifOTPDTO {
   @IsNotEmpty()
-  id: string;
+  TwoFaCode: string;
+  @IsNotEmpty()
+  TokenTmp: string;
 }
 
-export class VerifOTPDTO {}
-
-export class ValidateOTPDTO {}
+export class ValidateOTPDTO {
+  @IsNotEmpty()
+  TwoFaCode: string;
+}
 
 export class DisableOTPDTO {}

@@ -1,27 +1,23 @@
 import {
   Body,
   Controller,
-  Get,
+  HttpException,
   Post,
   Query,
   Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from './auth.guard';
-import { UsersService } from 'src/users/users.service';
-import { User2Fa } from 'src/users/dto/user2Fa.dto';
+import { AuthDto, ValidateOTPDTO, VerifOTPDTO } from './dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private userService: UsersService,
+    private prisma: PrismaService,
   ) {}
 
   @ApiOperation({ summary: 'login' })
@@ -36,15 +32,34 @@ export class AuthController {
     return await this.authService.register(dto);
   }
 
-  // @Post('gen-otp')
-  // async generateOTP(@Body() dto: GenOTPDTO) {}
+  @Post('gen-otp')
+  async generateOTP(@Query('username') username: any) {
+    return await this.authService.generateOTP(username);
+  }
 
-  // @Post('verif-otp')
-  // async verifyOTP(@Body() dto: VerifOTPDTO) {}
+  @Post('verif-otp')
+  async verifyOTP(
+    @Query('username') username: string,
+    @Body() dto: VerifOTPDTO,
+  ) {
+    return await this.authService.verifyOTP(username, dto);
+  }
 
-  // @Post('validate-otp')
-  // async validateOTP(@Body() dto: ValidateOTPDTO) {}
+  @Post('validate-otp')
+  async validateOTP(
+    @Query('username') username: string,
+    @Body() dto: ValidateOTPDTO,
+  ) {
+    return await this.authService.validateOTP(username, dto);
+  }
 
-  // @Post('disable-otp')
-  // async disableOTP(@Body() dto: DisableOTPDTO) {}
+  @Post('disable-otp')
+  async disableOTP(@Query('username') username: string) {
+    const user = await this.prisma.user.update({
+      where: { username: username },
+      data: { otp_url: '', otp_secret: '', otpEnabled: false },
+    });
+    delete user.hash;
+    return user;
+  }
 }

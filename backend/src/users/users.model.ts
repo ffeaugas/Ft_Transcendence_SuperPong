@@ -16,6 +16,7 @@ export class Users implements Prisma.UserCreateInput {
   login: string;
   username: string;
   friends?: any;
+  tokenTmp?: string;
   friendsAddedMe?: any;
   friendReqReceived?: any;
   blockedByUsers?: any;

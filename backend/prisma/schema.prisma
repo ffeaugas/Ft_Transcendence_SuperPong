@@ -66,6 +66,7 @@ model User {
     otpValidated      Boolean         @default(false)
     otp_secret        String?
     otp_url           String?
+    tokenTmp          String?         @unique
 
     @@map("users")
 }

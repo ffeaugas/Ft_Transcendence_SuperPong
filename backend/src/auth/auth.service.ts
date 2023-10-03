@@ -1,16 +1,15 @@
-import { ForbiddenException, Injectable, Res } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
-import { AuthDto } from './dto';
+import { AuthDto, ValidateOTPDTO, VerifOTPDTO } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UsersService } from 'src/users/users.service';
-import { Users } from 'src/users/users.model';
 import { JwtService } from '@nestjs/jwt';
 import * as fs from 'node:fs';
 import { firstValueFrom } from 'rxjs';
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
+import * as QRCode from 'qrcode';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class AuthService {
@@ -101,6 +100,79 @@ export class AuthService {
     }
   }
 
+  async respondWithQRCode(otpauthUrl: string) {
+    return await QRCode.toDataURL(otpauthUrl);
+  }
+
+  async getTwoFactorAuthenticationCode() {
+    const secretCode = speakeasy.generateSecret({
+      name: process.env.TWO_FACTOR_AUTHENTICATION_APP_NAME,
+    });
+    return {
+      otpauthUrl: secretCode.otpauth_url,
+      base32: secretCode.base32,
+    };
+  }
+
+  async verifyOTP(username: string, dto: VerifOTPDTO) {
+    const user = await this.prisma.user.findFirst({
+      where: { AND: [{ username: username }, { tokenTmp: dto.TokenTmp }] },
+    });
+    if (!user) throw new HttpException('User not found', 401);
+    const verified = speakeasy.totp.verify({
+      secret: user.otp_secret,
+      encoding: 'base32',
+      token: dto.TwoFaCode,
+    });
+    if (!verified) throw new HttpException('Two factor code not valid.', 401);
+    const payload = {
+      sub: user.id,
+      login: user.login,
+      role: user.role,
+      otpenabled: user.otpEnabled,
+      otpvalidated: user.otpValidated,
+    };
+    const updatedUser = await this.prisma.user.update({
+      where: { username: username },
+      data: { otpEnabled: verified, otpValidated: verified, tokenTmp: '' },
+    });
+    return {
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
+    };
+  }
+
+  async validateOTP(username: string, dto: ValidateOTPDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (!user) throw new HttpException('User not found', 401);
+    const verified = speakeasy.totp.verify({
+      secret: user.otp_secret,
+      encoding: 'base32',
+      token: dto.TwoFaCode,
+    });
+    if (!verified) throw new HttpException('Two factor code not valid.', 401);
+    const updatedUser = await this.prisma.user.update({
+      where: { username: username },
+      data: { otpEnabled: verified, otpValidated: verified },
+    });
+    return {
+      otpValidate: updatedUser.otpValidated,
+    };
+  }
+
+  async generateOTP(username: any) {
+    const { otpauthUrl, base32 } = await this.getTwoFactorAuthenticationCode();
+    const user = await this.prisma.user.update({
+      where: { username: username },
+      data: { otp_url: otpauthUrl, otp_secret: base32 },
+    });
+    const qrCodeDataURL = await this.respondWithQRCode(otpauthUrl);
+    return `<img src="${qrCodeDataURL}" alt="QR Code" />`;
+  }
+
   async login(dto: AuthDto) {
     const user = await this.usersService.getByUsername(dto.login);
     const payload = {
@@ -113,9 +185,17 @@ export class AuthService {
     if (!user.user42) {
       const verified = await argon.verify(user.hash, dto.password);
       if (!verified) throw new ForbiddenException('Bad Credentials');
-    } else if (user.otpEnabled) {
-      // if () {}
-      // TODO VERIFY THE 2FA
+    }
+    if (user.otpEnabled) {
+      const tmpToken = Math.random().toString(36).slice(-32);
+      await this.prisma.user.update({
+        where: { login: dto.login },
+        data: { tokenTmp: tmpToken },
+      });
+      return {
+        codeRequire: true,
+        tmpToken: tmpToken,
+      };
     }
     return {
       access_token: await this.jwtService.signAsync(payload, {
