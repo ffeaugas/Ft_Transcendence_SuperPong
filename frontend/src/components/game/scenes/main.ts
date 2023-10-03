@@ -190,22 +190,25 @@ export default class GameScene extends Phaser.Scene {
             });
             this.room.onMessage("otherLeft", () => {
               console.log("otherleft");
-              this.scoreEntities[0].setText("Player left");
-              this.finish = 1;
-              if (
-                window.location.href.replace(
-                  `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game/`,
-                  ""
-                ) === ""
-              ) {
-                setTimeout(() => {
-                  if (this.game.isRunning) {
-                    this.registry.destroy(); // destroy registry
-                    this.game.destroy(false, true);
-                    window.location.reload();
-                    return;
-                  }
-                }, 3000);
+              if (this.finish == 0) {
+                this.finish = 1;
+                this.scoreEntities[0].setText("Player left");
+                if (
+                  window.location.href.replace(
+                    `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game`,
+                    ""
+                  ) === ""
+                ) {
+                  setTimeout(() => {
+                    if (this.game.isRunning) {
+                      this.registry.destroy(); // destroy registry
+                      this.scene.stop();
+                      this.game.destroy(true);
+                      window.location.reload();
+                      return;
+                    }
+                  }, 3000);
+                }
               }
             });
             if (this.finish == 0) {
@@ -263,7 +266,7 @@ export default class GameScene extends Phaser.Scene {
                       if (this.game.isRunning) {
                         this.registry.destroy(); // destroy registry
                         this.scene.stop();
-                        this.game.destroy(false, true);
+                        this.game.destroy(true);
                         window.location.reload();
                         return;
                       }
@@ -286,7 +289,7 @@ export default class GameScene extends Phaser.Scene {
                       if (this.game.isRunning) {
                         this.registry.destroy(); // destroy registry
                         this.scene.stop();
-                        this.game.destroy(false, true);
+                        this.game.destroy(true);
                         window.location.reload();
                         return;
                       }

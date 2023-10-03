@@ -131,7 +131,6 @@ export default class LoadingScene extends Phaser.Scene {
           ""
         ) === ""
       ) {
-        console.log("tout va bien");
         const games = await this.client.getAvailableRooms();
         console.log(games);
         if (games.length > 0) {
