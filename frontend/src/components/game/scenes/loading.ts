@@ -11,11 +11,13 @@ export default class LoadingScene extends Phaser.Scene {
     nb_client: number = 0;
     backgroundEntities: { [index: number]: any } = {};
     nameEntities: { [index: number]: any } = {};
-    name: { [index: number]: any } = {};
+    name: { [index: number]: any } = ["", ""];
     playerSessionID: { [index: number]: any } = {};
     P1: { [index: number]: any } = {};
     nameLigth: { [index: number]: any } = {};
     nameAnim: { [index: number]: any } = {};
+    nameInit: number = 0;
+    nameAnimStatu: number = 0;
     P2: { [index: number]: any } = {};
     load: any;
     loadAnim: any;
@@ -61,11 +63,22 @@ export default class LoadingScene extends Phaser.Scene {
                 .rectangle(dim[0] / 2, dim[1] / 2, 20, 5000, 0x111111)
                 .setDepth(5)
                 .setRotation(0);
-            this.backgroundEntities[1] = this.add
-                .rectangle(dim[0] / 2, dim[1] / 2, 5, 5000, 0xaa00aa)
+            this.backgroundEntities[2] = this.add
+                .rectangle(dim[0] / 2, dim[1] / 2, 5, 5000, 0xee00ee, 1)
                 .setDepth(5)
                 .setRotation(0);
-            this.backgroundEntities[2] = this.add
+            this.backgroundEntities[1] = this.add
+                .rectangle(dim[0] / 2, dim[1] / 2, 5, 5000, 0x222222, 1)
+                .setDepth(5)
+                .setRotation(0);
+            this.tweens.add({
+                targets: this.backgroundEntities[1],
+                ease: "Cubic.easeOut",
+                duration: 1000,
+                repeat: 0,
+                alpha: 0,
+            });
+            this.backgroundEntities[3] = this.add
                 .circle(dim[0] / 2, dim[1] / 3, 150, 0x111111)
                 .setDepth(5);
             this.load = this.add
@@ -79,27 +92,51 @@ export default class LoadingScene extends Phaser.Scene {
                 rotation: -360,
                 repeat: -1,
             });
-            this.backgroundEntities[3] = this.add
-                .circle(dim[0] / 2, dim[1] / 3, 140, 0xaa00aa)
-                .setDepth(5);
             this.backgroundEntities[4] = this.add
+                .circle(dim[0] / 2, dim[1] / 3, 140, 0xee00ee)
+                .setDepth(5);
+            this.backgroundEntities[5] = this.add
+                .circle(dim[0] / 2, dim[1] / 3, 140, 0x222222, 1)
+                .setDepth(5);
+            this.tweens.add({
+                targets: this.backgroundEntities[5],
+                ease: "Quintic.easeOut",
+                duration: 1000,
+                repeat: 0,
+                alpha: 0,
+            });
+            this.backgroundEntities[6] = this.add
                 .circle(dim[0] / 2, dim[1] / 3, 130, 0x000000)
                 .setDepth(5);
-            this.backgroundEntities[5] = this.add.pointlight(
+            this.backgroundEntities[7] = this.add.pointlight(
                 dim[0] / 2,
                 dim[1] / 3,
                 0xaa00aa,
-                300,
+                150,
                 0.4
             );
-            for (let i = 1; i < 80; i++) {
-                this.backgroundEntities[5 + i] = this.add.pointlight(
+            this.tweens.add({
+                targets: this.backgroundEntities[7],
+                ease: "Quintic.easeOut",
+                duration: 1000,
+                repeat: 0,
+                radius: 300,
+            });
+            for (let i = 1; i < 64; i++) {
+                this.backgroundEntities[7 + i] = this.add.pointlight(
                     dim[0] / 2,
                     (i - 1) * 12.2,
                     0xaa00aa,
-                    35,
-                    0.1
+                    20,
+                    0.02
                 );
+                this.tweens.add({
+                    targets: this.backgroundEntities[7 + i],
+                    ease: "Quintic.easeOut",
+                    duration: 1000,
+                    repeat: 0,
+                    radius: 70,
+                });
             }
             this.nameEntities[0] = this.add
                 .text(dim[0] / 4, (dim[1] / 3) * 2.3, "", {
@@ -134,341 +171,501 @@ export default class LoadingScene extends Phaser.Scene {
 
         this.room.state.players.onAdd((player, sessionId) => {
             this.nb_client++;
+            this.nameAnimStatu = 0;
             let dim = [this.game.canvas.width, this.game.canvas.height];
-            this.room.onMessage("Joined", (player) => {
+            this.room.onMessage("Joined", (data: any) => {
                 // this.player = players.username;
-                console.log(player);
-                if (!this.playerSessionID[0] && this.name[1] != player) {
+                console.log(data.player.username);
+                if (
+                    this.name[0] == "" &&
+                    data.player.x < dim[0] / 2 &&
+                    this.name[1] != data.player.username
+                ) {
                     this.playerSessionID[0] = sessionId;
-                    this.name[0] = player;
-                    for (let i = 0; i < 50; i++) {
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                dim[0] / 4 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0x11ff11,
-                                0,
-                                0
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
+                    this.name[0] = data.player.username;
+                    this.nameEntities[0].setText(data.player.username);
+                    if (data.curent == 1) {
+                        if (!this.nameInit) {
+                            for (let i = 7; i < 18; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0xaa0000,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            for (let i = 18; i < 29; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        dim[0] / 4 - 200 + (i - 18) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0x00aa00,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            this.P1[0] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P2[0] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P1[1] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0xee0000
+                                )
+                                .setDepth(5);
+                            this.P2[1] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x00ee00
+                                )
+                                .setDepth(5);
+                            this.P1[2] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.P2[2] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.nameInit = 1;
+                            this.P1[3] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.P2[3] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.nameEntities[0].setTint(0x88ff88);
+                            this.nameEntities[1].setTint(0xff8888);
+                            this.nameInit = 1;
+                        }
+                    } else {
+                        if (!this.nameInit) {
+                            for (let i = 7; i < 18; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0x00aa00,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            for (let i = 18; i < 29; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        dim[0] / 4 - 200 + (i - 18) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0xaa0000,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            this.P1[0] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P2[0] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P1[1] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x00ee00
+                                )
+                                .setDepth(5);
+                            this.P2[1] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0xee0000
+                                )
+                                .setDepth(5);
+                            this.nameInit = 1;
+                            this.P1[2] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.P2[2] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.P1[3] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.P2[3] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.nameEntities[1].setTint(0x88ff88);
+                            this.nameEntities[0].setTint(0xff8888);
+                            this.nameInit = 1;
+                        }
+                    }
+                    for (let i = 18; i < 29; i++) {
+                        this.tweens.add({
+                            targets: this.backgroundEntities[i],
+                            ease: "Cubic.easeOut",
+                            duration: 2800,
                             repeat: 0,
-                            radius: (i + 1) * 1.1,
-                            intensity: 0.8,
+                            radius: 150,
                         });
                     }
-                    for (let i = 50; i < 100; i++) {
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                dim[0] / 4 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0x11ff11,
-                                0,
-                                0
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
-                            intensity: 0.8,
-                        });
-                    }
-                    this.nameEntities[0].setText(player);
-                    for (let i = 0; i < 50; i++) {
-                        this.nameLigth[i].destroy();
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                dim[0] / 4 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0x11ff11,
-                                (i + 1) * 1.1,
-                                0.8
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: 0,
-                            intensity: 0,
-                        });
-                    }
-                    for (let i = 50; i < 100; i++) {
-                        this.nameLigth[i].destroy();
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                dim[0] / 4 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0x11ff11,
-                                (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
-                                0.8
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: 0,
-                            intensity: 0,
-                        });
-                    }
-                } else if (!this.playerSessionID[1] && this.name[0] != player) {
-                    for (let i = 0; i < 50; i++) {
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                (dim[0] / 4) * 3 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0xff1111,
-                                0,
-                                0
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: (i + 1) * 1.1,
-                            intensity: 0.8,
-                        });
-                    }
-                    for (let i = 50; i < 100; i++) {
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                (dim[0] / 4) * 3 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0xff1111,
-                                0,
-                                0
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
-                            intensity: 0.8,
-                        });
-                    }
-                    for (let i = 0; i < 50; i++) {
-                        this.nameLigth[i].destroy();
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                (dim[0] / 4) * 3 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0xff1111,
-                                (i + 1) * 1.1,
-                                0.8
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: 0,
-                            intensity: 0,
-                        });
-                    }
-                    for (let i = 50; i < 100; i++) {
-                        this.nameLigth[i].destroy();
-                        this.nameLigth[i] = this.add
-                            .pointlight(
-                                (dim[0] / 4) * 3 - 200 + i * 4,
-                                (dim[1] / 3) * 2.3,
-                                0xff1111,
-                                (50 + 1) * 1.1 - (i - 50 + 1) * 1.1,
-                                0.8
-                            )
-                            .setDepth(8);
-                        this.nameAnim[i] = this.tweens.add({
-                            targets: this.nameLigth[i],
-                            ease: "Quintic.easeInOut",
-                            duration: 250,
-                            repeat: 0,
-                            radius: 0,
-                            intensity: 0,
-                        });
-                    }
+                    this.tweens.add({
+                        targets: this.P2[2],
+                        ease: "Cubic.easeOut",
+                        duration: 2800,
+                        repeat: 0,
+                        alpha: 0,
+                    });
+                } else if (
+                    this.name[1] == "" &&
+                    data.player.x > dim[0] / 2 &&
+                    this.name[0] != data.player.username
+                ) {
                     this.playerSessionID[1] = sessionId;
-                    this.name[1] = player;
-                    this.nameEntities[1].setText(player);
+                    this.name[1] = data.player.username;
+                    this.nameEntities[1].setText(data.player.username);
+                    if (data.curent == 1) {
+                        if (!this.nameInit) {
+                            for (let i = 7; i < 18; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0x00aa00,
+                                        70,
+                                        0.02
+                                    );
+                            }
+                            for (let i = 18; i < 29; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        dim[0] / 4 - 200 + (i - 18) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0xaa0000,
+                                        70,
+                                        0.02
+                                    );
+                            }
+                            this.P1[0] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P2[0] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P1[1] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x00ee00
+                                )
+                                .setDepth(5);
+                            this.P2[1] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0xee0000
+                                )
+                                .setDepth(5);
+                            this.nameInit = 1;
+                            this.P1[2] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222,
+                                    1
+                                )
+                                .setDepth(5);
+                            this.P2[2] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222,
+                                    1
+                                )
+                                .setDepth(5);
+                            this.P1[3] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.P2[3] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.nameEntities[1].setTint(0x88ff88);
+                            this.nameEntities[0].setTint(0xff8888);
+                        }
+                    } else {
+                        if (!this.nameInit) {
+                            for (let i = 7; i < 18; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0xaa0000,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            for (let i = 18; i < 29; i++) {
+                                this.backgroundEntities[i] =
+                                    this.add.pointlight(
+                                        dim[0] / 4 - 200 + (i - 18) * 40,
+                                        (dim[1] / 3) * 2.3,
+                                        0x00aa00,
+                                        60,
+                                        0.04
+                                    );
+                            }
+                            this.P1[0] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P2[0] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    420,
+                                    70,
+                                    0x111111
+                                )
+                                .setDepth(5);
+                            this.P1[1] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0xee0000
+                                )
+                                .setDepth(5);
+                            this.P2[1] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x00ee00
+                                )
+                                .setDepth(5);
+                            this.P1[2] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.P2[2] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    410,
+                                    60,
+                                    0x222222
+                                )
+                                .setDepth(5);
+                            this.P1[3] = this.add
+                                .rectangle(
+                                    (dim[0] / 4) * 3,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.P2[3] = this.add
+                                .rectangle(
+                                    dim[0] / 4,
+                                    (dim[1] / 3) * 2.3,
+                                    400,
+                                    50,
+                                    0x000000
+                                )
+                                .setDepth(5);
+                            this.nameEntities[0].setTint(0x88ff88);
+                            this.nameEntities[1].setTint(0xff8888);
+                            this.nameInit = 1;
+                        }
+                    }
+                    for (let i = 7; i < 18; i++) {
+                        this.tweens.add({
+                            targets: this.backgroundEntities[i],
+                            ease: "Cubic.easeOut",
+                            duration: 2800,
+                            repeat: 0,
+                            radius: 150,
+                        });
+                    }
+                    this.tweens.add({
+                        targets: this.P1[2],
+                        ease: "Cubic.easeOut",
+                        duration: 2800,
+                        repeat: 0,
+                        alpha: 0,
+                    });
                 }
             });
-            if (this.nb_client == 1) {
-                if (sessionId === this.room.sessionId) {
-                    this.P1[0] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            420,
-                            70,
-                            0x111111
-                        )
-                        .setDepth(5);
-                    this.P1[1] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            410,
-                            60,
-                            0xaa0000
-                        )
-                        .setDepth(5);
-                    this.P1[2] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            400,
-                            50,
-                            0x000000
-                        )
-                        .setDepth(5);
-                    this.P2[0] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            420,
-                            70,
-                            0x111111
-                        )
-                        .setDepth(5);
-                    this.P2[1] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            410,
-                            60,
-                            0x00aa00
-                        )
-                        .setDepth(5);
-                    this.P2[2] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            400,
-                            50,
-                            0x000000
-                        )
-                        .setDepth(5);
-                    this.nameEntities[0].setTint(0x88ff88);
-                    this.nameEntities[1].setTint(0xff8888);
-                    for (let i = 7; i < 18; i++) {
-                        this.backgroundEntities[i] = this.add.pointlight(
-                            (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
-                            (dim[1] / 3) * 2.3,
-                            0xaa0000,
-                            70,
-                            0.4
-                        );
-                    }
-                    for (let i = 18; i < 29; i++) {
-                        this.backgroundEntities[i] = this.add.pointlight(
-                            dim[0] / 4 - 200 + (i - 18) * 40,
-                            (dim[1] / 3) * 2.3,
-                            0x00aa00,
-                            70,
-                            0.4
-                        );
-                    }
-                    //this.turningRoger[0].visible = true;
-                } else {
-                    this.P1[0] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            420,
-                            70,
-                            0x111111
-                        )
-                        .setDepth(5);
-                    this.P1[1] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            410,
-                            60,
-                            0x00aa00
-                        )
-                        .setDepth(5);
-                    this.P1[2] = this.add
-                        .rectangle(
-                            (dim[0] / 4) * 3,
-                            (dim[1] / 3) * 2.3,
-                            400,
-                            50,
-                            0x000000
-                        )
-                        .setDepth(5);
-                    this.P2[0] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            420,
-                            70,
-                            0x111111
-                        )
-                        .setDepth(5);
-                    this.P2[1] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            410,
-                            60,
-                            0xaa0000
-                        )
-                        .setDepth(5);
-                    this.P2[2] = this.add
-                        .rectangle(
-                            dim[0] / 4,
-                            (dim[1] / 3) * 2.3,
-                            400,
-                            50,
-                            0x000000
-                        )
-                        .setDepth(5);
-                    this.nameEntities[1].setTint(0x88ff88);
-                    this.nameEntities[0].setTint(0xff8888);
-                    for (let i = 7; i < 18; i++) {
-                        this.backgroundEntities[i] = this.add.pointlight(
-                            (dim[0] / 4) * 3 - 200 + (i - 7) * 40,
-                            (dim[1] / 3) * 2.3,
-                            0x00aa00,
-                            70,
-                            0.4
-                        );
-                    }
-                    for (let i = 18; i < 29; i++) {
-                        this.backgroundEntities[i] = this.add.pointlight(
-                            dim[0] / 4 - 200 + (i - 18) * 40,
-                            (dim[1] / 3) * 2.3,
-                            0xaa0000,
-                            70,
-                            0.4
-                        );
-                    }
-                    //this.turningRoger[1].visible = true;
-                }
-            }
         });
         this.room.state.players.onRemove((player, sessionId) => {
             this.nb_client--;
             console.log(this.client.name);
             let dim = [this.game.canvas.width, this.game.canvas.height];
-            if (this.playerSessionID[0] == sessionId) {
+            if (player.x < dim[0] / 2) {
+                for (let i = 18; i < 29; i++) {
+                    this.tweens.add({
+                        targets: this.backgroundEntities[i],
+                        ease: "Cubic.easeOut",
+                        duration: 2800,
+                        repeat: 0,
+                        radius: 60,
+                    });
+                }
+                this.tweens.add({
+                    targets: this.P2[2],
+                    ease: "Cubic.easeOut",
+                    duration: 2800,
+                    repeat: 0,
+                    alpha: 1,
+                });
                 this.playerSessionID[0] = 0;
                 this.name[0] = "";
                 this.nameEntities[0].setText("");
-            } else if (this.playerSessionID[1]) {
+            } else if (player.x > dim[0] / 2) {
+                for (let i = 7; i < 18; i++) {
+                    this.tweens.add({
+                        targets: this.backgroundEntities[i],
+                        ease: "Cubic.easeOut",
+                        duration: 2800,
+                        repeat: 0,
+                        radius: 60,
+                    });
+                }
+                this.tweens.add({
+                    targets: this.P1[2],
+                    ease: "Cubic.easeOut",
+                    duration: 2800,
+                    repeat: 0,
+                    alpha: 1,
+                });
                 this.playerSessionID[1] = 0;
                 this.name[1] = "";
                 this.nameEntities[1].setText("");
@@ -482,7 +679,6 @@ export default class LoadingScene extends Phaser.Scene {
     update(time: number, delta: number): void {
         //console.log(time);
         let dim = [this.game.canvas.width, this.game.canvas.height];
-        console.log(time - this.timer);
         if (this.nb_client == 2) {
             if (this.timer == 0) {
                 this.load.destroy();

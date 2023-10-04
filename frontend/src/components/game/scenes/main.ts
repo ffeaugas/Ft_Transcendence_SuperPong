@@ -68,8 +68,8 @@ export default class GameScene extends Phaser.Scene {
                 dim[0] / 2,
                 (i - 1) * 12.2,
                 0xaa00aa,
-                35,
-                0.1
+                70,
+                0.02
             );
         }
         this.scoreEntities[0] = this.add

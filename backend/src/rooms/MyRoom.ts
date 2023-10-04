@@ -171,7 +171,9 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, player);
     this.clients.forEach((client) => {
       this.state.players.forEach((player) => {
-        client.send('Joined', player.username);
+        if (player.username == options.name)
+          client.send('Joined', { player: player, curent: 1 });
+        else client.send('Joined', { player: player, curent: 0 });
       });
     });
   }
