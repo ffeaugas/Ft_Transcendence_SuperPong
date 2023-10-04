@@ -17,6 +17,7 @@ const BIO_MAX_LENGTH: number = 150;
 export default function ProfileEditor() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [checked, setChecked] = useState<boolean>(false);
   const [objectURL, setObjectURL] = useState<any | undefined>(undefined);
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
     undefined
@@ -163,6 +164,14 @@ export default function ProfileEditor() {
     }
   };
 
+  //TO COMPLETE
+  async function changeDoubleAuth() {
+    const check = await setChecked(!checked);
+    if (!checked) {
+      console.log("check");
+    }
+  }
+
   useEffect(() => {
     if (username) {
       getProfileDatas(username).then((datas) => {
@@ -297,6 +306,16 @@ export default function ProfileEditor() {
         </button>
       </div>
       <BlockedList />
+      <div className={styles.otpCheckbox}>
+        <label htmlFor="otp">Double Authentification</label>
+        <input
+          type="checkbox"
+          id="otp"
+          name="otp"
+          checked={checked}
+          onChange={changeDoubleAuth}
+        />
+      </div>
       <p className={styles.errorMessage}>{feedbackMessage}</p>
     </div>
   );
