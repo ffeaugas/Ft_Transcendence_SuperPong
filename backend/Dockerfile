@@ -4,7 +4,7 @@ WORKDIR /usr/src/app/
 
 COPY package*.json ./
 
-RUN npm i prisma && npm install
+RUN npm update && npm install
 
 COPY . .
 
