@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 
-import axios from "axios";
 import { useEffect, useState } from "react";
 import styles from "@/styles/ProfileEditor/ProfileEditor.module.css";
 import { useRouter } from "next/navigation";
@@ -17,6 +16,7 @@ const BIO_MAX_LENGTH: number = 150;
 export default function ProfileEditor() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [urlQRCode, setUrlQRCode] = useState<string | null>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [objectURL, setObjectURL] = useState<any | undefined>(undefined);
   const [profileDatas, setProfileDatas] = useState<ProfileDatas | undefined>(
@@ -26,6 +26,7 @@ export default function ProfileEditor() {
     username: "",
     profilePicture: "",
     bio: "",
+    code2fa: "",
   });
   const [datasEditor, setDatasEditor] = useState<EditorModes>({
     username: false,
@@ -166,9 +167,37 @@ export default function ProfileEditor() {
 
   //TO COMPLETE
   async function changeDoubleAuth() {
-    const check = await setChecked(!checked);
-    if (!checked) {
-      console.log("check");
+    try {
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/gen-otp?username=${username}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await res.json();
+      setUrlQRCode(data.urlData);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function send2faCode() {
+    try {
+      console.log("EEEEEEEEEEEEEEE", editedDatas.code2fa);
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/validate-otp?username=${username}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ TwoFaCode: editedDatas.code2fa }),
+        }
+      );
+      const data = await res.json();
+      console.log("DTAAAAA :", data);
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -187,6 +216,7 @@ export default function ProfileEditor() {
         profilePicture: profileDatas.profilePicture,
         bio: profileDatas.bio,
       });
+      setChecked(profileDatas?.otpEnabled);
     }
     setDatasEditor({
       username: false,
@@ -316,6 +346,26 @@ export default function ProfileEditor() {
           onChange={changeDoubleAuth}
         />
       </div>
+      {urlQRCode && (
+        <>
+          <img src={urlQRCode} />
+          <input
+            type="text"
+            id="code2fa"
+            name="code2fa"
+            value={editedDatas.code2fa}
+            className={styles.imageUploaderInput}
+            onChange={(evt) => handleChange(evt)}
+          />
+          <button
+            type="submit"
+            onClick={send2faCode}
+            className={styles.customButton}
+          >
+            send
+          </button>
+        </>
+      )}
       <p className={styles.errorMessage}>{feedbackMessage}</p>
     </div>
   );

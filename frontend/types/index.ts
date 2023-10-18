@@ -93,24 +93,8 @@ type ProfileDatas = {
   profilePicture?: string;
   eloMatchMaking?: number;
   userId: number;
+  otpEnabled: boolean;
 };
-
-// enum MenuType {
-//   CHANNEL_SELECTOR = "CHANNEL_SELECTOR",
-//   USER_SELECTOR = "USER_SELECTOR",
-//   CHANNEL_CREATION = "CHANNEL_CREATION",
-//   CHANNEL_ADMINISTRATION = "CHANNEL_ADMINISTRATION",
-// }
-
-// enum UserStatus {
-//   ONLINE = "ONLINE",
-//   OFFLINE = "OFFLINE",
-// }
-
-// enum ActiveChannelOption {
-//   PRIV_MSG = "PRIV_MSG",
-//   CHANNEL = "CHANNEL",
-// }
 
 type EditorModes = {
   username: boolean;
@@ -122,4 +106,5 @@ type EditedDatas = {
   username: string;
   profilePicture?: string;
   bio: string;
+  code2fa: string;
 };
