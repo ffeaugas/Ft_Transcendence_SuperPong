@@ -72,7 +72,7 @@ export class MessageService {
         where: { id: req.user.sub },
       });
       const achievement = await this.prisma.achievement.findUnique({
-        where: { title: 'Type sympa' },
+        where: { title: 'Good boy' },
       });
       const updatedAchievement = await this.prisma.profile.update({
         where: { userId: user.id },

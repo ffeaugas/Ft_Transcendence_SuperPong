@@ -42,6 +42,7 @@ export class ProfileService {
     if (!user) throw new ForbiddenException('This profile did not exist');
     const profile = await this.prisma.profile.findUnique({
       where: { userId: user.id },
+      include: { user: true },
     });
     if (!profile) throw new ForbiddenException('This profile did not exist');
     return profile;
@@ -67,41 +68,6 @@ export class ProfileService {
       image.stream.pipe(writer);
     });
   }
-
-  // async downloadImage(picture: string, imageName: string) {
-  //   const writer = fs.createWriteStream(`./uploads/avatar/${imageName}.jpeg`);
-  //   const response = await this.httpService.axiosRef({
-  //     url: picture,
-  //     method: 'GET',
-  //     responseType: 'stream',
-  //   });
-  //   response.data.pipe(writer);
-  //   return new Promise((resolve, reject) => {
-  //     writer.on('finish', resolve);
-  //     writer.on('error', reject);
-  //   });
-  // }
-
-  // private async updateUserProfilePicture(
-  //   userId: number,
-  //   imageUrl: string,
-  // ): Promise<void> {
-  //   await this.prisma.profile.update({
-  //     where: { userId },
-  //     data: { profilePicture: imageUrl },
-  //   });
-  // }
-
-  // async updateProfilePicture(req: Request, dto: ProfilePictureUpdateDto) {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: { id: req['user'].sub },
-  //   });
-  //   if (!user) throw new ForbiddenException('User not found.');
-  //   const newImgUrl = await this.saveImage(dto.image);
-  //   await this.updateUserProfilePicture(user.id, newImgUrl);
-
-  //   return { message: 'Profile picture updated successfully' };
-  // }
 
   async updateProfileBio(dto: ProfileBioUpdateDto) {
     const userFounded = await this.prisma.user.findUnique({

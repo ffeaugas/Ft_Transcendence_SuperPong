@@ -59,7 +59,7 @@ export class AuthService {
         userData.login + '_' + +newUser.id,
       );
       const achievement = await this.prisma.achievement.findUnique({
-        where: { title: 'Boutonneux' },
+        where: { title: 'GPU Eater' },
       });
       const updatedAchievement = await this.prisma.profile.update({
         where: { userId: newUser.id },
@@ -116,7 +116,7 @@ export class AuthService {
 
   async verifyOTP(username: string, dto: VerifOTPDTO) {
     const user = await this.prisma.user.findFirst({
-      where: { AND: [{ username: username }, { tokenTmp: dto.TokenTmp }] },
+      where: { AND: [{ login: username }, { tokenTmp: dto.TokenTmp }] },
     });
     if (!user) throw new HttpException('User not found', 401);
     const verified = speakeasy.totp.verify({
@@ -133,8 +133,8 @@ export class AuthService {
       otpvalidated: user.otpValidated,
     };
     const updatedUser = await this.prisma.user.update({
-      where: { username: username },
-      data: { otpEnabled: verified, otpValidated: verified, tokenTmp: '' },
+      where: { login: username },
+      data: { otpValidated: verified, tokenTmp: '' },
     });
     return {
       access_token: await this.jwtService.signAsync(payload, {
@@ -153,6 +153,7 @@ export class AuthService {
       encoding: 'base32',
       token: dto.TwoFaCode,
     });
+    console.log('valid secret: ', user.otp_secret, 'code :', dto.TwoFaCode);
     if (!verified) throw new HttpException('Two factor code not valid.', 401);
     const updatedUser = await this.prisma.user.update({
       where: { username: username },
@@ -170,7 +171,8 @@ export class AuthService {
       data: { otp_url: otpauthUrl, otp_secret: base32 },
     });
     const qrCodeDataURL = await this.respondWithQRCode(otpauthUrl);
-    return `<img src="${qrCodeDataURL}" alt="QR Code" />`;
+    console.log('secret: ', user.otp_secret, otpauthUrl);
+    return { urlData: qrCodeDataURL };
   }
 
   async login(dto: AuthDto) {

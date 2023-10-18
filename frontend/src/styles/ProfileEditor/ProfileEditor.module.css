@@ -104,6 +104,22 @@ img.rounded {
   margin: 0 auto;
 }
 
+.otpCheckbox {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.otpCheckbox label {
+  color: var(--textColor1);
+}
+
+.otpCheckbox button {
+  margin: 0;
+}
+
 .errorMessage {
   color: red;
 }
