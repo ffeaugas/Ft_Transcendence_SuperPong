@@ -44,38 +44,32 @@ async function bootstrap() {
       data: [
         {
           title: 'Roger', //fait
-          description: 'etre Roger',
+          description: 'be Roger',
           picture: 'default.png',
         },
         {
           title: 'Serial Looser', //fait
-          description: 'Perdre 5 fois de suite',
+          description: 'Loose 5 games in a row',
           picture: 'default.png',
         },
         {
           title: 'Serial Winner', //fait
-          description: 'Gagner 5 fois de suite',
+          description: 'Win 5 games in a row',
           picture: 'default.png',
         },
         {
-          title: 'Boutonneux', //fait
-          description: "Ce connecter via l'intra 42",
+          title: 'GPU Eater', //fait
+          description: 'Connect via 42 intranet',
           picture: 'default.png',
         },
         {
-          title: 'Ami de Roger', //fait
-          description: 'Etre ami avec Roger',
+          title: "Roger's friend", //fait
+          description: 'Be frien with Roger',
           picture: 'default.png',
         },
         {
-          title: 'English Man',
-          description:
-            'Pas oublier de traduire tous les achievements en anglais',
-          picture: 'default.png',
-        },
-        {
-          title: 'Type sympa', //fait
-          description: 'Dire Bonjour dans le chat general',
+          title: 'Good boy', //fait
+          description: "Say 'Bonjour' in the General channel",
           picture: 'default.png',
         },
       ],
