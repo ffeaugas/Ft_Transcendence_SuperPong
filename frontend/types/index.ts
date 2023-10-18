@@ -93,7 +93,7 @@ type ProfileDatas = {
   profilePicture?: string;
   eloMatchMaking?: number;
   userId: number;
-  otpEnabled: boolean;
+  user: any;
 };
 
 type EditorModes = {

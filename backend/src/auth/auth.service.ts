@@ -116,7 +116,7 @@ export class AuthService {
 
   async verifyOTP(username: string, dto: VerifOTPDTO) {
     const user = await this.prisma.user.findFirst({
-      where: { AND: [{ username: username }, { tokenTmp: dto.TokenTmp }] },
+      where: { AND: [{ login: username }, { tokenTmp: dto.TokenTmp }] },
     });
     if (!user) throw new HttpException('User not found', 401);
     const verified = speakeasy.totp.verify({
@@ -133,7 +133,7 @@ export class AuthService {
       otpvalidated: user.otpValidated,
     };
     const updatedUser = await this.prisma.user.update({
-      where: { username: username },
+      where: { login: username },
       data: { otpValidated: verified, tokenTmp: '' },
     });
     return {

@@ -165,8 +165,7 @@ export default function ProfileEditor() {
     }
   };
 
-  //TO COMPLETE
-  async function changeDoubleAuth() {
+  async function activateDoubleAuth() {
     try {
       const res = await fetch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/gen-otp?username=${username}`,
@@ -181,9 +180,31 @@ export default function ProfileEditor() {
     }
   }
 
+  async function removeDoubleAuth() {
+    try {
+      const res = await fetch(
+        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/disable-otp?username=${username}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await res.json();
+    } catch (error) {
+      console.log(error);
+    }
+    setChecked(false);
+  }
+
+  function changeDoubleAuth() {
+    if (profileDatas?.user.otpEnabled) {
+      removeDoubleAuth();
+    } else {
+      activateDoubleAuth();
+    }
+  }
+
   async function send2faCode() {
     try {
-      console.log("EEEEEEEEEEEEEEE", editedDatas.code2fa);
       const res = await fetch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/validate-otp?username=${username}`,
         {
@@ -195,7 +216,9 @@ export default function ProfileEditor() {
         }
       );
       const data = await res.json();
-      console.log("DTAAAAA :", data);
+      console.log("2FA success : ", data);
+      setUrlQRCode(null);
+      setChecked(true);
     } catch (error) {
       console.log(error);
     }
@@ -215,8 +238,9 @@ export default function ProfileEditor() {
         username: username,
         profilePicture: profileDatas.profilePicture,
         bio: profileDatas.bio,
+        code2fa: "",
       });
-      setChecked(profileDatas?.otpEnabled);
+      setChecked(profileDatas?.user.otpEnabled);
     }
     setDatasEditor({
       username: false,
@@ -349,6 +373,7 @@ export default function ProfileEditor() {
       {urlQRCode && (
         <>
           <img src={urlQRCode} />
+          <p>Enter the google auth code :</p>
           <input
             type="text"
             id="code2fa"
