@@ -153,17 +153,15 @@ export class AuthService {
       encoding: 'base32',
       token: dto.TwoFaCode,
     });
-    setTimeout(async () => {
-      console.log('valid secret: ', user.otp_secret, 'code :', dto.TwoFaCode);
-      if (!verified) throw new HttpException('Two factor code not valid.', 401);
-      const updatedUser = await this.prisma.user.update({
-        where: { username: username },
-        data: { otpEnabled: verified, otpValidated: verified },
-      });
-      return {
-        otpValidate: updatedUser.otpValidated,
-      };
-    }, 200);
+    console.log('valid secret: ', user.otp_secret, 'code :', dto.TwoFaCode);
+    if (!verified) throw new HttpException('Two factor code not valid.', 401);
+    const updatedUser = await this.prisma.user.update({
+      where: { username: username },
+      data: { otpEnabled: verified, otpValidated: verified },
+    });
+    return {
+      otpValidate: updatedUser.otpValidated,
+    };
   }
 
   async generateOTP(username: any) {
