@@ -59,7 +59,7 @@ export class AuthService {
         userData.login + '_' + +newUser.id,
       );
       const achievement = await this.prisma.achievement.findUnique({
-        where: { title: 'Boutonneux' },
+        where: { title: 'GPU Eater' },
       });
       const updatedAchievement = await this.prisma.profile.update({
         where: { userId: newUser.id },
@@ -134,7 +134,7 @@ export class AuthService {
     };
     const updatedUser = await this.prisma.user.update({
       where: { username: username },
-      data: { otpEnabled: verified, otpValidated: verified, tokenTmp: '' },
+      data: { otpValidated: verified, tokenTmp: '' },
     });
     return {
       access_token: await this.jwtService.signAsync(payload, {
