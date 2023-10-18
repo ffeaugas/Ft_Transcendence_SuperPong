@@ -15,6 +15,8 @@ export class MyRoom extends Room<MyRoomState> {
   mooving_ball = 0;
   host: Client;
   game: GameService;
+  host_username: string;
+  client_username: string;
 
   async onCreate(options: any) {
     this.game = new GameService(prisma);
@@ -42,6 +44,19 @@ export class MyRoom extends Room<MyRoomState> {
       }
     });
     this.onMessage('leave', (cli) => {
+      const dto = new GameDto();
+      if (this.host != cli) {
+        dto.looser = this.host_username;
+        dto.looserScore = this.state.score[1];
+        dto.winner = this.client_username;
+        dto.winnerScore = this.state.score[0];
+      } else {
+        dto.winner = this.host_username;
+        dto.winnerScore = this.state.score[1];
+        dto.looser = this.client_username;
+        dto.looserScore = this.state.score[0];
+      }
+      this.game.createGameHistory(dto);
       this.clients.forEach((client) => {
         client.send('otherLeft');
       });
@@ -153,6 +168,7 @@ export class MyRoom extends Room<MyRoomState> {
       player.x = mapWidth * 0.01;
       player.y = mapHeight / 2;
       this.player[0] = client.sessionId;
+      this.host_username = player.username;
       this.host = client;
       player.get_ball = 1;
     } else {
@@ -165,6 +181,7 @@ export class MyRoom extends Room<MyRoomState> {
       ball.celerite = 1;
       ball.angle = 0;
       this.player[1] = client.sessionId;
+      this.client_username = player.username;
       player.get_ball = 0;
     }
     if (this.player[1] && this.player[0]) {

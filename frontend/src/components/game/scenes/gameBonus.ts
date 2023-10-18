@@ -217,15 +217,17 @@ export default class GameSceneBonus extends Phaser.Scene {
             this.room.onMessage("otherLeft", () => {
               console.log("otherleft");
               this.scoreEntities[0].setText("Player left");
-              this.finish = 1;
-              setTimeout(() => {
-                if (this.game.isRunning) {
-                  this.registry.destroy(); // destroy registry
-                  this.game.destroy(false, true);
-                  window.location.reload();
-                  return;
-                }
-              }, 3000);
+              if (this.finish == 0) {
+                this.finish = 1;
+                setTimeout(() => {
+                  if (this.game.isRunning) {
+                    this.registry.destroy(); // destroy registry
+                    this.game.destroy(false, true);
+                    window.location.reload();
+                    return;
+                  }
+                }, 3000);
+              }
             });
 
             if (this.finish == 0) {
