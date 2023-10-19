@@ -39,7 +39,8 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
       if (player.get_ball != 0 && this.mooving_ball == 0) {
-        this.direction = 2.5;
+        if (player.x < 200) this.direction = 2.5;
+        else this.direction = -2.5;
         this.mooving_ball = 1;
       }
     });

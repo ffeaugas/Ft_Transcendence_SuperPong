@@ -24,7 +24,7 @@ export function updateLoadingState(GS: Phaser.Scene, time: number) {
         GS.terminate = 1;
         console.log(GS.terminate);
         GS.scene.stop();
-        GS.scene.start("Game", GS.room);
+        GS.scene.start("GameBonus", GS.room);
     } else if (time - GS.timer > 2000) {
         if (GS.loadStat == 2) {
             GS.load.destroy();
