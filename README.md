@@ -22,3 +22,34 @@
 
 <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"/>
 <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white"/>
+
+
+<h1>Journal de bord</h1>
+
+19 Octobre - 19h04 [Franci] : On attend juste Subielo et on fait valider le projet - Il s'est couché à 11h ce matin et vient de se réveiller
+
+<h2>Liste non exhaustive des trucs à améliorer par la suite</h2>
+
+[CLIENT]
+- Sortir les fonctions métier des fichiers .tsx, pages comme component, pour les mettres dans des fichiers à part
+- Homogénéïser les formulaires (virer formik pour le Register et faire un formulaire React classique)
+- Homogénéïser les call API (finir de virer axios, améliorer la gestion d'erreur)
+- Rajouter des pop-ups à plusieurs endroits (par exemple lors du setup de la double authentification)
+- Optimiser la DB : utiliser des charsets de taille adaptée à la place des strings
+- Fragmenter les components trop volumineux (le ProfilEditor par exemple)
+- Regrouper les useState en objet quand trop nombreux (ex Chat, ProfileEditor)
+- Refactoriser certains composants (le ProfilEditor encore et toujours)
+- Revoir le style de l'ensemble du site pour le rendre plus pro + optimisation du css (beaucoup de lignes dupliquées, style de l'ui à homogénéïser)
+- Améliorer la responsivité
+
+[SERVER]
+- Refactoriser les gros services (channels et users surtout), alléger le nombre d'appels à prisma dans le code en utilisant mieux class-validator, mieux utiliser prisma en règle général
+- Séparer les gros services pour avoir plusieurs petits services au sein des modules (exemple service channel => service channel-administration + service channel-creation)
+- Mettre à jour la documentation Swagger
+
+[JEU]
+- Refactoriser le jeu
+- Mieux gérer la fenêtre de jeu, resoudre le glitch secret
+
+[Gros boulot]
+- Retirer Socket.io et utiliser uniquement colyseus pour gérer les channels du chat et le status des users en plus du jeu
