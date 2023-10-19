@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  gap: 20px;
+  gap: 10px;
 }
 
 .alternativePage {
@@ -40,7 +40,6 @@ img.rounded {
   border: 2px solid var(--backgroundColor3);
   background-color: #03121daf;
   padding: var(--padding1);
-  /* border-radius: 10px; */
 }
 
 .editProfile {
@@ -199,4 +198,31 @@ img.rounded {
 .centered-element {
   margin-left: auto;
   margin-right: auto;
+}
+
+/*================ CHECKIN PAGE ================*/
+
+.button {
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 5px 10px;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: var(--textSize1);
+  width: 50%;
+  max-width: 70px;
+  margin: 0 auto;
+}
+
+.button:hover {
+  background-color: var(--titleColor1);
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
 }

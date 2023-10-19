@@ -1,8 +1,10 @@
 "use client";
 
+import Header from "@/components/Header";
 import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import styles from "@/styles/page.module.css";
 
 export default function Checkin() {
   const [code2fa, setCode2fa] = useState<string>("");
@@ -27,7 +29,6 @@ export default function Checkin() {
       );
       if (res.ok) {
         const data = await res.json();
-        console.log("2FA success : ", data);
         localStorage.setItem("Authenticate", "true");
         localStorage.setItem("token", data.access_token);
         setCookie("Authenticate", "true");
@@ -45,18 +46,21 @@ export default function Checkin() {
   }
 
   return (
-    <>
-      <p>Enter the google auth code :</p>
-      <input
-        type="text"
-        id="code2fa"
-        name="code2fa"
-        value={code2fa}
-        onChange={(evt) => setCode2fa(evt.target.value)}
-      />
-      <button type="submit" onClick={check2faCode}>
-        send
-      </button>
-    </>
+    <section className={`${styles.page}`}>
+      <Header />
+      <div className={styles.auth}>
+        <h4>Enter the google auth code :</h4>
+        <input
+          type="text"
+          id="code2fa"
+          name="code2fa"
+          value={code2fa}
+          onChange={(evt) => setCode2fa(evt.target.value)}
+        />
+        <button className={styles.button} type="submit" onClick={check2faCode}>
+          send
+        </button>
+      </div>
+    </section>
   );
 }

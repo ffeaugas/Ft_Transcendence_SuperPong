@@ -67,7 +67,7 @@ h1 b {
   /* color: var(--titleColor2); */
   font-family: "Vibur", sans-serif;
   color: #fff;
-  animation: pulsate 0.24s ease-in-out infinite alternate;
+  animation: pulsate 5s ease-in-out infinite alternate;
 }
 
 h2 {
