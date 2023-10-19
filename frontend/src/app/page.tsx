@@ -16,26 +16,27 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const DynamicComponentWithNoSSR = dynamic(
-    () => import("@/components/Home/Home"),
-    {
-        ssr: false,
-    }
+  () => import("@/components/Home/Home"),
+  {
+    ssr: false,
+  }
 );
 
 const Game = () => {
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setLoading(true);
-    }, []);
+  useEffect(() => {
+    setLoading(true);
+  }, []);
 
-    return (
-        <section className={`${styles.page}`}>
-            <Header />
-            <div key={Math.random()} id="game"></div>
-            {loading ? <DynamicComponentWithNoSSR /> : null}
-        </section>
-    );
+  return (
+    <section className={`${styles.page}`}>
+      <Header />
+      <h1>Welcome to Superpong</h1>
+      <div key={Math.random()} id="game"></div>
+      {loading ? <DynamicComponentWithNoSSR /> : null}
+    </section>
+  );
 };
 
 export default Game;

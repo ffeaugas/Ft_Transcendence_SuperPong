@@ -28,6 +28,7 @@ export default function MsgList({
 
   function handleSubmit(evt: any) {
     evt.preventDefault();
+    if (textInput === "") return;
     submitNewMessage(textInput);
     setTextInput("");
   }

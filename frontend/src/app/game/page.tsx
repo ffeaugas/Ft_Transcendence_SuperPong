@@ -15,15 +15,17 @@ const DynamicComponentWithNoSSR = dynamic(
 
 const Game = () => {
   const [loading, setLoading] = useState(false);
+  const [auth, setAuth] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
   }, []);
 
-  let auth = false;
-  if (typeof window !== "undefined") {
-    auth = localStorage?.getItem("Authenticate") === "true" ? true : false;
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setAuth(localStorage?.getItem("Authenticate") === "true" ? true : false);
+    }
+  }, []);
 
   return (
     <section className={`${styles.page}`}>
@@ -33,7 +35,7 @@ const Game = () => {
       {loading && auth ? (
         <DynamicComponentWithNoSSR />
       ) : (
-        <p>Your arent authenticated</p>
+        <h4>Your are not authenticated</h4>
       )}
     </section>
   );

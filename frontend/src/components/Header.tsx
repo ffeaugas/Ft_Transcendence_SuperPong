@@ -4,7 +4,6 @@
 
 import styles from "../styles/Header.module.css";
 import Link from "next/link";
-// import { usePathname } from "next/navigation";
 import { deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";

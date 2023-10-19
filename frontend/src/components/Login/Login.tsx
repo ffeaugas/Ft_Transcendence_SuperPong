@@ -1,8 +1,6 @@
 "use client";
 
-// import { Formik, Form, Field, ErrorMessage } from "formik";
 import React, { useState } from "react";
-// import { useLogin } from "./hook/useLogin";
 import styles from "@/styles/Login.module.css";
 import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
@@ -10,66 +8,6 @@ import { useRouter } from "next/navigation";
 const clientId = process.env.NEXT_PUBLIC_OAUTH42_UID as string;
 const redirectUri = `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/auth/callback`;
 const scope = "public";
-
-// export default function Login() {
-//   const { initialValues, handleLogin } = useLogin();
-
-//   const handleAuthorize = () => {
-//     const authorizeUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-//       redirectUri
-//     )}&response_type=code&scope=${scope}`;
-//     window.location.href = authorizeUrl;
-//   };
-
-//   return (
-//     <div className={styles.login}>
-//       <Formik initialValues={initialValues} onSubmit={handleLogin}>
-//         <Form>
-//           <h1 className={styles.fieldName}>Login</h1>
-//           <div className={styles.fieldContainer}>
-//             <Field
-//               type="text"
-//               name="login"
-//               id="login"
-//               className={styles.fieldInput}
-//             />
-//             <ErrorMessage name="login" component="div" />
-//           </div>
-//           <h1 className={styles.fieldName}>Password</h1>
-//           <div className={styles.fieldContainer}>
-//             <Field
-//               type="password"
-//               name="password"
-//               id="password"
-//               className={styles.fieldInput}
-//             />
-//             <ErrorMessage name="password" component="div" />
-//           </div>
-//           <div className={styles.buttonContainer}>
-//             <ul>
-//               <button type="submit" className={styles.button}>
-//                 Login
-//               </button>
-//             </ul>
-//           </div>
-//         </Form>
-//       </Formik>
-
-//       <ul>
-//         <button className={styles.button} onClick={handleAuthorize}>
-//           <span className={styles.buttonContent}>
-//             <span>Sign with</span>
-//             <img
-//               src="https://etudestech.com/wp-content/uploads/2021/08/42_logo.png"
-//               alt="Icon"
-//               className={styles.buttonIcon}
-//             />
-//           </span>
-//         </button>
-//       </ul>
-//     </div>
-//   );
-// }
 
 type LoginDatas = {
   username: string;
@@ -84,6 +22,7 @@ export default function Login() {
     code2fa: "",
   });
   const [token2fa, setToken2fa] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
 
   async function handleLogin(evt: any) {
@@ -117,7 +56,7 @@ export default function Login() {
       }, 400);
     } else {
       setTimeout(() => {
-        alert("Bad credentials");
+        setErrorMessage("Bad credentials");
       }, 400);
     }
     setLoginDatas({
@@ -178,36 +117,44 @@ export default function Login() {
   };
 
   return (
-    <>
-      <form onSubmit={(evt) => handleLogin(evt)}>
-        <input
-          type="text"
-          name="username"
-          value={loginDatas.username}
-          onChange={(evt) => handleChange(evt)}
-        />
-        <input
-          type="text"
-          name="password"
-          value={loginDatas.password}
-          onChange={(evt) => handleChange(evt)}
-        />
-        <button>Send</button>
-      </form>
+    <div className={styles.login}>
+      {token2fa === null && (
+        <form onSubmit={(evt) => handleLogin(evt)}>
+          <h1 className={styles.fieldName}>Login</h1>
+          <input
+            type="text"
+            name="username"
+            value={loginDatas.username}
+            onChange={(evt) => handleChange(evt)}
+            className={styles.fieldInput}
+          />
+          <h1 className={styles.fieldName}>Password</h1>
+          <input
+            type="password"
+            name="password"
+            value={loginDatas.password}
+            onChange={(evt) => handleChange(evt)}
+            className={styles.fieldInput}
+          />
+          <button className={styles.button}>Login</button>
+          <p className={styles.fieldError}>{errorMessage}</p>
+        </form>
+      )}
       {token2fa !== null && (
         <>
-          <p>Enter the google auth code :</p>
+          <h1 className={styles.fieldName}>Enter the google auth code :</h1>
           <input
             type="text"
             id="code2fa"
             name="code2fa"
             value={loginDatas.code2fa}
             onChange={(evt) => handleChange(evt)}
+            className={styles.fieldInput}
           />
           <button
             type="submit"
             onClick={check2faCode}
-            className={styles.customButton}
+            className={styles.button}
           >
             send
           </button>
@@ -225,6 +172,6 @@ export default function Login() {
           </span>
         </button>
       </ul>
-    </>
+    </div>
   );
 }

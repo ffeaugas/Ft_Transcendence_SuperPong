@@ -1,104 +1,71 @@
 .login {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .fieldName {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    margin-top: 8px;
-    text-align: center;
-    color: white;
-    font-family: "Vibur", serif;
-    animation: pulsate 0.24s ease-in-out infinite alternate;
-}
-
-.fieldContainer {
-    margin-bottom: 10px;
+  font-size: var(--titleSize2);
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  text-align: center;
+  color: white;
 }
 
 .fieldInput {
-    height: 30px;
-    padding: 8px;
-    border: 1px solid var(--titleColor2);
-    border-radius: 10px;
-    background-color: var(--backgroundColor2);
-    width: 100%;
-    color: white;
-}
-
-.buttonContainer {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+  height: 30px;
+  padding: 8px;
+  border: 1px solid var(--titleColor2);
+  border-radius: 10px;
+  background-color: var(--backgroundColor2);
+  width: 80%;
+  max-width: 200px;
+  color: white;
 }
 
 .buttonContent {
-    display: flex;
-    align-items: right;
+  display: flex;
+  align-items: right;
 }
 
 .buttonIcon {
-    width: 20px;
-    height: 20px;
-    filter: invert();
-    margin-left: 8px;
+  width: 20px;
+  height: 20px;
+  filter: invert();
+  margin-left: 8px;
 }
 
 .button {
-    background-color: var(--backgroundColor2);
-    border: none;
-    color: var(--textColor1);
-    padding: 10px 24px;
-    margin-top: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: 400;
-    font-family: "Teko", sans-serif;
-    font-size: 16px;
+  background-color: var(--backgroundColor2);
+  border: none;
+  color: var(--textColor1);
+  padding: 10px 24px;
+  margin-top: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 400;
+  font-family: "Teko", sans-serif;
+  font-size: 16px;
+  max-width: 150px;
 }
 
 .button:hover {
-    background-color: var(--titleColor1);
-    color: var(--textColor1);
+  background-color: var(--titleColor1);
+  color: var(--textColor1);
 }
 
 .fieldError {
-    color: rgb(255, 191, 191);
-    font-size: 18px;
-    margin-top: 5px;
-    animation: 0.5s pulsateError alternate infinite;
-    font-family: "Vibur", serif;
-}
-
-@keyframes pulsate {
-    100% {
-        text-shadow: 0 0 4px #fff, 0 0 11px #fff, 0 0 19px #fff,
-            0 0 40px var(--backgroundColor3), 0 0 80px var(--backgroundColor3),
-            0 0 90px var(--backgroundColor3), 0 0 100px var(--backgroundColor3),
-            0 0 150px var(--backgroundColor3);
-    }
-
-    0% {
-        text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 18px #fff,
-            0 0 38px var(--backgroundColor3), 0 0 73px var(--backgroundColor3),
-            0 0 80px var(--backgroundColor3), 0 0 94px var(--backgroundColor3),
-            0 0 140px var(--backgroundColor3);
-    }
-}
-
-@keyframes pulsateError {
-    100% {
-        text-shadow: 0 0 4px rgb(255, 211, 211), 0 0 11px rgb(255, 211, 211),
-            0 0 19px rgb(255, 211, 211), 0 0 40px #ff0000, 0 0 80px #ff0000,
-            0 0 90px #ff0000, 0 0 100px #ff0000, 0 0 150px #ff0000;
-    }
-
-    0% {
-        text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 18px #fff,
-            0 0 38px #ff0000, 0 0 73px #ff0000, 0 0 80px #ff0000,
-            0 0 94px #ff0000, 0 0 140px #ff0000;
-    }
+  font-size: var(--textSize1);
+  color: rgb(255, 191, 191);
+  font-size: 18px;
+  margin-top: 5px;
 }

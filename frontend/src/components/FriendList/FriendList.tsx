@@ -72,7 +72,7 @@ export default function FriendList({ username }: FriendListProps) {
 
   return (
     <div className={styles.friendList}>
-      <h3>{username}'s friend list :</h3>
+      <h3>Friend list :</h3>
       <ul>
         {friends.map((friend) => (
           <FriendItem

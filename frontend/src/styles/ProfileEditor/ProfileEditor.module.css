@@ -123,3 +123,8 @@ img.rounded {
 .errorMessage {
   color: red;
 }
+
+.profileEditor p {
+  color: var(--textColor1);
+  font-size: var(--titleSize2);
+}
