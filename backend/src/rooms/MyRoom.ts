@@ -39,7 +39,8 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('launch', (client) => {
       const player = this.state.players.get(client.sessionId);
       if (player.get_ball != 0 && this.mooving_ball == 0) {
-        this.direction = 2.5;
+        if (player.x < 200) this.direction = 2.5;
+        else this.direction = -2.5;
         this.mooving_ball = 1;
       }
     });
@@ -176,7 +177,7 @@ export class MyRoom extends Room<MyRoomState> {
       player.x = mapWidth * 0.99;
       player.y = mapHeight / 2;
       ball.r = 10;
-      ball.x = mapWidth / 2;
+      ball.x = 30;
       ball.y = mapHeight / 2;
       ball.celerite = 1;
       ball.angle = 0;
@@ -192,7 +193,9 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, player);
     this.clients.forEach((client) => {
       this.state.players.forEach((player) => {
-        client.send('Joined', player.username);
+        if (player.username == options.name)
+          client.send('Joined', { player: player, curent: 1 });
+        else client.send('Joined', { player: player, curent: 0 });
       });
     });
   }

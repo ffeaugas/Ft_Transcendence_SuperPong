@@ -213,7 +213,7 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       player.x = mapWidth * 0.99;
       player.y = mapHeight / 2;
       ball.r = 10;
-      ball.x = mapWidth / 2;
+      ball.x = 30;
       ball.y = mapHeight / 2;
       ball.celerite = 1;
       ball.angle = 0;
@@ -228,7 +228,9 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, player);
     this.clients.forEach((client) => {
       this.state.players.forEach((player) => {
-        client.send('Joined', player.username);
+        if (player.username == options.name)
+          client.send('Joined', { player: player, curent: 1 });
+        else client.send('Joined', { player: player, curent: 0 });
       });
     });
   }

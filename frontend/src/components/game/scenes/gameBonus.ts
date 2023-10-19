@@ -31,21 +31,6 @@ export default class GameSceneBonus extends Phaser.Scene {
     super("GameBonus");
   }
 
-  // async postGame(data): Promise<string> {
-  //     const res = await fetch(
-  //         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/game`,
-  //         {
-  //             method: "POST",
-  //             headers: {
-  //                 "Content-Type": "application/json",
-  //                 Authorization: "Bearer " + localStorage.getItem("token"),
-  //             },
-  //             body: JSON.stringify(data),
-  //         }
-  //     );
-  //     return "";
-  // }
-
   init(data: any) {
     this.room = data;
   }
@@ -57,13 +42,25 @@ export default class GameSceneBonus extends Phaser.Scene {
     let dim = [this.game.canvas.width, this.game.canvas.height];
     this.cursorKeys = this.input.keyboard.createCursorKeys();
     this.KeyF = this.input.keyboard.addKey("F");
-    this.backgroundEntities[0] = this.add.rectangle(
-      dim[0] / 2,
-      dim[1] / 2,
-      25,
-      dim[1],
-      0x00bbb9
-    );
+    this.backgroundEntities[0] = this.add
+      .rectangle(dim[0] / 2, dim[1] / 2, 20, dim[1], 0x111111)
+      .setDepth(2);
+    this.backgroundEntities[1] = this.add
+      .rectangle(dim[0] / 2, dim[1] / 2, 20, dim[1], 0x111111)
+      .setDepth(2);
+    this.backgroundEntities[2] = this.add
+      .rectangle(dim[0] / 2, dim[1] / 2, 5, 5000, 0xee00ee)
+      .setDepth(3)
+      .setRotation(0);
+    for (let i = 1; i < 80; i++) {
+      this.backgroundEntities[2 + i] = this.add.pointlight(
+        dim[0] / 2,
+        (i - 1) * 12.2,
+        0xaa00aa,
+        70,
+        0.04
+      );
+    }
     this.scoreEntities[0] = this.add
       .text(dim[0] / 2, 20, "0    0", {
         fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
@@ -71,23 +68,24 @@ export default class GameSceneBonus extends Phaser.Scene {
         align: "center",
         color: "#666666",
       })
-      .setOrigin(0.5);
-    this.ballEntity = this.add.rectangle(dim[0], dim[1], 15, 15, 0x006600);
+      .setOrigin(0.5)
+      .setDepth(21);
+    this.ballEntity = this.add
+      .rectangle(dim[0], dim[1], 15, 15, 0x006600)
+      .setDepth(10);
     this.ballLight = this.add.pointlight(dim[0], dim[1], 0x000a10, 275);
     this.ballLight.intensity = 0.25;
-    this.bonusEntity = this.add.rectangle(-500, -500, 20, 20, 0xff0000);
+    this.bonusEntity = this.add
+      .rectangle(-500, -500, 20, 20, 0xff0000)
+      .setDepth(20);
   }
 
   async create() {
     console.log("Joining custom game room...");
 
     try {
-      // this.scale.displaySize.setAspectRatio(
-      //   window.outerWidth / window.outerHeight
-      // );
       let dim = [this.game.canvas.width, this.game.canvas.height];
       this.scale.refresh();
-      // this.matchMaker.joinOrCreate("pong", {mode: "classic"});
       this.game.canvas.style.cursor = "none";
       console.log("Joined successfully!");
     } catch (e) {
@@ -216,6 +214,9 @@ export default class GameSceneBonus extends Phaser.Scene {
 
             this.room.onMessage("otherLeft", () => {
               console.log("otherleft");
+              this.scoreEntities[1] = this.add
+                .rectangle(dim[0] / 2, 20, 610, 50, 0x111111)
+                .setDepth(20);
               this.scoreEntities[0].setText("Player left");
               if (this.finish == 0) {
                 this.finish = 1;
@@ -280,6 +281,9 @@ export default class GameSceneBonus extends Phaser.Scene {
 
             if (this.room) {
               this.room.onMessage("win", (username) => {
+                this.scoreEntities[1] = this.add
+                  .rectangle(dim[0] / 2, 20, 610, 50, 0x111111)
+                  .setDepth(20);
                 this.scoreEntities[0].setText("You are a Winner " + username);
                 this.room.leave();
                 if (this.finish == 0) {
@@ -297,6 +301,9 @@ export default class GameSceneBonus extends Phaser.Scene {
               });
 
               this.room.onMessage("loose", (username) => {
+                this.scoreEntities[1] = this.add
+                  .rectangle(dim[0] / 2, 20, 610, 50, 0x111111)
+                  .setDepth(20);
                 this.scoreEntities[0].setText("You are a Looser " + username);
                 this.room.leave();
                 if (this.finish == 0) {
