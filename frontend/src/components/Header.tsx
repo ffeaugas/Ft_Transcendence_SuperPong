@@ -38,6 +38,11 @@ export default function Header() {
       return user["username"];
     } else {
       setAuth(false);
+      setAuth(localStorage.getItem("Authenticate") !== "true");
+      localStorage.setItem("Authenticate", "false");
+      localStorage.removeItem("Authenticate");
+      localStorage.removeItem("token");
+      deleteCookie("Authenticate");
       return "";
     }
   }

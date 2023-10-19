@@ -4,7 +4,6 @@ import Header from "@/components/Header";
 import styles from "../../styles/page.module.css";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { getCookie } from "cookies-next";
 
 const DynamicComponentWithNoSSR = dynamic(
   () => import("@/components/game/index"),

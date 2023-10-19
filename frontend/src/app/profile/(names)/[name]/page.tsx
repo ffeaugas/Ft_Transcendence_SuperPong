@@ -10,7 +10,6 @@ import Achievements from "@/components/Achievements/Achievements";
 import ProfileEditor from "@/components/ProfileEditor/ProfileEditor";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/GlobalRedux/store";
-import FriendRequestList from "@/components/FriendRequests/FriendRequestList";
 
 type ProfileDatas = {
   id: number;
@@ -62,16 +61,17 @@ export default function Profile({ params }: { params: { name: string } }) {
         setProfileDatas(datas);
       });
     }
-  }, []);
+  }, [username]);
 
   if (!profileDatas) {
     return (
       <section className={`${styles.page}`}>
         <Header />
-        <p>...</p>;
+        <p>...</p>
       </section>
     );
   }
+
   return (
     <section className={styles.page}>
       <Header />

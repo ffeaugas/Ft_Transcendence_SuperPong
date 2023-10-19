@@ -60,7 +60,6 @@ img.rounded {
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  /* max-width: 150px; */
   width: 100%;
 }
 

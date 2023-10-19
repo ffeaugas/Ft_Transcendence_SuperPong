@@ -166,8 +166,10 @@ export default function Chat() {
       activeDiscussionType === ActiveDiscussionType.CHANNEL &&
       activeDiscussion === channelName &&
       kickedUser === user?.username
-    )
+    ) {
       setActiveDiscussion("General");
+      setSelectedMenu(MenuType.CHANNEL_SELECTOR);
+    }
   }
 
   function listenMessage(message: Message) {

@@ -93,6 +93,12 @@ export default function ProfileEditor() {
       if (res.ok) {
         dispatch(setUsername(editedDatas.username));
         router.push(`/profile/${editedDatas.username}`);
+      } else {
+        const data = await res.json();
+        setFeedbackMessage(data.message);
+        setTimeout(() => {
+          setFeedbackMessage("");
+        }, 3000);
       }
     } catch (error) {}
   }
@@ -161,7 +167,7 @@ export default function ProfileEditor() {
       setFeedbackMessage(data.message);
       setTimeout(() => {
         setFeedbackMessage("");
-      }, 2200);
+      }, 3000);
     }
   };
 
