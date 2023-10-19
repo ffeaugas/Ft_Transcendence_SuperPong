@@ -43,34 +43,34 @@ async function bootstrap() {
     const achievements = await prisma.achievement.createMany({
       data: [
         {
-          title: 'Roger', //fait
+          title: 'Roger',
           description: 'be Roger',
-          picture: 'default.png',
+          picture: 'sadnessAchievement.png',
         },
         {
-          title: 'Serial Looser', //fait
+          title: 'Serial Looser',
           description: 'Loose 5 games in a row',
-          picture: 'default.png',
+          picture: 'keep-calm-i-m-just-serial-loser.png',
         },
         {
-          title: 'Serial Winner', //fait
+          title: 'Serial Winner',
           description: 'Win 5 games in a row',
-          picture: 'default.png',
+          picture: 'crown.png',
         },
         {
-          title: 'GPU Eater', //fait
+          title: 'GPU Eater',
           description: 'Connect via 42 intranet',
-          picture: 'default.png',
+          picture: 'gpueater.png',
         },
         {
-          title: "Roger's friend", //fait
-          description: 'Be frien with Roger',
-          picture: 'default.png',
+          title: "Roger's friend",
+          description: 'Be friend with Roger',
+          picture: 'befriend.png',
         },
         {
-          title: 'Good boy', //fait
+          title: 'Good boy',
           description: "Say 'Bonjour' in the General channel",
-          picture: 'default.png',
+          picture: 'goodboy.png',
         },
       ],
     });

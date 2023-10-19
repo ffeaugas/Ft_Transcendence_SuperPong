@@ -197,6 +197,7 @@ export class AuthService {
       return {
         codeRequire: true,
         tmpToken: tmpToken,
+        username: user.login,
       };
     }
     return {

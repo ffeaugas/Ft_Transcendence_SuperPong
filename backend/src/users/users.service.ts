@@ -186,7 +186,7 @@ export class UsersService {
     });
     if (receiver.username === 'Roger') {
       const achievement = await this.prismaService.achievement.findUnique({
-        where: { title: 'Ami de Roger' },
+        where: { title: "Roger's friend" },
       });
       const updatedAchievement = await this.prismaService.profile.update({
         where: { userId: sender.id },
@@ -194,7 +194,7 @@ export class UsersService {
       });
     } else if (sender.username === 'Roger') {
       const achievement = await this.prismaService.achievement.findUnique({
-        where: { title: 'Ami de Roger' },
+        where: { title: "Roger's friend" },
       });
       const updatedAchievement = await this.prismaService.profile.update({
         where: { userId: receiver.id },

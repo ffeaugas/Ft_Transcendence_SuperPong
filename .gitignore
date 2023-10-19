@@ -41,3 +41,9 @@ lerna-debug.log*
 #Uploads
 backend/uploads
 !backend/uploads/avatar/default.png
+!backend/uploads/avatar/crown.png
+!backend/uploads/avatar/goodboy.png
+!backend/uploads/avatar/befriend.png
+!backend/uploads/avatar/gpueater.png
+!backend/uploads/avatar/keep-calm-i-m-just-serial-loser.png
+!backend/uploads/avatar/sadnessAchievement.png
