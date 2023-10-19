@@ -213,7 +213,7 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
       player.x = mapWidth * 0.99;
       player.y = mapHeight / 2;
       ball.r = 10;
-      ball.x = mapWidth / 2;
+      ball.x = 30;
       ball.y = mapHeight / 2;
       ball.celerite = 1;
       ball.angle = 0;
