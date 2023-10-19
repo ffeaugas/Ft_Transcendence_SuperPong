@@ -32,8 +32,6 @@ export default class MainMenuScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("MENU SCENE");
-
     var timesDelay = 10;
     const { width, height } = this.scale;
 
@@ -334,13 +332,11 @@ export default class MainMenuScene extends Phaser.Scene {
           button.name == "PlayButton" &&
           this.input.mousePointer.leftButtonDown()
         ) {
-          console.log(button.name);
           this.scene.start("Loading");
         } else if (
           button.name == "CustomButton" &&
           this.input.mousePointer.leftButtonDown()
         ) {
-          console.log(button.name);
           this.scene.start("LoadingSceneBonus");
         }
       } else {

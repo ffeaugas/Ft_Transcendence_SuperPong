@@ -23,7 +23,6 @@ export default function Achievements({ username }: AchievementsProps) {
       `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/achievement/?user=${username}`
     );
     if (!res.ok) {
-      console.log(res);
       throw new Error("Failed fetching achievements");
     }
     const response = await res.json();

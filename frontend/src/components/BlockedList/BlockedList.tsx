@@ -30,7 +30,6 @@ export default function BlockedList() {
         }
       );
       const blocked = await res.json();
-      console.log("BLOCKED :", blocked);
       return blocked;
     } catch (error) {
       console.error("Error fetching blocked users", error);
@@ -40,7 +39,7 @@ export default function BlockedList() {
 
   const handleRelationChange = async (evt: any) => {
     evt.preventDefault();
-
+    if (userToDeblock === "") return undefined;
     try {
       const res = await axios.patch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/changeRelation`,

@@ -16,18 +16,12 @@ export class SocketEvents {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    //console.log(`client connected : ${client.id}`);
-  }
+  handleConnection(client: Socket) {}
 
-  handleDisconnect(client: Socket) {
-    //console.log(`client disconnected : ${client.id}`);
-  }
+  handleDisconnect(client: Socket) {}
 
   @SubscribeMessage('NEW_MESSAGE')
-  handleEvent(@MessageBody() data: string) {
-    //console.log('data:', data);
-  }
+  handleEvent(@MessageBody() data: string) {}
 
   sendMessage(message: Message) {
     this.server.emit('NEW_MESSAGE', message);

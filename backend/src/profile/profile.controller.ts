@@ -43,7 +43,6 @@ export class ProfileController {
   @Post('upload-pp')
   @UseInterceptors(FileInterceptor('image', multerConfig))
   async uploadFile(@Req() req: any, @UploadedFile() file) {
-    console.log(file);
     return await this.profileService.uploadFile(req, file);
   }
 

@@ -26,7 +26,6 @@ export const useRegister = () => {
     );
     if (res.ok) {
       const json = await res.json();
-      console.log(json);
       localStorage.setItem("Authenticate", "true");
       localStorage.setItem("token", json.access_token);
       setCookie("Authenticate", "true");

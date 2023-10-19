@@ -222,7 +222,6 @@ export default function ProfileEditor() {
         }
       );
       const data = await res.json();
-      console.log("2FA success : ", data);
       setUrlQRCode(null);
       setChecked(true);
     } catch (error) {

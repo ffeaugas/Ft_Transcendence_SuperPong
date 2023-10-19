@@ -44,7 +44,6 @@ export default function Login() {
     if (res.ok) {
       const json = await res.json();
       if (json.codeRequire) {
-        // console.log("FO UN TOKEN: ", json);
         setToken2fa(json.tmpToken);
         return;
       }
@@ -68,7 +67,6 @@ export default function Login() {
 
   async function check2faCode() {
     try {
-      console.log("EEEEEEEEEEEEEEE", loginDatas.code2fa);
       const res = await fetch(
         `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/auth/verif-otp?username=${loginDatas.username}`,
         {
@@ -84,7 +82,6 @@ export default function Login() {
       );
       if (res.ok) {
         const data = await res.json();
-        console.log("2FA success : ", data);
         localStorage.setItem("Authenticate", "true");
         localStorage.setItem("token", data.access_token);
         setCookie("Authenticate", "true");

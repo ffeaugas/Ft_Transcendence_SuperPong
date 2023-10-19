@@ -16,12 +16,18 @@ const DynamicComponentWithNoSSR = dynamic(
 const Game = () => {
   const [loading, setLoading] = useState(false);
   const pathname: string | null = usePathname();
+  const [auth, setAuth] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
   }, []);
 
-  const auth = localStorage.getItem("Authenticate") === "true";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setAuth(localStorage?.getItem("Authenticate") === "true" ? true : false);
+    }
+  }, []);
+
   return (
     <section className={`${styles.page}`}>
       <Header />

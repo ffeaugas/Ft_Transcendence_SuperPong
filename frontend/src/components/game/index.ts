@@ -67,7 +67,6 @@ export default function Index() {
       if (gameInstance) {
         gameInstance.scene.remove("Game");
         gameInstance.destroy(true);
-        console.log(gameInstance.scene);
       }
     };
   }, []);

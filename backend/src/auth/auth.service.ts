@@ -153,7 +153,6 @@ export class AuthService {
       encoding: 'base32',
       token: dto.TwoFaCode,
     });
-    console.log('valid secret: ', user.otp_secret, 'code :', dto.TwoFaCode);
     if (!verified) throw new HttpException('Two factor code not valid.', 401);
     const updatedUser = await this.prisma.user.update({
       where: { username: username },
@@ -171,7 +170,6 @@ export class AuthService {
       data: { otp_url: otpauthUrl, otp_secret: base32 },
     });
     const qrCodeDataURL = await this.respondWithQRCode(otpauthUrl);
-    console.log('secret: ', user.otp_secret, otpauthUrl);
     return { urlData: qrCodeDataURL };
   }
 

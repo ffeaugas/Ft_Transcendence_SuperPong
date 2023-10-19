@@ -188,7 +188,6 @@ export default class GameScene extends Phaser.Scene {
               this.ballLight.y = ball.y;
             });
             this.room.onMessage("otherLeft", () => {
-              console.log("otherleft");
               if (this.finish == 0) {
                 this.finish = 1;
                 this.scoreEntities[1] = this.add
@@ -207,6 +206,18 @@ export default class GameScene extends Phaser.Scene {
                       this.scene.stop();
                       this.game.destroy(true);
                       window.location.reload();
+                      return;
+                    }
+                  }, 3000);
+                } else {
+                  setTimeout(() => {
+                    if (this.game.isRunning) {
+                      this.registry.destroy(); // destroy registry
+                      this.scene.stop();
+                      this.game.destroy(true);
+                      window.location.replace(
+                        `http://${process.env.NEXT_PUBLIC_DOMAIN}:3000/game`
+                      );
                       return;
                     }
                   }, 3000);

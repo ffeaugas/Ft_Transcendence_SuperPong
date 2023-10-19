@@ -1,11 +1,9 @@
 import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { Profile } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ProfileBioUpdateDto, ProfilePictureUpdateDto } from './dto';
-import { Request, Express } from 'express';
+import { ProfileBioUpdateDto } from './dto';
 import * as fs from 'node:fs';
 import { join } from 'path';
-import path from 'node:path';
 
 @Injectable()
 export class ProfileService {
@@ -27,7 +25,6 @@ export class ProfileService {
       if (err) return console.log(err);
       console.log('File deleted successfully');
     });
-    console.log('File uploaded:', file);
     await this.prisma.profile.update({
       where: { userId: req.user.sub },
       data: { profilePicture: file.filename },

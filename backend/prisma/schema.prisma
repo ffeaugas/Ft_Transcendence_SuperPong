@@ -108,9 +108,9 @@ model Mute {
     id            Int      @id @default(autoincrement())
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt()
-    mutedPlayer   User     @relation("userMuted", fields: [mutedPlayerId], references: [id])
+    mutedPlayer   User     @relation("userMuted", fields: [mutedPlayerId], references: [id], onDelete: Cascade)
     mutedPlayerId Int
-    channel       Channel  @relation("channelMute", fields: [channelId], references: [id])
+    channel       Channel  @relation("channelMute", fields: [channelId], references: [id], onDelete: Cascade)
     channelId     Int
 }
 
@@ -119,9 +119,9 @@ model FriendRequest {
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt()
     senderId   Int?
-    sender     User?    @relation("friendReqSender", fields: [senderId], references: [id])
+    sender     User?    @relation("friendReqSender", fields: [senderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     receiverId Int?
-    receiver   User?    @relation("friendReqReceiver", fields: [receiverId], references: [id])
+    receiver   User?    @relation("friendReqReceiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model GameRequest {
@@ -129,9 +129,9 @@ model GameRequest {
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt()
     senderId   Int?
-    sender     User?    @relation("gameReqSender", fields: [senderId], references: [id])
+    sender     User?    @relation("gameReqSender", fields: [senderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     receiverId Int?
-    receiver   User?    @relation("gameReqReceiver", fields: [receiverId], references: [id])
+    receiver   User?    @relation("gameReqReceiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     roomId     Int?
 }
 

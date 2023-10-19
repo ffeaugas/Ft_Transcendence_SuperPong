@@ -198,7 +198,6 @@ export class MyRoomGameBonus extends Room<MyRoomState> {
 
     const player = new Player();
     player.username = options.name;
-    // console.log(player.username);
 
     if (!this.player[0]) {
       player.x = mapWidth * 0.01;

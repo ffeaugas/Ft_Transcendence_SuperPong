@@ -113,9 +113,7 @@ export default class GameSceneBonus extends Phaser.Scene {
         entity.setData("serverX", player.x);
         //entity.y=player.y;
         if (player.status == 1) {
-          this.room.onMessage("connected", (players) => {
-            console.log(this.player);
-          });
+          this.room.onMessage("connected", (players) => {});
           this.room.send("updateStatus", 2);
           entity.setData("serverY", player.y);
         }
@@ -213,7 +211,6 @@ export default class GameSceneBonus extends Phaser.Scene {
             });
 
             this.room.onMessage("otherLeft", () => {
-              console.log("otherleft");
               this.scoreEntities[1] = this.add
                 .rectangle(dim[0] / 2, 20, 610, 50, 0x111111)
                 .setDepth(20);
