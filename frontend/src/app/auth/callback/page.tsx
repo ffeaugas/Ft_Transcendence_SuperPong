@@ -17,7 +17,6 @@ export default function Callback() {
       })
       .then((response) => {
         if (response.data.access_token.codeRequire) {
-          console.log("YA LA 2 FA !!!!!!!!!!!!!!!!!!");
           localStorage.setItem("tmpToken", response.data.access_token.tmpToken);
           localStorage.setItem("username", response.data.access_token.username);
           router.push("/login/checkin");

@@ -266,6 +266,7 @@ export class ChannelsService {
       updatedAdmins = targetChannel.adminUsers.filter(
         (adminUser) => adminUser.username !== targetUser.username,
       );
+      this.socketEvents.kickFromChannel(channelName, targetUser.username);
     }
     const updateChannelAdmins = await this.prisma.channel.update({
       where: { channelName: channelName },

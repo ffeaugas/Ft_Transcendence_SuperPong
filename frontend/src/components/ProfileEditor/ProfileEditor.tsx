@@ -93,6 +93,12 @@ export default function ProfileEditor() {
       if (res.ok) {
         dispatch(setUsername(editedDatas.username));
         router.push(`/profile/${editedDatas.username}`);
+      } else {
+        const data = await res.json();
+        setFeedbackMessage(data.message);
+        setTimeout(() => {
+          setFeedbackMessage("");
+        }, 3000);
       }
     } catch (error) {}
   }
@@ -161,7 +167,7 @@ export default function ProfileEditor() {
       setFeedbackMessage(data.message);
       setTimeout(() => {
         setFeedbackMessage("");
-      }, 2200);
+      }, 3000);
     }
   };
 
@@ -372,14 +378,14 @@ export default function ProfileEditor() {
       </div>
       {urlQRCode && (
         <>
-          <img src={urlQRCode} />
+          <img className={styles.qrCode} src={urlQRCode} />
           <p>Enter the google auth code :</p>
           <input
             type="text"
             id="code2fa"
             name="code2fa"
             value={editedDatas.code2fa}
-            className={styles.imageUploaderInput}
+            className={styles.fieldInput}
             onChange={(evt) => handleChange(evt)}
           />
           <button
