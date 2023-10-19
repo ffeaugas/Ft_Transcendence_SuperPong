@@ -9,11 +9,31 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
   const [link, setLink] = useState<string>("");
-  const username = useSelector((state: RootState) => state.user.username);
+
+  async function getUsername(): Promise<string | undefined> {
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_DOMAIN}:3001/users/me`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    if (res.ok) {
+      const user = await res.json();
+      return user["username"];
+    }
+  }
 
   useEffect(() => {
-    setLink("/profile/" + username);
+    getUsername().then((username) => {
+      if (username) {
+        setLink("/profile/" + username);
+      }
+    });
   }, []);
+
   return (
     <div className={styles.profilePage}>
       <Header />

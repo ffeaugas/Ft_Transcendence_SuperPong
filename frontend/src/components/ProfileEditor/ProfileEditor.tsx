@@ -378,14 +378,14 @@ export default function ProfileEditor() {
       </div>
       {urlQRCode && (
         <>
-          <img src={urlQRCode} />
+          <img className={styles.qrCode} src={urlQRCode} />
           <p>Enter the google auth code :</p>
           <input
             type="text"
             id="code2fa"
             name="code2fa"
             value={editedDatas.code2fa}
-            className={styles.imageUploaderInput}
+            className={styles.fieldInput}
             onChange={(evt) => handleChange(evt)}
           />
           <button

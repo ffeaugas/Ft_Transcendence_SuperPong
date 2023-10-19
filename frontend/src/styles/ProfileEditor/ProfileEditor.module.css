@@ -119,6 +119,23 @@ img.rounded {
   margin: 0;
 }
 
+.qrCode {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.fieldInput {
+  height: 30px;
+  padding: 8px;
+  border: 1px solid var(--titleColor2);
+  border-radius: 10px;
+  background-color: var(--backgroundColor2);
+  width: 80%;
+  max-width: 200px;
+  color: white;
+  margin: 0 auto;
+}
+
 .errorMessage {
   color: red;
 }
